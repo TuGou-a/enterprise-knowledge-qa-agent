@@ -37,6 +37,7 @@ class WireContractTest {
         assertThat(request.history()).extracting(Message::role).containsExactly(Role.USER, Role.ASSISTANT);
         assertThat(mapper.readTree(mapper.writeValueAsString(request)).at("/history/0/role").asText()).isEqualTo("user");
         assertThat(mapper.readValue("{\"question\":\"报销期限多久？\"}", QaRequest.class).history()).isEmpty();
+        assertThat(mapper.readValue("{\"question\":\"报销期限多久？\",\"history\":null}", QaRequest.class).history()).isEmpty();
     }
 
     @ParameterizedTest

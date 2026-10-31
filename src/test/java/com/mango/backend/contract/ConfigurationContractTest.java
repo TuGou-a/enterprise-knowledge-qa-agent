@@ -12,8 +12,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.bind.validation.BindValidationException;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.FieldError;
 
 import javax.sql.DataSource;
 import java.net.URI;
@@ -152,10 +154,17 @@ class ConfigurationContractTest {
         new ApplicationContextRunner().withUserConfiguration(DatabaseBinding.class)
                 .withPropertyValues("spring.datasource.url=jdbc:postgresql://example.test/test",
                         "spring.datasource.username=synthetic-user", "spring.datasource.password=")
-                .run(context -> assertThat(context).hasFailed());
+                .run(context -> {
+                    assertThat(context).hasFailed();
+                    assertThat(context.getStartupFailure()).rootCause()
+                            .isInstanceOfSatisfying(BindValidationException.class, failure ->
+                                    assertThat(failure.getValidationErrors().getAllErrors()).anySatisfy(error ->
+                                            assertThat(error).isInstanceOfSatisfying(FieldError.class,
+                                                    field -> assertThat(field.getField()).isEqualTo("password"))));
+                });
     }
 
-    @Configuration(proxyBeanMethods = false)
+    @TestConfiguration(proxyBeanMethods = false)
     @EnableConfigurationProperties(DatabaseProperties.class)
     static class DatabaseBinding {}
 }
