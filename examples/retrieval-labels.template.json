@@ -1,0 +1,31 @@
+{
+  "materialType": "UNFILLED_ANNOTATION_TEMPLATE",
+  "annotationStatus": "PENDING_T04_CORPUS",
+  "relevanceScale": "BINARY",
+  "queries": [
+    {
+      "queryId": "E01",
+      "snapshotId": null,
+      "query": "报销期限是多久？",
+      "relevantClauses": null,
+      "conflictPairs": null,
+      "expectedAnswer": null
+    },
+    {
+      "queryId": "E02",
+      "snapshotId": null,
+      "query": "报销期限是多久？",
+      "relevantClauses": null,
+      "conflictPairs": null,
+      "expectedAnswer": null
+    },
+    {
+      "queryId": "E04",
+      "snapshotId": null,
+      "query": "费用发生后，最迟多长时间内要提交报销？",
+      "relevantClauses": null,
+      "conflictPairs": null,
+      "expectedAnswer": null
+    }
+  ]
+}
