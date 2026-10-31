@@ -23,7 +23,7 @@
 
 按用户确认，采用 AgentScope Java `2.0.4` 发行版。该版本的[根 POM](https://github.com/agentscope-ai/agentscope-java/blob/v2.0.4/pom.xml) 声明版本 `2.0.4`，编译目标为 Java 17；另见[发行说明](https://github.com/agentscope-ai/agentscope-java/releases/tag/v2.0.4)。
 
-本项目需要 ReAct 决策与 Java 工具调用，可依赖 `agentscope-core` 和 OpenAI 兼容模型扩展。以下片段是拟加入现有 POM 的配置，尚未修改业务工程：
+本项目需要 ReAct 决策与 Java 工具调用，可依赖 `agentscope-core` 和 OpenAI 兼容模型扩展。T01 已将以下依赖声明写入根 POM；配置与共享契约见 [T01 交接](08-t01-contracts.md)，尚未进行依赖解析或运行验证：
 
 ```xml
 <properties>
@@ -58,7 +58,7 @@
 
 依据：发行版 [AgentScope dependencies BOM 第 72、73 行](https://github.com/agentscope-ai/agentscope-java/blob/v2.0.4/agentscope-dependencies-bom/pom.xml#L72)，以及本机 Maven 缓存中的 `spring-boot-dependencies-3.5.10.pom` 与 `reactor-bom-2024.0.14.pom`。应用父 POM 的依赖管理会影响传递依赖，普通模块接入仍可能选中低于框架构建基线的版本。这里确认的是版本基线差异，尚未证明发生缺失方法或链接错误，实际选中版本以实施后的依赖树为准。
 
-实施首先核查 `mvn dependency:tree -Dincludes=io.projectreactor:*,io.projectreactor.netty:*,com.fasterxml.jackson.core:*,com.fasterxml.jackson.datatype:*`，随后按项目约定验证 Java 17 编译、Boot 启动和真实工具结构化调用；本轮没有执行这些命令。保留用户选择的 Boot 3.5.10，不在设计阶段未经验证地覆盖整个 Reactor/Jackson BOM，也不引入面向 Boot 4 的 starter。若验证失败，根据实际错误调整兼容依赖后再继续业务实现。
+收到用户测试指令后，首先核查 `mvn dependency:tree -Dincludes=io.projectreactor:*,io.projectreactor.netty:*,com.fasterxml.jackson.core:*,com.fasterxml.jackson.datatype:*`，随后按项目约定验证 Java 17 编译、Boot 启动和真实工具结构化调用；本轮没有执行这些命令。保留用户选择的 Boot 3.5.10，不在设计阶段未经验证地覆盖整个 Reactor/Jackson BOM，也不引入面向 Boot 4 的 starter。若验证失败，根据实际错误调整兼容依赖后再继续业务实现。
 
 ## DeepSeek 官方 API
 
