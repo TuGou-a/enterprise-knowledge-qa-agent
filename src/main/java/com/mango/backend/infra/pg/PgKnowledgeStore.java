@@ -149,8 +149,11 @@ public class PgKnowledgeStore implements KnowledgeStore {
     @Override
     public List<RecallHit> searchKeyword(String snapshotId, List<String> tokens, int limit, Duration timeout) {
         requireLimit(limit);
-        return database(timeout, true, () -> tokens.isEmpty()
-                ? List.of() : hits(mapper.searchKeyword(snapshotId, tokens, limit)));
+        if (tokens.isEmpty()) {
+            requirePositiveTimeout(timeout);
+            return List.of();
+        }
+        return database(timeout, true, () -> hits(mapper.searchKeyword(snapshotId, tokens, limit)));
     }
 
     @Override
@@ -205,6 +208,10 @@ public class PgKnowledgeStore implements KnowledgeStore {
         return database(timeout, true, () -> {
             var rows = mapper.loadChunks(key.document().snapshotId(), List.of(key));
             if (rows.isEmpty()) {
+                var snapshot = mapper.findSnapshot(key.document().snapshotId());
+                if (snapshot != null && snapshot.state() != SnapshotState.READY) {
+                    throw failure(Failure.Code.SNAPSHOT_UNAVAILABLE, "指定资料快照尚未发布", false);
+                }
                 return Optional.empty();
             }
             var row = rows.get(0);
@@ -267,11 +274,15 @@ public class PgKnowledgeStore implements KnowledgeStore {
         }
     }
 
-    /** 短事务是同步数据库调用的边界；不跨模型调用，也不共享可变请求状态。 */
-    private <T> T database(Duration timeout, boolean readOnly, Supplier<T> operation) {
+    private void requirePositiveTimeout(Duration timeout) {
         if (timeout == null || timeout.isNegative() || timeout.isZero()) {
             throw failure(Failure.Code.INVALID_ARGUMENT, "数据库超时必须为正数", false);
         }
+    }
+
+    /** 短事务是同步数据库调用的边界；不跨模型调用，也不共享可变请求状态。 */
+    private <T> T database(Duration timeout, boolean readOnly, Supplier<T> operation) {
+        requirePositiveTimeout(timeout);
         if (timeout.compareTo(Duration.ofSeconds(1)) < 0) {
             throw failure(Failure.Code.BUDGET_EXHAUSTED, "数据库剩余预算不足一秒，未开始新查询", false);
         }
