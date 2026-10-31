@@ -60,12 +60,17 @@ public final class SiliconFlowEmbeddingClient implements EmbeddingClient {
             }
             var embedding = requiredArray(item, "embedding");
             var values = new float[embedding.size()];
+            boolean hasNonZero = false;
             for (int i = 0; i < values.length; i++) {
                 var value = embedding.get(i);
                 if (!value.isNumber()) {
                     throw failure(INVALID_RESPONSE, "Embedding 向量分量必须为数值");
                 }
                 values[i] = value.floatValue();
+                hasNonZero |= values[i] != 0.0f;
+            }
+            if (!hasNonZero) {
+                throw failure(INVALID_RESPONSE, "Embedding 不能为零向量");
             }
             try {
                 // 维度和有限性由内部值类型一次性约束，边界转换为模型协议错误。
