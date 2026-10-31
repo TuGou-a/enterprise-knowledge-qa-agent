@@ -8,7 +8,7 @@
 
 `BackendApplication` 扫描 `contract.config`。`AgentProperties` 绑定 `knowledge-agent`，`DatabaseProperties` 绑定 `spring.datasource`，使用 `@Validated` 及嵌套 `@Valid` 做启动校验。真实模式缺少任一模型密钥或数据库密码时启动失败；数据库用户名有默认值，显式配置为空也会校验失败；数值必须满足声明的范围和组合约束。启动校验不调用真实模型，不证明密钥有效或服务可用。配置对象的 `toString()` 隐藏密钥及数据库连接信息；异常、HTTP 响应、提示词和 Trace 不得输出配置对象的原始字段或外部原始错误体。
 
-当前默认只有真实配置。T09 负责后续离线 Mock 隔离：Mock profile 不能绑定真实配置类，也不能自动配置真实数据源；不得用占位密钥使其伪装成真实模式。根目录 `.env` 不会自动加载。
+当前默认只有真实配置。用户在 T09 范围讨论中确认：离线入口放在 `src/test/`，通过 Maven 测试运行，不新增 Mock HTTP 服务。本轮只准备契约测试与隔离配置绑定测试，不扫描真实应用、不创建数据源，也不用占位密钥启动真实模式；完整 Mock 问答待 T07 等业务实现合并后以模型和工具替身补齐，R10 仍待完成。此决定替代先前 Mock profile 的入口设想，见 [评估文档](03-evaluation.md)。根目录 `.env` 不会自动加载。
 
 ### 配置清单
 

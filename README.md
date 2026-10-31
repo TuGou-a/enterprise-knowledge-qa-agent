@@ -2,7 +2,7 @@
 
 面向报销与差旅制度的知识问答项目。通过检索和原文读取工具，帮助员工获得有文档依据的回答；资料冲突或不足时，明确说明限制并请求补充信息。
 
-当前阶段已完成需求讨论与架构设计，业务功能尚未实现。本文中的依赖、接口、数据表和运行配置属于实施方案，不代表已经编译、启动或通过验收。
+本轮 T09 基于已合并的 T01：依赖声明、真实配置校验与共享契约已经落地，本轮补充契约测试和交付材料。该基线尚无完整问答、导入与检索业务实现；完整离线 Mock、真实输出及评估结论待后续补齐。尚未执行依赖解析、编译、启动或测试。
 
 ## 文档入口
 
@@ -10,7 +10,22 @@
 - [需求基线](docs/01-requirements.md)：题目要求、已确认范围与验收点。
 - [详细方案](docs/02-solution.md)：模块职责、工具契约和失败处理。
 - [框架接入核查](docs/framework-verification.md)：官方来源、发行版 API 与兼容性边界。
+- [开发计划](docs/06-parallel-development-plan.md)与[T01 契约](docs/08-t01-contracts.md)：任务边界、类型及待验证事项。
+- [测试与评估](docs/03-evaluation.md)、[AI 使用记录](docs/04-ai-usage.md)和[阶段复盘](docs/05-retrospective.md)。
+- [示例与证据说明](examples/README.md)：验收输入、标注模板和后续运行证据的保存方式，当前没有实际输出或 Trace。
 - [业务术语表](GLOSSARY.md)与[数据库选型决策](docs/adr/0001-postgres-hybrid-retrieval.md)。
+
+## 当前测试入口
+
+需要 Java 17 和已安装的 Maven（可使用 Maven 3.9 系列）；仓库未提供 Maven Wrapper。首次准备插件和依赖可能需要网络；契约测试本身不需要业务密钥、PostgreSQL 或云模型。收到测试指令后，在项目根目录执行：
+
+```bash
+mvn -Dtest='*ContractTest' test
+```
+
+测试覆盖向量合法性、配置约束、读取结果互斥、资料排序和 JSON 契约；不加载完整应用。实际命令尚未运行，测试报告待生成。依赖全部缓存后才可尝试加 `-o` 断网执行。当前入口不能证明完整 Mock 问答、真实检索或模型决策。
+
+评审可先阅读 [需求映射和测试边界](docs/03-evaluation.md)，再检查 `src/test/` 和 `examples/`。完整问答运行步骤、真实数据库初始化及资料导入命令待对应模块合并后补充并验证。
 
 ## 已确认的项目范围
 
@@ -91,43 +106,15 @@ AgentScope 默认并行执行同轮工具。首期显式采用 `ToolkitConfig.pa
 
 请求使用 `question` 和可选 `history`；后端只维护当前请求的执行上下文。调用方需要负责传回历史，服务端不提供跨请求会话恢复。历史仅用于理解追问，不能直接作为制度依据，每次回答仍需核对当前资料。
 
-## Maven 依赖方案
+## Maven 依赖声明
 
-沿用现有 Spring Boot parent，在原有依赖基础上增加下列依赖。以下是设计片段，尚未写入根目录 `pom.xml`；实际依赖树、Java 17 编译和启动结果待实施验证。
-
-```xml
-<dependency>
-    <groupId>io.agentscope</groupId>
-    <artifactId>agentscope-core</artifactId>
-    <version>2.0.4</version>
-</dependency>
-<dependency>
-    <groupId>io.agentscope</groupId>
-    <artifactId>agentscope-extensions-model-openai</artifactId>
-    <version>2.0.4</version>
-</dependency>
-<dependency>
-    <groupId>org.mybatis.spring.boot</groupId>
-    <artifactId>mybatis-spring-boot-starter</artifactId>
-    <version>3.0.5</version>
-</dependency>
-<dependency>
-    <groupId>org.postgresql</groupId>
-    <artifactId>postgresql</artifactId>
-    <scope>runtime</scope>
-</dependency>
-<dependency>
-    <groupId>com.huaban</groupId>
-    <artifactId>jieba-analysis</artifactId>
-    <version>1.0.2</version>
-</dependency>
-```
+根目录 [pom.xml](pom.xml) 已声明 AgentScope core/OpenAI 扩展 2.0.4、MyBatis starter 3.0.5、jieba 1.0.2、PostgreSQL 驱动、Reactor、Validation 和 Spring Boot Test；沿用现有 Spring Boot parent。T09 复用已有测试依赖，没有新增依赖或覆盖 BOM。实际依赖树、Java 17 编译和启动结果待后续验证。
 
 PostgreSQL 驱动版本交由现有 Spring Boot 依赖管理。业务服务通过 MyBatis Mapper 完成持久化；Mapper XML 集中维护参数化 SQL，RRF 与重排序协调在 `HybridSearchService` 中完成。
 
-## 配置方案
+## 配置与启动边界
 
-配置清单见 [.env.example](.env.example)。真实密钥通过环境变量提供；示例文件不包含真实密钥。Spring Boot 默认不会自动加载项目根目录的 `.env` 文件，实施时需要由启动终端、IDE 或容器显式注入环境变量。
+配置清单见 [.env.example](.env.example) 与 [T01 契约](docs/08-t01-contracts.md)。配置绑定和值约束已经实现；真实模式需要两家模型服务密钥和数据库凭据，缺失时启动校验失败，账号可用性仍待实际调用验证。真实密钥通过环境变量提供；示例文件不包含真实密钥。Spring Boot 默认不会自动加载项目根目录的 `.env` 文件，需要由启动终端、IDE 或容器显式注入环境变量。当前契约测试入口与真实启动配置隔离。
 
 应用负责读取 `DEEPSEEK_BASE_URL`、`DEEPSEEK_MODEL` 并传给 Provider；它不会自动读取这两个变量。固定版的窗口表尚不认识 `deepseek-flash`，需要在 `ModelCreationContext` 中通过 `option("contextWindowSize", configuredWindow)` 显式设置核查后的窗口。该名称仍按当前 DeepSeek 官方建议保留，实际输入预算由应用另行限制。
 
@@ -150,8 +137,8 @@ PostgreSQL 驱动版本交由现有 Spring Boot 依赖管理。业务服务通�
 
 ## 运行与验证状态
 
-当前已有应用启动骨架，问答接口、知识入库、数据库初始化和 Mock 模式尚未实现。因此暂不提供会被误认为已可用的完整问答启动命令。实施完成后，README 需补充环境安装、数据初始化、真实模式、Mock 模式与测试命令，并逐条执行验证。
+本轮任务基线只有应用启动骨架、配置与共享契约，问答接口、知识入库、数据库初始化和完整 Mock 模式尚未实现。完整问答启动、资料导入及 Mock 流程命令待对应模块合并后补充。当前仅提供上文的契约测试命令，未执行验证。
 
 验收材料至少覆盖明确答案、文档冲突、资料外问题、相似改写、上下文追问和工具失败；另验证执行上限与文档替换。Mock 验证流程，真实模型 Trace 证明动作调整，二者分别标注，结果引用对应文件。
 
-当前 Git 根目录、`pom.xml`、`src/`、README 与 `docs/` 已位于同一项目根目录。提交考核时仍需补齐实际代码、资料与验证材料；本次仅更新设计文档，未调整 Git 历史。
+当前 Git 根目录、`pom.xml`、`src/`、README 与 `docs/` 位于同一项目根目录。最终交付仍需补齐业务代码、资料、R01–R10 验收证据与实测结论，记录实际投入时间和未完成项，并提交题号、GitHub URL 与最终 commit SHA；当前不预填。T09 按独立 Worktree 开发、子代理静态审查并合并 `dev` 的流程交付，合并后等待用户测试指令。
