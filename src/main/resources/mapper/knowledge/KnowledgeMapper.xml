@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mango.backend.infra.pg.KnowledgeMapper">
+    <resultMap id="snapshot" type="com.mango.backend.infra.pg.PgRows$Snapshot">
+        <constructor>
+            <idArg column="snapshot_id" javaType="java.lang.String"/>
+            <arg column="state" javaType="com.mango.backend.contract.knowledge.KnowledgeTypes$SnapshotState"/>
+            <arg column="embedding_model" javaType="java.lang.String"/>
+            <arg column="embedding_dimension" javaType="_int"/>
+            <arg column="preprocessing_version" javaType="java.lang.String"/>
+            <arg column="tokenizer_version" javaType="java.lang.String"/>
+            <arg column="dictionary_version" javaType="java.lang.String"/>
+            <arg column="stop_words_version" javaType="java.lang.String"/>
+            <arg column="content_hash" javaType="java.lang.String"/>
+            <arg column="created_at" javaType="java.time.Instant"/>
+            <arg column="published_at" javaType="java.time.Instant"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="chunk" type="com.mango.backend.infra.pg.PgRows$Chunk">
+        <constructor>
+            <idArg column="snapshot_id" javaType="java.lang.String"/>
+            <idArg column="document_id" javaType="java.lang.String"/>
+            <idArg column="version" javaType="java.lang.String"/>
+            <arg column="title" javaType="java.lang.String"/>
+            <arg column="version_date" javaType="java.time.LocalDate"/>
+            <arg column="applicable_scope" javaType="java.lang.String"/>
+            <arg column="supersedes" javaType="java.util.List"
+                 typeHandler="com.mango.backend.infra.pg.DocumentRefsTypeHandler"/>
+            <arg column="document_hash" javaType="java.lang.String"/>
+            <idArg column="chunk_id" javaType="java.lang.String"/>
+            <arg column="topic_key" javaType="java.lang.String"/>
+            <arg column="content" javaType="java.lang.String"/>
+            <arg column="start_offset" javaType="_int"/>
+            <arg column="end_offset" javaType="_int"/>
+            <arg column="content_hash" javaType="java.lang.String"/>
+            <arg column="raw_score" javaType="_double"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="documentHash" type="com.mango.backend.infra.pg.PgRows$DocumentHash">
+        <constructor>
+            <idArg column="document_id" javaType="java.lang.String"/>
+            <idArg column="version" javaType="java.lang.String"/>
+            <arg column="content_hash" javaType="java.lang.String"/>
+        </constructor>
+    </resultMap>
+
+    <sql id="chunkColumns">
+        c.snapshot_id, c.document_id, c.version, d.title, d.version_date, d.applicable_scope,
+        d.supersedes, d.content_hash AS document_hash, c.chunk_id, c.topic_key, c.content,
+        c.start_offset, c.end_offset, c.content_hash
+    </sql>
+    <sql id="chunkJoins">
+        FROM kb_chunk c
+        JOIN kb_document d USING (snapshot_id, document_id, version)
+        JOIN kb_corpus s ON s.snapshot_id = c.snapshot_id AND s.state = 'READY'
+    </sql>
+    <sql id="stableOrder">
+        c.snapshot_id COLLATE "C" ASC, c.document_id COLLATE "C" ASC,
+        c.version COLLATE "C" ASC, c.chunk_id COLLATE "C" ASC
+    </sql>
+
+    <select id="latestReadySnapshot" resultMap="snapshot">
+        SELECT * FROM kb_corpus WHERE state = 'READY'
+        ORDER BY published_at DESC, snapshot_id COLLATE "C" ASC LIMIT 1
+    </select>
+    <select id="findSnapshot" resultMap="snapshot">
+        SELECT * FROM kb_corpus WHERE snapshot_id = #{snapshotId}
+    </select>
+    <select id="lockSnapshot" resultMap="snapshot" flushCache="true" useCache="false">
+        SELECT * FROM kb_corpus WHERE snapshot_id = #{snapshotId} FOR UPDATE
+    </select>
+    <insert id="createSnapshot">
+        INSERT INTO kb_corpus (snapshot_id, state, embedding_model, embedding_dimension,
+            preprocessing_version, tokenizer_version, dictionary_version, stop_words_version,
+            content_hash, created_at, published_at)
+        VALUES (#{snapshot.snapshotId}, 'BUILDING', #{snapshot.indexProfile.embeddingModel},
+            #{snapshot.indexProfile.embeddingDimension}, #{snapshot.indexProfile.preprocessingVersion},
+            #{snapshot.indexProfile.tokenizerVersion}, #{snapshot.indexProfile.dictionaryVersion},
+            #{snapshot.indexProfile.stopWordsVersion}, #{snapshot.contentHash,jdbcType=VARCHAR},
+            #{snapshot.createdAt}, NULL)
+    </insert>
+    <insert id="insertDocuments">
+        INSERT INTO kb_document (snapshot_id, document_id, version, title, version_date,
+            applicable_scope, supersedes, content, content_hash) VALUES
+        <foreach collection="documents" item="doc" separator=",">
+            (#{doc.metadata.key.snapshotId}, #{doc.metadata.key.documentId}, #{doc.metadata.key.version},
+             #{doc.metadata.title}, #{doc.metadata.versionDate}, #{doc.metadata.applicableScope,jdbcType=VARCHAR},
+             CAST(#{doc.metadata.supersedes,typeHandler=com.mango.backend.infra.pg.DocumentRefsTypeHandler} AS jsonb),
+             #{doc.content}, #{doc.metadata.contentHash})
+        </foreach>
+    </insert>
+    <insert id="insertChunks">
+        INSERT INTO kb_chunk (snapshot_id, document_id, version, chunk_id, topic_key, content,
+            start_offset, end_offset, content_hash, search_vector, embedding) VALUES
+        <foreach collection="chunks" item="row" separator=",">
+            (#{row.chunk.key.document.snapshotId}, #{row.chunk.key.document.documentId},
+             #{row.chunk.key.document.version}, #{row.chunk.key.chunkId}, #{row.chunk.topicKey},
+             #{row.chunk.content}, #{row.chunk.startOffset}, #{row.chunk.endOffset}, #{row.chunk.contentHash},
+             to_tsvector('simple'::regconfig, #{row.tokenText}), CAST(#{row.vector} AS vector))
+        </foreach>
+    </insert>
+    <select id="documentHashes" resultMap="documentHash">
+        SELECT document_id, version, content_hash FROM kb_document WHERE snapshot_id = #{snapshotId}
+        ORDER BY document_id COLLATE "C" ASC, version COLLATE "C" ASC
+    </select>
+    <select id="countChunks" resultType="long">
+        SELECT count(*) FROM kb_chunk WHERE snapshot_id = #{snapshotId}
+    </select>
+    <update id="publishSnapshot">
+        UPDATE kb_corpus SET state = 'READY', content_hash = #{contentHash}, published_at = clock_timestamp()
+        WHERE snapshot_id = #{snapshotId} AND state = 'BUILDING'
+    </update>
+    <select id="searchVector" resultMap="chunk">
+        SELECT <include refid="chunkColumns"/>,
+               c.embedding &lt;=&gt; CAST(#{vector} AS vector) AS raw_score
+        <include refid="chunkJoins"/>
+        WHERE c.snapshot_id = #{snapshotId}
+        ORDER BY raw_score ASC, <include refid="stableOrder"/>
+        LIMIT #{limit}
+    </select>
+    <select id="searchKeyword" resultMap="chunk">
+        SELECT <include refid="chunkColumns"/>,
+               ts_rank_cd(c.search_vector, q.query)::double precision AS raw_score
+        <include refid="chunkJoins"/>
+        CROSS JOIN (SELECT
+            <foreach collection="tokens" item="token" separator=" || ">
+                plainto_tsquery('simple'::regconfig, #{token})
+            </foreach>
+            AS query) q
+        WHERE c.snapshot_id = #{snapshotId} AND c.search_vector @@ q.query
+        ORDER BY raw_score DESC, <include refid="stableOrder"/>
+        LIMIT #{limit}
+    </select>
+    <select id="expandTopics" resultMap="chunk">
+        SELECT <include refid="chunkColumns"/>, 0.0::double precision AS raw_score
+        <include refid="chunkJoins"/>
+        WHERE c.snapshot_id = #{snapshotId} AND c.topic_key IN
+        <foreach collection="topics" item="topic" open="(" separator="," close=")">#{topic}</foreach>
+        <if test="!excluded.isEmpty()">
+            AND (c.document_id, c.version, c.chunk_id) NOT IN
+            <foreach collection="excluded" item="key" open="(" separator="," close=")">
+                (#{key.document.documentId}, #{key.document.version}, #{key.chunkId})
+            </foreach>
+        </if>
+        ORDER BY c.topic_key COLLATE "C" ASC, <include refid="stableOrder"/>
+        LIMIT #{limit}
+    </select>
+    <select id="loadChunks" resultMap="chunk">
+        SELECT <include refid="chunkColumns"/>, 0.0::double precision AS raw_score
+        <include refid="chunkJoins"/>
+        WHERE c.snapshot_id = #{snapshotId} AND (c.document_id, c.version, c.chunk_id) IN
+        <foreach collection="keys" item="key" open="(" separator="," close=")">
+            (#{key.document.documentId}, #{key.document.version}, #{key.chunkId})
+        </foreach>
+    </select>
+</mapper>
