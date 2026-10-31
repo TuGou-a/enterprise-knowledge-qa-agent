@@ -83,7 +83,7 @@
 ```
 
 - 文档 ID、版本、标题和原文必须是非空白字符串；版本日期使用有效的 `YYYY-MM-DD` 日期。原文保留反序列化后字符串的全部字符，不去除首尾空白、不替换换行、不做 Unicode 归一化。
-- `applicableScope` 为字符串或 `null`，`null` 表示未知；`supersedes` 为明确替代对象的数组，元素沿用 `DocumentRef` 的 `documentId`、`version`。首批三组资料均不声明替代关系，冲突双方的适用范围均未知。
+- `applicableScope` 为字符串或 `null`，`null` 表示未知；`supersedes` 为明确替代对象的数组，元素沿用 `DocumentRef` 的 `documentId`、`version`，目标须在本份完整资料中且不能重复或指向自身。首批三组资料均不声明替代关系，冲突双方的适用范围均未知。
 - `clauseTopics` 的键为原文条款的正整数编号字符串，值为非空白的中性主题；每个条款恰有一个主题标注，不接受不存在的条款标注。同主题使用相同值，保证两份期限规定能够被主题扩展同时发现。
 - 使用导入专用的严格 JSON 读取配置，拒绝重复 JSON 字段、未知字段、尾随 JSON 值、类型强转、重复文档版本及重复条款编号。错误指出字段或文档、条款标识，不回显完整原文。
 - 文档键、条款与主题覆盖、元数据及替代引用的结构在输入边界集中校验；不宣称结构校验能证明原文语义、制度效力或答案支持性。合成资料中的适用条件、替代关系和主题语义仍须在资料编写及静态审查中核对。
@@ -147,3 +147,9 @@ T04 在 `data/README.md` 中提供静态文档、条款和主题对应表。快�
 已确认业务术语及时写入根目录 `GLOSSARY.md`；只有涉及难以逆转、存在真实取舍且需要解释原因的决定才新增 ADR。代码开发遵守独立 Worktree、主代理实现、子代理审查、合并 `dev` 后清理 Worktree 的流程；编译、启动、测试和真实导入等待用户后续指令。
 
 本轮复用 [ADR 0003](adr/0003-immutable-published-corpus.md) 的不可变快照与完整重导决定。输入格式、命令参数和默认词典等属于当前范围内可调整的实现约定，不另建重复 ADR。
+
+## 实施与审查记录
+
+任务 Worktree 为 `/private/tmp/agent-t04-ingestion`，任务分支为 `task/t04-ingestion`，开发基线为 `fba3c4d`。主代理已完成首版代码和三组资料，接下来由子代理进行规范及契约两个方向的静态审查。尚未执行编译、启动、测试、依赖解析、数据库初始化或真实模型与导入调用。
+
+交付包含独立的 `IngestionApplication`、`CorpusImporter`、严格的输入读取与条款切分、哈希实现及共享的 `JiebaKnowledgeTokenizer`。入口与操作说明见 [data/README.md](../data/README.md)，词典库的静态取证与处理边界见 [T04 踩坑记录](pitfalls/T04-jieba-dictionary-loading.md)。
