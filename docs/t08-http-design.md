@@ -8,7 +8,7 @@
 - 实现范围：`src/main/java/com/mango/backend/qa/api/**`，复用 `QaRequest`、`QaService`、`AnswerEnvelope` 与 `Result`，不修改共享类型或实现 T07 问答服务。
 - 入口：`POST /api/qa`，返回单次最终 JSON 结果。长度限制和主要 HTTP 状态沿用 T01。
 - 当前 T07 尚未交付服务实现。T08 的静态交接不代表接口已能启动、完成问答或通过运行验收。
-- 开发完成后由子代理审查，合并至 `dev` 并删除任务 worktree；编译、启动、测试与真实接口验证等待用户后续指令。
+- 开发完成后由子代理审查并修复问题。按用户本轮最新确认，合并至 `dev` 后删除任务 worktree；编译、启动、测试与真实接口验证等待用户后续指令。
 
 ## 已确认：严格校验 JSON
 
@@ -38,10 +38,10 @@
 | `RATE_LIMITED`、`AUTHENTICATION_FAILED`、`UPSTREAM_UNAVAILABLE`、`INVALID_RESPONSE`、`DATABASE_UNAVAILABLE` | 502 |
 | `NOT_FOUND`、`INVALID_ARGUMENT`、`INPUT_LIMIT_EXCEEDED`、`BUDGET_EXHAUSTED`、`INTERNAL_ERROR` | 500 |
 
-- 请求自身的格式、类型、必填及非空白校验失败返回 400；配置长度超限返回 413。服务内部异常不按请求输入错误处理，取舍见 [ADR 0003](adr/0003-http-failure-boundary.md)。
+- 请求自身的格式、类型、必填及非空白校验失败返回 400；配置长度超限返回 413。服务内部异常不按请求输入错误处理，取舍见 [ADR 0004](adr/0004-http-failure-boundary.md)。
 - 未预期异常返回 500。MVC 的方法、媒体类型等错误保留框架 HTTP 语义，例如 405、406、415，并统一响应外层。
 - 错误响应为 `Result<Void>`，`code` 与 HTTP 状态一致，`data` 为 `null`。输入错误指出字段或限制；其他错误使用固定提示，不回显原始输入、上游错误体或堆栈。
-- 日志只记录依赖错误类别或未处理异常类型，不记录异常消息、原始请求、堆栈或配置值。
+- T08 自身的日志只记录依赖错误类别或未处理异常类型，不记录异常消息、原始请求、堆栈或配置值。框架 DEBUG/TRACE 可能记录请求或异步异常，当前默认日志级别下未开启这些日志；调整框架日志级别前需另行核对脱敏范围。
 - 若问答服务以空 `Mono` 结束，视为未能提供任务结果，返回 500，避免以空响应表示成功。
 
 ## 已确认：MVC 异步超时兜底
@@ -55,7 +55,7 @@
 
 - `QaController`：执行配置长度校验，保留原始请求内容，通过 `Mono` 调用 T07 并包装最终响应。
 - `QaWebConfiguration`：为 `QaRequest` 注册独立的 HTTP JSON Mapper 副本，拒绝未知字段和数字、布尔值向字符串强转；同时配置 MVC 超时。共享 Mapper 和模型草稿解析规则保持原有行为。
-- `QaExceptionHandler`：统一输入、依赖、MVC 和未预期异常响应；不复用异常原始消息构造公开系统错误。
+- `QaExceptionHandler`：仅处理当前应用上下文下 `/api/qa` 路径的输入、依赖、MVC 和未预期异常响应；保留 MVC 的状态与协议头，不复用异常原始消息构造公开系统错误。其他路径重新抛出原异常，继续交由框架处理。按路径限定是因为方法和媒体类型错误可能发生在 Controller 匹配之前。
 - `QaInputLimitException`：仅标识 HTTP 输入的配置长度超限，消息只包含字段和服务端上限。
 - T07 须提供 Spring 可发现的 `QaService` Bean，内部可解释失败由其组装 `AnswerEnvelope`；T08 不提供占位服务。
 - T09 后续编写 HTTP 用例：有效输入、全部五类任务状态、历史缺省/null/连续同角色、必填及类型错误、未知字段、各长度边界、全部依赖错误码、空结果及 MVC 超时。运行时需执行 MVC 异步分派，不能只核对第一次返回。
