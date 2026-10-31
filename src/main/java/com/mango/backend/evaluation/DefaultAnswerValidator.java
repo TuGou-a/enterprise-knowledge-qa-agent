@@ -27,6 +27,21 @@ public final class DefaultAnswerValidator implements AnswerValidator {
         boolean readFailed = !retrieval.unresolvedReadErrors().isEmpty();
         boolean topicTruncated = retrieval.truncated();
 
+        // 插入顺序就是 T01 的失败优先级；只采信实际预算标志。
+        var failures = new LinkedHashSet<AnswerReason>();
+        if (budget.deadlineExceeded()) {
+            failures.add(AnswerReason.DEADLINE_EXCEEDED);
+        }
+        if (budget.toolLimitExceeded()) {
+            failures.add(AnswerReason.BUDGET_EXHAUSTED);
+        }
+        if (budget.iterationLimitExceeded()) {
+            failures.add(AnswerReason.MAX_ITERATIONS);
+        }
+        if (budget.textLimitExceeded()) {
+            failures.add(AnswerReason.INPUT_LIMIT_EXCEEDED);
+        }
+
         // 仅模型草稿是不可信输入；运行上下文与已读证据沿用各自边界的契约。
         boolean structureValid = draft != null && draft.status() != null && draft.reason() != null
                 && hasText(draft.answer()) && draft.citations() != null && draft.evidenceGaps() != null
@@ -44,21 +59,16 @@ public final class DefaultAnswerValidator implements AnswerValidator {
                 case NO_EVIDENCE -> draft.reason() == AnswerReason.OUT_OF_CORPUS
                         && !draft.evidenceGaps().isEmpty();
                 case INCOMPLETE -> switch (draft.reason()) {
-                    case ROUTE_FAILED, READ_FAILED, TOPIC_TRUNCATED, BUDGET_EXHAUSTED,
-                         MAX_ITERATIONS, INPUT_LIMIT_EXCEEDED, DEADLINE_EXCEEDED, MODEL_FAILED,
-                         OUTPUT_INVALID, CITATION_INVALID -> true;
+                    case ROUTE_FAILED -> routeFailed;
+                    case READ_FAILED -> readFailed;
+                    case TOPIC_TRUNCATED -> topicTruncated;
+                    case BUDGET_EXHAUSTED, MAX_ITERATIONS, INPUT_LIMIT_EXCEEDED,
+                         DEADLINE_EXCEEDED -> failures.contains(draft.reason());
                     default -> false;
                 };
             };
         }
 
-        boolean hasRuntimeFailure = budget.deadlineExceeded() || budget.toolLimitExceeded()
-                || budget.iterationLimitExceeded() || budget.textLimitExceeded()
-                || routeFailed || readFailed || topicTruncated;
-        if (structureValid && draft.status() == TaskStatus.INCOMPLETE && !hasRuntimeFailure) {
-            // 模型不能自报运行故障；模型请求失败与调用前输入超限由 T07 处理。
-            structureValid = false;
-        }
         if (structureValid && draft.status() == TaskStatus.NO_EVIDENCE
                 && !routeFailed && !readFailed && !topicTruncated
                 && (retrieval.routes().vector() != RouteStatus.OK
@@ -71,8 +81,8 @@ public final class DefaultAnswerValidator implements AnswerValidator {
         boolean citationsValid = true;
         if (structureValid) {
             for (var citation : draft.citations()) {
-                if (!hasText(citation.documentId()) || !hasText(citation.version())
-                        || !hasText(citation.chunkId()) || !hasText(citation.quote())) {
+                if (citation.documentId().isBlank() || citation.version().isBlank()
+                        || citation.chunkId().isBlank() || citation.quote().isBlank()) {
                     citationsValid = false;
                     break;
                 }
@@ -102,20 +112,6 @@ public final class DefaultAnswerValidator implements AnswerValidator {
             }
         }
 
-        // 插入顺序就是 T01 的失败优先级，同时保留所有真实限制的公开说明。
-        var failures = new LinkedHashSet<AnswerReason>();
-        if (budget.deadlineExceeded()) {
-            failures.add(AnswerReason.DEADLINE_EXCEEDED);
-        }
-        if (budget.toolLimitExceeded()) {
-            failures.add(AnswerReason.BUDGET_EXHAUSTED);
-        }
-        if (budget.iterationLimitExceeded()) {
-            failures.add(AnswerReason.MAX_ITERATIONS);
-        }
-        if (budget.textLimitExceeded()) {
-            failures.add(AnswerReason.INPUT_LIMIT_EXCEEDED);
-        }
         if (!structureValid) {
             failures.add(AnswerReason.OUTPUT_INVALID);
         } else if (!citationsValid) {
