@@ -77,7 +77,18 @@ public final class IngestionApplication {
             reportDiagnostic(exception);
             exitCode = 1;
         } catch (RuntimeException exception) {
-            System.err.println("导入失败 code=INTERNAL_ERROR：启动配置、分词资源或应用依赖初始化失败");
+            IngestionConfigurationException configurationFailure = null;
+            for (Throwable cause = exception; cause != null; cause = cause.getCause()) {
+                if (cause instanceof IngestionConfigurationException failure) {
+                    configurationFailure = failure;
+                    break;
+                }
+            }
+            if (configurationFailure == null) {
+                System.err.println("导入失败 code=INTERNAL_ERROR：启动配置或应用依赖初始化失败");
+            } else {
+                System.err.println("导入失败 code=INVALID_ARGUMENT：" + configurationFailure.getMessage());
+            }
             reportDiagnostic(exception);
             exitCode = 1;
         }

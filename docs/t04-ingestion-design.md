@@ -153,3 +153,7 @@ T04 在 `data/README.md` 中提供静态文档、条款和主题对应表。快�
 任务 Worktree 为 `/private/tmp/agent-t04-ingestion`，任务分支为 `task/t04-ingestion`，开发基线为 `fba3c4d`。主代理已完成首版代码和三组资料，接下来由子代理进行规范及契约两个方向的静态审查。尚未执行编译、启动、测试、依赖解析、数据库初始化或真实模型与导入调用。
 
 交付包含独立的 `IngestionApplication`、`CorpusImporter`、严格的输入读取与条款切分、哈希实现及共享的 `JiebaKnowledgeTokenizer`。入口与操作说明见 [data/README.md](../data/README.md)，词典库的静态取证与处理边界见 [T04 踩坑记录](pitfalls/T04-jieba-dictionary-loading.md)。
+
+首次实现提交为 `04ed5f5`。规范审查发现的失败诊断不足、创建尝试标记提前问题已在 `313048e` 修复并获原审查代理定向复核。UTF-8 解码策略已显式设置为 `REPORT`；原 decoder 本就默认严格处理，该项属于表达澄清，不记为实际缺陷。
+
+契约审查另发现分词资源启动提示不够具体、主题缺失未指出条款、重复 JSON 字段缺少定位信息，主代理已补充专用的安全配置异常、条款诊断及解析位置，正在进行定向复核。两条审查线均未执行运行验证。

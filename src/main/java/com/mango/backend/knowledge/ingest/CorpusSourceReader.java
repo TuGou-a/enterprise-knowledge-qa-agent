@@ -55,7 +55,9 @@ final class CorpusSourceReader {
                     .reduce((left, right) -> left + "." + right).orElse("documents");
             throw new IllegalArgumentException("资料 JSON 字段格式不正确：" + field);
         } catch (JsonProcessingException exception) {
-            throw new IllegalArgumentException("资料不是有效的单一 JSON 对象，或包含重复字段");
+            var location = exception.getLocation();
+            String position = location == null ? "" : "（第 " + location.getLineNr() + " 行，第 " + location.getColumnNr() + " 列）";
+            throw new IllegalArgumentException("资料不是有效的单一 JSON 对象，或包含重复字段" + position);
         } catch (IOException exception) {
             throw new IllegalArgumentException("资料文件无法读取");
         }
