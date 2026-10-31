@@ -53,8 +53,9 @@ public final class CorpusImporter {
                     index.dictionaryVersion(), index.stopWordsVersion());
             var snapshot = new CorpusSnapshot(snapshotId, SnapshotState.BUILDING, profile,
                     corpus.contentHash(), Instant.now(), null);
+            var creationTimeout = budget.callTimeout(properties.timeouts().databaseMs());
             creationAttempted = true;
-            store.createSnapshot(snapshot, budget.callTimeout(properties.timeouts().databaseMs()));
+            store.createSnapshot(snapshot, creationTimeout);
             int batchSize = properties.limits().embeddingBatchSize();
             for (int start = 0; start < corpus.documents().size(); start += batchSize) {
                 int end = Math.min(start + batchSize, corpus.documents().size());

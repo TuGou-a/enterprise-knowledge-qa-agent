@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -134,7 +135,8 @@ public final class JiebaKnowledgeTokenizer implements KnowledgeTokenizer {
             resource = new FileSystemResource(location);
         }
         try (var reader = new BufferedReader(new InputStreamReader(resource.getInputStream(),
-                StandardCharsets.UTF_8.newDecoder()))) {
+                StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
+                        .onUnmappableCharacter(CodingErrorAction.REPORT)))) {
             var lines = new ArrayList<String>();
             String line;
             while ((line = reader.readLine()) != null) {

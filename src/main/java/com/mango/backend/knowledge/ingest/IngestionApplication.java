@@ -52,6 +52,7 @@ public final class IngestionApplication {
             timeout = Duration.ofMillis(milliseconds);
         } catch (IllegalArgumentException exception) {
             System.err.println("导入失败 code=INVALID_ARGUMENT：请检查 --corpus-file 和 --import-timeout-ms 参数");
+            reportDiagnostic(exception);
             System.exit(2);
             return;
         }
@@ -73,12 +74,26 @@ public final class IngestionApplication {
             } else if (exception.snapshotId() != null) {
                 System.err.println("快照创建已尝试，未发布；若已写入则保持 BUILDING，下次使用新快照完整重导。");
             }
+            reportDiagnostic(exception);
             exitCode = 1;
         } catch (RuntimeException exception) {
             System.err.println("导入失败 code=INTERNAL_ERROR：启动配置、分词资源或应用依赖初始化失败");
+            reportDiagnostic(exception);
             exitCode = 1;
         }
         System.exit(exitCode);
+    }
+
+    /** 保留因果类型和项目代码位置，不输出可能携带凭据或原文的异常消息。 */
+    private static void reportDiagnostic(Throwable exception) {
+        for (Throwable cause = exception; cause != null; cause = cause.getCause()) {
+            System.err.println("异常类型=" + cause.getClass().getName());
+            for (var frame : cause.getStackTrace()) {
+                if (frame.getClassName().startsWith("com.mango.backend.")) {
+                    System.err.println("  at " + frame);
+                }
+            }
+        }
     }
 
     /** 只有本批处理入口显式导入此配置，普通问答应用不加载额外配置。 */
