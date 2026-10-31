@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="基于 Java、AgentScope、MyBatis、PostgreSQL 与 pgvector 的知识问答架构，包含硅基流动 Embedding、混合检索与 BGE 重排序。">
+  <title>企业知识问答 Agent · 架构设计</title>
+  <style>
+    :root{--bg:#f5f6f8;--paper:#fff;--ink:#17243a;--muted:#5c6b80;--line:#dce3ec;--blue:#315be8;--blue-bg:#eef2ff;--teal:#087f83;--teal-bg:#eaf7f5;--amber:#986214;--amber-bg:#fff6df;--red:#b84643;--nav:#14233c;--radius:16px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:28px}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}a{color:var(--blue);text-underline-offset:4px}a:hover{color:#183eb4}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #64a9ff;outline-offset:4px}p{margin:10px 0 16px}strong{font-weight:650}code,pre,.mono{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}code{font-size:.9em;background:#edf1f7;padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}pre{margin:14px 0;padding:22px;background:#16243b;color:#e4ecff;border-radius:12px;font-size:12.5px;line-height:1.85;overflow:auto;tab-size:2}pre code{padding:0;background:none;color:inherit;overflow-wrap:normal}
+    .sidebar{position:fixed;inset:0 auto 0 0;width:248px;background:var(--nav);color:#fff;padding:34px 24px;overflow-y:auto}.brand{font-size:19px;letter-spacing:.02em;line-height:1.5;font-weight:650}.brand-icon{display:inline-grid;place-items:center;width:31px;height:31px;border:1px solid #58709b;border-radius:9px;margin-right:9px;color:#96b6ff;font-family:monospace}.nav-sub{color:#a4b4d0;font-size:12px;margin:10px 0 28px}.sidebar nav{display:grid;gap:5px}.sidebar nav a{color:#c1cde0;text-decoration:none;font-size:13px;display:flex;gap:12px;padding:9px 10px;border-radius:7px}.sidebar nav a span{color:#7084a5;font-size:11px;padding-top:2px}.sidebar nav a:hover,.sidebar nav a.active{color:#fff;background:#263e64}.sidebar nav a.active span{color:#a5c1ff}.side-foot{margin-top:30px;border-top:1px solid #334460;padding-top:19px;color:#a4b4d0;font-size:11px;line-height:1.9}.side-foot a{color:#bdceff}
+    main{margin-left:248px;padding:42px 48px 60px;max-width:1460px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:12px;margin-bottom:26px}.hero{padding:36px 38px 30px;border:1px solid #d5def2;border-radius:20px;background:linear-gradient(125deg,#fff 40%,#eaf0ff);position:relative;overflow:hidden}.eyebrow{font-size:11px;letter-spacing:.12em;color:var(--blue);font-weight:700}.hero h1{font-size:36px;line-height:1.35;letter-spacing:-.025em;margin:13px 0 14px}.lead{max-width:790px;color:#43536d;font-size:16px}.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}.tag{display:inline-block;border:1px solid #d7e1f0;border-radius:100px;padding:3px 11px;background:#ffffffa8;color:#41516d;font-size:11px}.tag.confirmed{background:var(--teal-bg);border-color:#bddfd6;color:var(--teal)}.hero-note{margin-top:22px;border-top:1px solid #d7e1f0;padding-top:16px;font-size:12px;color:var(--muted)}
+    section{margin-top:42px;scroll-margin-top:24px}h2{font-size:23px;line-height:1.5;margin:0 0 9px;display:flex;align-items:center;gap:12px}.num{font:12px/1.3 monospace;color:var(--blue);background:var(--blue-bg);padding:7px 8px;border-radius:6px}h3{font-size:16px;margin:22px 0 8px}.intro{color:var(--muted);margin:0 0 19px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.card{border:1px solid var(--line);border-radius:var(--radius);background:var(--paper);padding:22px}.card h3{margin:0 0 8px}.card p{font-size:13px;color:var(--muted);margin:0}.card .label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}.runtime{display:flex;align-items:center;gap:16px}.runtime .quantity{font-size:36px;line-height:1.2;font-weight:700;color:var(--blue)}.runtime strong{display:block}.runtime small{font-size:11px;color:var(--muted)}
+    .callout{padding:17px 20px;border-radius:11px;background:var(--blue-bg);border-left:3px solid var(--blue);font-size:13px;margin:18px 0}.callout p{margin:0}.callout.warn{background:var(--amber-bg);border-color:#c28b32;color:#72501e}.callout.teal{background:var(--teal-bg);border-color:var(--teal)}.table-wrap{border:1px solid var(--line);border-radius:12px;overflow:auto;background:white;margin:15px 0}table{width:100%;border-collapse:collapse;min-width:670px;font-size:13px}th,td{text-align:left;vertical-align:top;padding:14px 16px;border-bottom:1px solid #e8edf3}th{background:#edf1f7;font-weight:650;font-size:12px;color:#43536d}tr:last-child td{border-bottom:0}td:first-child{font-weight:600}td p{margin:0}.choice-table td:first-child{width:18%}.choice-table td:nth-child(2){width:44%}.subtext{display:block;color:var(--muted);font-size:11px;font-weight:400;margin-top:5px}
+    figure{margin:18px 0;background:white;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}.figure-title{font-size:12px;font-weight:650;padding:15px 20px;border-bottom:1px solid #e7ecf3;display:flex;justify-content:space-between;gap:16px}.figure-title small{font-size:10px;color:var(--muted);font-weight:400}.svg-wrap{overflow-x:auto;padding:10px 12px}svg.diagram{display:block;width:100%;height:auto;min-width:710px}svg text{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}svg .node{fill:#f7f9fd;stroke:#cbd7e9;stroke-width:1.5}svg .blue{fill:#edf1ff;stroke:#9aaff4}svg .green{fill:#e9f7f4;stroke:#8ec6bc}svg .gold{fill:#fff6e1;stroke:#dfbf7c}svg .title{font-size:18px;font-weight:650;fill:#223552}svg .detail{font-size:14px;fill:#596d87}svg .edge{fill:none;stroke:#758bad;stroke-width:1.7}svg .edge-blue{fill:none;stroke:#315be8;stroke-width:1.8}svg .label{font-size:13px;fill:#536e94}svg .lifeline{stroke:#d2dbea;stroke-width:1.4;stroke-dasharray:5 5}figcaption{padding:13px 20px 17px;color:var(--muted);font-size:12px;border-top:1px solid #eef1f5}.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:11px;color:var(--muted);margin:10px 0}.dot{display:inline-block;width:8px;height:8px;background:var(--blue);border-radius:50%;margin-right:6px}.dot.teal{background:var(--teal)}.dot.amber{background:#be8a2d}
+    .steps{counter-reset:step;list-style:none;margin:0;padding:0}.steps li{position:relative;padding:0 0 21px 40px;border-left:1px solid #d4deed;margin-left:12px;font-size:13px;color:#52627a}.steps li:last-child{padding-bottom:0;border:0}.steps li:before{counter-increment:step;content:counter(step);position:absolute;left:-12px;top:0;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#edf2ff;color:var(--blue);font:11px monospace;border:1px solid #c7d4f5}.steps strong{display:block;color:var(--ink);margin-bottom:2px}.formula{text-align:center;margin:18px 0;padding:20px;border:1px dashed #afbee8;background:#f5f7ff;border-radius:10px;font-family:monospace;font-size:16px;color:#3153a6}.pill{display:inline-block;white-space:nowrap;font:10px/1.5 monospace;padding:4px 7px;border-radius:5px;background:var(--blue-bg);color:var(--blue)}.pill.green{background:var(--teal-bg);color:var(--teal)}.pill.amber{background:var(--amber-bg);color:var(--amber)}
+    .scenario-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.scenario-tabs button{border:1px solid var(--line);border-radius:7px;background:#fff;padding:8px 16px;font-size:12px;color:#52627a}.scenario-tabs button[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}.scenario-panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:23px 25px}.scenario-heading{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:18px}.scenario-heading h3{margin:0}.scenario-heading span{font-size:11px;color:var(--muted)}.scenario-foot{margin:18px 0 0;font-size:12px;padding:13px 15px;border-radius:8px;background:#f2f5fa;color:#52627a}.scenario-note{font-size:11px;color:var(--muted)}ul{padding-left:22px}li{margin:5px 0}.compact{font-size:13px;color:var(--muted)}.timeline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.day{background:white;border:1px solid var(--line);border-radius:12px;padding:22px}.day-number{font-size:11px;color:var(--blue);letter-spacing:.08em}.day h3{margin:7px 0 9px}.day p{font-size:12px;color:var(--muted);margin:0}.sources{font-size:12px;display:grid;gap:10px}.sources a{overflow-wrap:anywhere}.source-note{font-size:11px;color:var(--muted)}footer{margin-top:40px;padding-top:22px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;font-size:11px;color:var(--muted)}
+    @media(min-width:1600px){main{padding-left:64px;padding-right:64px}}@media(max-width:1150px){.sidebar{width:220px;padding:30px 20px}main{margin-left:220px;padding:32px 30px}.hero{padding:30px}.hero h1{font-size:30px}.grid.three{gap:10px}.grid.three .card{padding:17px}.runtime{gap:10px}.runtime .quantity{font-size:30px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    .edition{color:var(--teal);background:var(--teal-bg);padding:5px 12px;border-radius:6px;font-size:11px}.hero-flow{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:25px;padding-top:22px;border-top:1px solid #dae3f2}.hero-flow a{display:flex;align-items:center;gap:8px;font-size:12px;text-decoration:none;color:#405370}.hero-flow b{font:10px monospace;display:grid;place-items:center;width:24px;height:24px;background:#e9effa;border-radius:6px;color:#57729a}.hero-flow>span{color:#a0afc7}.hero-flow .highlight{color:var(--teal);font-weight:650}.hero-flow .highlight b{background:#d8eee8;color:var(--teal)}.model-grid{margin:20px 0}.model-card{padding:20px!important}.model-card .model-role{font-size:11px;color:var(--muted)}.model-card h3{font-size:19px;margin:8px 0}.model-card p{min-height:50px;line-height:1.8}.model-card code{display:inline-block;margin-top:14px;font-size:10.5px;white-space:nowrap}.model-card.featured{background:linear-gradient(145deg,#f2fbf7,#fff);border-color:#a7d2c4}.model-card.featured .model-role{color:var(--teal)}.parameter-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:18px;background:#172943;border-radius:12px;padding:20px 8px;color:white}.parameter-strip>div{text-align:center;border-right:1px solid #3a4c66}.parameter-strip>div:last-child{border:0}.parameter-strip strong{display:block;font-size:26px;line-height:1.4;color:#c9dbff}.parameter-strip span{font-size:11px;color:#b2c2da}.mini-note{margin-top:20px;padding:14px 16px;border-radius:8px;background:var(--amber-bg);color:#80602c;font-size:12px}.endpoint{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid #cfe3dd;background:#f1f9f6;border-radius:9px;font-size:12px;margin:15px 0}.endpoint>span{color:var(--teal);font:700 11px monospace}.endpoint code{background:none;padding:0;font-size:12px}.endpoint small{margin-left:auto;color:var(--muted);font-size:10px}.mybatis-card{margin:20px 0}.mybatis-card p{font-size:13px}.mapper-flow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 0;padding:13px 16px;background:#f3f6fc;border-radius:9px;font:12px monospace}.mapper-flow b{color:#8ea3c1}details{border-top:1px solid var(--line);margin-top:16px;padding-top:14px}summary{cursor:pointer;font-size:12px;color:var(--blue);font-weight:600}summary:focus-visible{outline:3px solid #64a9ff;outline-offset:4px}.card .formula{font-size:13px;margin:18px 0 0}.svg-wrap svg.diagram{min-width:760px}.topbar{line-height:1.7}
+  </style>
+</head>
+<body>
+  <aside class="sidebar" aria-label="文档目录">
+    <div class="brand"><span class="brand-icon">K</span>知识问答 Agent</div>
+    <p class="nav-sub">架构设计 · 报销与差旅制度</p>
+    <nav>
+      <a href="#scope" class="active"><span>01</span>目标与边界</a>
+      <a href="#choices"><span>02</span>技术选型与取舍</a>
+      <a href="#overview"><span>03</span>总体架构</a>
+      <a href="#hybrid"><span>04</span>混合检索与重排序</a>
+      <a href="#agent"><span>05</span>Agent 动态决策</a>
+      <a href="#data"><span>06</span>资料与版本模型</a>
+      <a href="#contracts"><span>07</span>接口与工具契约</a>
+      <a href="#reliability"><span>08</span>引用、冲突与失败</a>
+      <a href="#integration"><span>09</span>Maven 与模型接入</a>
+      <a href="#evaluation"><span>10</span>测试与评审证据</a>
+      <a href="#delivery"><span>11</span>目录与实施顺序</a>
+      <a href="#references"><span>12</span>来源与待验证项</a>
+    </nav>
+    <div class="side-foot">技术路线：已确认<br>实施设计：供评审<br>版本：1.2 · 2026-10-31<br><br><a href="../README.md">README 与选型理由 ↗</a><br><a href="02-solution.md">详细 Markdown 方案 ↗</a></div>
+  </aside>
+  <main>
+    <div class="topbar"><span>项目架构文档 / VERSION 1.2</span><span class="edition">AgentScope 2.0.4 · 已对照本地发行版源码</span></div>
+    <header class="hero">
+      <div class="eyebrow">ARCHITECTURE / 企业知识问答</div>
+      <h1>企业知识问答 Agent</h1>
+      <p class="lead">面向报销与差旅制度。先以向量和关键词寻找候选，再通过重排序确定阅读顺序；Agent 查证原文，输出回答、引用与明确的任务状态。</p>
+      <div class="tags"><span class="tag confirmed">考核优先</span><span class="tag">Java 17 · Spring Boot</span><span class="tag">AgentScope Java 2.0.4 · Maven</span><span class="tag">MyBatis · PostgreSQL · pgvector</span><span class="tag">jieba</span><span class="tag">DeepSeek · SiliconFlow</span></div>
+      <div class="hero-flow" aria-label="问答主流程"><a href="#hybrid"><b>01</b>双路召回</a><span>→</span><a href="#hybrid"><b>02</b>RRF 融合</a><span>→</span><a href="#hybrid" class="highlight"><b>03</b>BGE 重排序</a><span>→</span><a href="#agent"><b>04</b>原文查证</a><span>→</span><a href="#contracts"><b>05</b>带引用回答</a></div>
+      <div class="hero-note">技术路线依据需求讨论确定。表结构、接口与参数是实施建议；文档中的流程演示不是运行记录。当前业务工程尚未接入 Agent、检索或云模型。</div>
+    </header>
+
+    <section id="scope">
+      <h2><span class="num">01</span>目标与边界</h2>
+      <p class="intro">完成题目要求的真实决策循环与验证材料，控制在题目建议的投入规模内。</p>
+      <div class="grid three">
+        <div class="card runtime"><div class="quantity">1</div><div><strong>Java 应用</strong><small>HTTP API 与资料导入入口</small></div></div>
+        <div class="card runtime"><div class="quantity">1</div><div><strong>PostgreSQL</strong><small>原文、版本、全文索引与向量</small></div></div>
+        <div class="card runtime"><div class="quantity">2</div><div><strong>云端服务商</strong><small>三类能力：决策、向量化、重排序</small></div></div>
+      </div>
+      <div class="grid" style="margin-top:16px">
+        <div class="card"><div class="label">INPUT / 输入</div><h3>问题、可选历史、合成制度</h3><p>问题和历史由调用方提交。制度带文档 ID、版本日期与原文。首期覆盖报销、差旅规则，保留未知适用范围。</p></div>
+        <div class="card"><div class="label">OUTPUT / 输出</div><h3>回答、原文引用、资料缺口与状态</h3><p>明确回答依据。冲突时展示双方资料；无法确认时追问；达到执行上限时明确返回未完成。</p></div>
+      </div>
+      <div class="callout"><p><strong>已确认的范围：</strong>沿用现有后端，以 HTTP API 为主；历史随请求传入，第一版不保存跨请求会话；本期不开发聊天界面。界面、线上部署、多 Agent 与生产级 Runtime 均非题目必需。</p></div>
+    </section>
+
+    <section id="choices">
+      <h2><span class="num">02</span>技术选型与取舍</h2>
+      <p class="intro">选择原因按实际约束记录。完整说明同步写入 <a href="../README.md">README</a>，便于答辩与后续复核。</p>
+      <div class="table-wrap"><table class="choice-table"><thead><tr><th>选择</th><th>为什么选择</th><th>代价与适用边界</th></tr></thead><tbody>
+        <tr><td>Java 17<span class="subtext">已确认 · 个人经验</span></td><td>我更熟悉 Java，现有工程也是 Spring Boot 与 Maven，便于在有限时间内实现、排查和测试。</td><td>部分 AI 示例优先提供 Python 版本，需核对 Java 生态能力。不是通用的语言优劣结论。</td></tr>
+        <tr><td>AgentScope Java<span class="subtext">已确认 · 时间约束</span></td><td>开发时间有限，希望聚焦业务开发，复用模型适配与工具循环，减少底层大模型交互代码。</td><td>固定发行版；理解框架上限、事件与结构化输出行为，业务质量仍由项目验证。</td></tr>
+        <tr><td>PostgreSQL＋pgvector<span class="subtext">已确认 · 简化部署</span></td><td>一个数据库保存原文、版本、关键词索引与向量，减少组件和数据同步工作。</td><td>应用实现召回 SQL、融合与一致性。规模扩大后重新测试召回和性能。</td></tr>
+        <tr><td>MyBatis<span class="subtext">已确认 · 数据访问</span></td><td>Mapper 接口与 XML 集中管理原文入库、版本读取、向量与全文查询，直接表达 PostgreSQL 特有 SQL。</td><td>维护 SQL 和结果映射；绑定查询参数，校验向量转换。3.0.5 为候选版本，目标工程仍需验证。</td></tr>
+        <tr><td>混合检索＋RRF<span class="subtext">混合已确认 · 融合方式为建议</span></td><td>向量覆盖相似表达，关键词覆盖明确术语；按排名融合，形成重排序候选池。</td><td>需要 Embedding、查询与评估。不能预先声称混合一定优于单路。</td></tr>
+        <tr><td>BGE 重排序<span class="subtext">已确认 · 硅基流动 API</span></td><td>使用 <code>BAAI/bge-reranker-v2-m3</code> 联合比较问题与候选条款，细化相关性排名，复用已有云端服务。</td><td>增加请求延迟、费用和文本传输；失败时回退 RRF。分数不能确定制度效力或回答可信度。</td></tr>
+        <tr><td>jieba Java<span class="subtext">已确认 · 中文分词</span></td><td>在 Java 进程内完成中文分词，给 PostgreSQL 提供词项，文档与问题共用处理配置。</td><td>验证词典、停用词、版本与并发行为；关键词排序用 <code>ts_rank_cd</code>，不是 BM25。</td></tr>
+        <tr><td>DeepSeek＋硅基流动<span class="subtext">已确认 · 云端模型</span></td><td>DeepSeek 决策与回答；硅基流动提供 Embedding 和重排序，本地只运行应用与数据库。</td><td>依赖网络、账号可用性与限流条件。三类能力分别配置、校验响应与记录耗时。</td></tr>
+        <tr><td>单 Agent、调用方历史<span class="subtext">单 Agent 为建议 · 历史方式已确认</span></td><td>一个 Agent 通过检索与读取工具完成任务，便于观察决策；请求带历史即可覆盖上下文追问。</td><td>调用方负责传回历史。首期不提供服务端跨请求会话恢复。</td></tr>
+      </tbody></table></div>
+      <p class="source-note">框架和模型能力见 <a href="#references">官方来源</a>；数据库选型另记录为 <a href="adr/0001-postgres-hybrid-retrieval.md">ADR-0001</a>。</p>
+    </section>
+
+    <section id="overview">
+      <h2><span class="num">03</span>总体架构</h2>
+      <p class="intro">Spring Boot 管理业务边界，AgentScope 调度模型与工具，MyBatis 访问 PostgreSQL；检索内部调用向量化与重排序服务。</p>
+      <div class="grid three model-grid">
+        <div class="card model-card"><span class="model-role">决策与生成</span><h3>DeepSeek</h3><p>选择检索、读取、补查或结束，组织回答与引用草稿。</p><code>DeepSeek 官方 API</code></div>
+        <div class="card model-card"><span class="model-role">向量化</span><h3>Embedding</h3><p>文档入库与查询时生成相同空间的 1024 维稠密向量。</p><code>BAAI/bge-m3</code></div>
+        <div class="card model-card featured"><span class="model-role">候选重排序</span><h3>Reranker</h3><p>在 RRF 候选池中细化相关性排序，确定主候选阅读顺序。</p><code>BAAI/bge-reranker-v2-m3</code></div>
+      </div>
+      <figure>
+        <div class="figure-title">图 1 / 组件与职责边界<small>箭头表示主要调用与返回关系</small></div>
+        <div class="svg-wrap"><svg class="diagram" viewBox="0 0 1100 590" role="img" aria-labelledby="overview-title overview-desc">
+          <title id="overview-title">企业知识问答总体架构</title><desc id="overview-desc">调用方经 HTTP API 进入 QaService，ReActAgent 调用 DeepSeek，通过检索和读取工具访问 MyBatis 与 PostgreSQL。硅基流动负责查询向量和候选重排序，结果经过引用与状态校验，运行过程导出 Trace。</desc>
+          <defs><marker id="arrow-o" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8" fill="#758bad"/></marker><marker id="blue-o" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8" fill="#315be8"/></marker></defs>
+          <rect x="20" y="35" width="180" height="80" rx="12" class="node"/><text x="110" y="68" text-anchor="middle" class="title">调用方</text><text x="110" y="94" text-anchor="middle" class="detail">question＋history</text>
+          <rect x="250" y="35" width="270" height="80" rx="12" class="node"/><text x="385" y="68" text-anchor="middle" class="title">HTTP API</text><text x="385" y="94" text-anchor="middle" class="detail">输入校验 · Result 封装</text>
+          <rect x="570" y="35" width="240" height="80" rx="12" class="node blue"/><text x="690" y="68" text-anchor="middle" class="title">QaService</text><text x="690" y="94" text-anchor="middle" class="detail">资料快照 · 请求预算</text>
+          <path d="M200 75 H250" class="edge" marker-end="url(#arrow-o)"/><path d="M520 75 H570" class="edge" marker-end="url(#arrow-o)"/><path d="M690 115 V170" class="edge" marker-end="url(#arrow-o)"/>
+          <rect x="570" y="170" width="240" height="90" rx="13" class="node blue"/><text x="690" y="205" text-anchor="middle" class="title">ReActAgent</text><text x="690" y="233" text-anchor="middle" class="detail">模型选择动作与下一步</text>
+          <rect x="870" y="170" width="210" height="90" rx="13" class="node blue"/><text x="975" y="205" text-anchor="middle" class="title">DeepSeek API</text><text x="975" y="233" text-anchor="middle" class="detail">工具调用 · 结构化回答</text><path d="M815 215 H865" class="edge-blue" marker-start="url(#blue-o)" marker-end="url(#blue-o)"/>
+          <rect x="250" y="170" width="270" height="90" rx="13" class="node gold"/><text x="385" y="205" text-anchor="middle" class="title">引用与状态校验</text><text x="385" y="233" text-anchor="middle" class="detail">证据集合 · 输出契约</text><path d="M570 215 H520" class="edge" marker-end="url(#arrow-o)"/><path d="M385 170 V115" class="edge" marker-end="url(#arrow-o)"/>
+          <rect x="20" y="170" width="180" height="90" rx="13" class="node"/><text x="110" y="205" text-anchor="middle" class="title">Trace 记录</text><text x="110" y="233" text-anchor="middle" class="detail">步骤 · 观察 · 动作</text><path d="M570 185 H545 V145 H110 V170" class="edge" stroke-dasharray="4 5" marker-end="url(#arrow-o)"/>
+          <rect x="400" y="340" width="260" height="90" rx="13" class="node green"/><text x="530" y="375" text-anchor="middle" class="title">searchKnowledge</text><text x="530" y="403" text-anchor="middle" class="detail">双路召回 · RRF · 重排序</text>
+          <rect x="720" y="340" width="260" height="90" rx="13" class="node green"/><text x="850" y="375" text-anchor="middle" class="title">readKnowledge</text><text x="850" y="403" text-anchor="middle" class="detail">指定版本原文 · 证据登记</text>
+          <path d="M650 260 V295 H530 V340" class="edge" marker-end="url(#arrow-o)"/><path d="M730 260 V295 H850 V340" class="edge" marker-end="url(#arrow-o)"/><text x="715" y="318" text-anchor="middle" class="label">仅开放两个只读业务工具</text>
+          <rect x="20" y="330" width="320" height="110" rx="13" class="node green"/><text x="180" y="359" text-anchor="middle" class="title">硅基流动 API</text><text x="180" y="390" text-anchor="middle" class="detail">bge-m3 · 查询向量</text><text x="180" y="418" text-anchor="middle" class="detail">bge-reranker-v2-m3 · 重排序</text><path d="M345 385 H395" class="edge" marker-start="url(#arrow-o)" marker-end="url(#arrow-o)"/>
+          <rect x="540" y="490" width="400" height="80" rx="13" class="node green"/><text x="740" y="520" text-anchor="middle" class="title">MyBatis Mapper → PostgreSQL</text><text x="740" y="550" text-anchor="middle" class="detail">原文 · 版本 · tsvector · pgvector(1024 维)</text><path d="M530 430 V465 H625 V490" class="edge" marker-end="url(#arrow-o)"/><path d="M850 430 V490" class="edge" marker-end="url(#arrow-o)"/>
+          <text x="35" y="524" class="detail">资料导入：分条款 → 分词／向量化</text><text x="35" y="550" class="detail">索引完成后，发布 READY 资料快照</text>
+        </svg></div>
+        <figcaption>共享配置，隔离每个请求的运行状态。调用方历史只帮助理解问题；引用必须来自当前资料快照中本次实际读取的原文。</figcaption>
+      </figure>
+      <div class="grid">
+        <div class="card"><h3>框架承担通用执行</h3><p>模型适配、工具 schema、工具调度、ReAct 轮次、中间件与结构化输出。固定 AgentScope 发行版，核对真实 API。</p></div>
+        <div class="card"><h3>应用承担业务正确性</h3><p>MyBatis 映射、两路检索、重排序与回退、版本关系、引用定位和效果评估。重排序属于检索内部步骤，模型仍只有两个业务工具。</p></div>
+      </div>
+    </section>
+
+    <section id="hybrid">
+      <h2><span class="num">04</span>混合检索与重排序</h2>
+      <p class="intro">召回扩大资料覆盖，RRF 合并排名，Reranker 细化相关性。其他制度版本单独保留，最终由 Agent 读取原文并查证适用关系。</p>
+      <figure><div class="figure-title">图 2 / 从双路召回到原文查证<small>数量为待验证初值 · 全程固定资料快照</small></div>
+        <div class="svg-wrap"><svg class="diagram" viewBox="0 0 1100 710" role="img" aria-labelledby="hybrid-title hybrid-desc">
+          <title id="hybrid-title">混合检索、BGE 重排序与独立版本扩展</title><desc id="hybrid-desc">查询经 Embedding 与 jieba 分别在 PostgreSQL 召回。每路最多20条，经RRF去重后最多20条进入BGE重排序，选取最多6条主候选。同时按重排序前候选池的主题扩展最多12条关联版本，两类候选均由Agent读取查证。重排序失败回退RRF。</desc>
+          <defs><marker id="arrow-h" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#758bad"/></marker><marker id="teal-h" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#087f83"/></marker></defs>
+          <rect x="16" y="14" width="1068" height="306" rx="15" fill="#f8faff" stroke="#e3e9f4"/>
+          <text x="36" y="43" class="label">阶段 A / 双路召回 · MyBatis Mapper 执行 SQL</text>
+          <rect x="30" y="133" width="165" height="80" rx="12" class="node blue"/><text x="112" y="166" text-anchor="middle" class="title">检索查询</text><text x="112" y="192" text-anchor="middle" class="detail">模型选择与改写</text>
+          <rect x="260" y="65" width="235" height="80" rx="12" class="node green"/><text x="377" y="98" text-anchor="middle" class="title">Embedding API</text><text x="377" y="124" text-anchor="middle" class="detail">bge-m3 · 1024 维</text>
+          <rect x="260" y="215" width="235" height="80" rx="12" class="node"/><text x="377" y="248" text-anchor="middle" class="title">jieba 中文分词</text><text x="377" y="274" text-anchor="middle" class="detail">同一词典与处理规则</text>
+          <path d="M195 173 H225 V255 H260" class="edge" marker-end="url(#arrow-h)"/>
+          <path d="M225 173 V105 H260" class="edge" marker-end="url(#arrow-h)"/>
+          <rect x="565" y="65" width="230" height="80" rx="12" class="node green"/><text x="680" y="98" text-anchor="middle" class="title">pgvector</text><text x="680" y="124" text-anchor="middle" class="detail">余弦距离 · 最多 20 条</text>
+          <rect x="565" y="215" width="230" height="80" rx="12" class="node"/><text x="680" y="248" text-anchor="middle" class="title">PG 全文检索</text><text x="680" y="274" text-anchor="middle" class="detail">ts_rank_cd · 最多 20 条</text>
+          <path d="M495 255 H565" class="edge" marker-end="url(#arrow-h)"/>
+          <path d="M495 105 H565" class="edge" marker-end="url(#arrow-h)"/>
+          <rect x="895" y="130" width="180" height="85" rx="12" class="node blue"/><text x="985" y="163" text-anchor="middle" class="title">RRF 融合</text><text x="985" y="190" text-anchor="middle" class="detail">片段去重 · k＝60</text>
+          <path d="M795 255 H840 V193 H895" class="edge" marker-end="url(#arrow-h)"/>
+          <path d="M795 105 H840 V155 H895" class="edge" marker-end="url(#arrow-h)"/>
+          <text x="36" y="363" class="label">阶段 B / 相关性排序与版本查证</text>
+          <path d="M985 215 V338 H10 V450 H25" class="edge" marker-end="url(#arrow-h)"/>
+          <rect x="25" y="400" width="210" height="100" rx="12" class="node blue"/><text x="130" y="435" text-anchor="middle" class="title">候选池</text><text x="130" y="464" text-anchor="middle" class="detail">最多 20 条</text><text x="130" y="487" text-anchor="middle" class="detail">保留 RRF 排名与片段键</text>
+          <rect x="300" y="400" width="315" height="100" rx="12" class="node green"/><text x="457" y="433" text-anchor="middle" class="title">硅基流动 Rerank API</text><text x="457" y="462" text-anchor="middle" class="detail">BAAI/bge-reranker-v2-m3</text><text x="457" y="486" text-anchor="middle" class="detail">问题＋候选条款 → 相关性排序</text>
+          <path d="M235 450 H300" class="edge" marker-end="url(#arrow-h)"/>
+          <rect x="680" y="400" width="160" height="100" rx="12" class="node green"/><text x="760" y="441" text-anchor="middle" class="title">主候选</text><text x="760" y="471" text-anchor="middle" class="detail">最多 6 条</text><path d="M615 450 H680" class="edge" marker-end="url(#arrow-h)"/>
+          <rect x="900" y="400" width="175" height="100" rx="12" class="node gold"/><text x="987" y="441" text-anchor="middle" class="title">Agent 原文查证</text><text x="987" y="471" text-anchor="middle" class="detail">读取 · 补查 · 判断</text><path d="M840 450 H900" class="edge" marker-end="url(#arrow-h)"/>
+          <rect x="300" y="570" width="540" height="85" rx="12" class="node gold"/><text x="570" y="604" text-anchor="middle" class="title">同主题版本扩展 · 最多额外 12 条</text><text x="570" y="633" text-anchor="middle" class="detail">基于重排序前候选池，独立于主候选与分数保留</text>
+          <path d="M130 500 V612 H300" fill="none" stroke="#b38b43" stroke-width="1.7" marker-end="url(#arrow-h)"/>
+          <path d="M840 612 H987 V500" fill="none" stroke="#b38b43" stroke-width="1.7" marker-end="url(#arrow-h)"/>
+          <path d="M235 420 V380 H760 V400" fill="none" stroke="#087f83" stroke-dasharray="5 5" stroke-width="1.7" marker-end="url(#teal-h)"/>
+          <text x="470" y="372" text-anchor="middle" font-size="13" fill="#087f83">重排序失败：按 RRF 返回主候选，披露降级</text>
+          <text x="550" y="692" text-anchor="middle" class="label">相关性排名决定优先阅读什么；制度适用性必须依据原文查证。</text>
+        </svg></div><figcaption>关键词路由使用 jieba＋PG simple 配置、ts_rank_cd 与 GIN；向量路由先做精确检索。标准 Embedding 接口使用稠密向量，关键词单独实现。重排序结果通过输入下标映射回本地片段，原文与版本保持不变。</figcaption>
+      </figure>
+      <div class="parameter-strip" aria-label="建议检索参数">
+        <div><strong>20＋20</strong><span>两路召回上限</span></div><div><strong>20</strong><span>RRF 后送入重排序</span></div><div><strong>6</strong><span>主候选上限</span></div><div><strong>＋12</strong><span>主题扩展上限</span></div>
+      </div>
+      <p class="source-note">以上均为待验证初值，可按资料规模和评估结果配置。topK 仅控制主候选，主题扩展另计，累计文本仍受请求预算限制。</p>
+      <div class="grid">
+        <div class="card"><h3>为什么保留 RRF，再做重排序</h3><p>RRF 以排名合并两路不同量纲的分数，形成覆盖较广的候选池；Reranker 联合比较问题与条款，细化池内顺序。先保留最多 20 条，再选最终主候选，避免过早缩小到 6 条。</p><div class="formula">RRF(d) = Σ 1 / (60 + rank(d))</div></div>
+        <div class="card"><h3>为什么单独扩展其他版本</h3><p>30 天与 15 天的条款都可能与问题相关。按重排序前候选池的 topic_key 补充其他版本，独立返回，不以分数阈值过滤。存在截断时显式披露，不能声称已穷尽规定。</p><div class="mini-note">RRF 分数、重排序分数均不是回答置信度。</div></div>
+      </div>
+      <h3>重排序请求与结果校验</h3>
+      <div class="endpoint"><span>POST</span><code>https://api.siliconflow.cn/v1/rerank</code><small>复用 SILICONFLOW_API_KEY</small></div>
+      <div class="grid">
+        <div><pre><code>{
+  "model": "BAAI/bge-reranker-v2-m3",
+  "query": "差旅报销应在多久内提交？",
+  "documents": ["&lt;候选条款原文 1&gt;", "&lt;候选条款原文 2&gt;"],
+  "top_n": 2,
+  "return_documents": false
+}</code></pre><p class="source-note">两条候选仅用于展示请求结构，实际 top_n 取 topK 与候选数的较小值。BGE 不发送 Qwen 专用的 instruction。</p></div>
+        <div class="card"><ol class="steps"><li><strong>保留输入映射</strong>输入下标对应快照、文档版本与片段键。</li><li><strong>验证返回值</strong>检查 index 范围、唯一性、数量和有限分数；并列按 RRF 排名与片段键排序。</li><li><strong>按本地原文查证</strong>结果只调整阅读顺序，不修改知识库，不代替 readKnowledge。</li></ol></div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>执行结果</th><th>应用返回的排序模式</th><th>后续行为</th></tr></thead><tbody>
+        <tr><td>重排序成功</td><td><code>RERANK</code></td><td>返回主候选与独立主题扩展，Agent 继续读取。</td></tr>
+        <tr><td>重排序超时、限流或响应异常</td><td><code>RRF_FALLBACK</code></td><td>整批回退 RRF，记录降级原因；召回与查证完整时允许披露降级后回答。</td></tr>
+        <tr><td>候选池为空</td><td><code>NONE / SKIPPED_EMPTY</code></td><td>跳过云请求，由 Agent 判断是否补查；空候选本身不等同于无依据。</td></tr>
+        <tr><td>必要召回失败或主题查证截断</td><td>另记 <code>unresolvedErrors / truncated</code></td><td>继续保留材料，通常返回 INCOMPLETE；已读取并证实的冲突可同时披露。</td></tr>
+      </tbody></table></div>
+      <div class="callout teal"><p><strong>配置与预算：</strong>重排序建议超时 10 秒，实际不超过请求剩余总预算；调用前检查候选与文本长度，不静默删去适用条件。更换 Reranker 无需重建文档向量，但需要重新评估。来源：<a href="https://docs.siliconflow.cn/docs/api/rerank-post">硅基流动 Rerank API</a>、<a href="https://huggingface.co/BAAI/bge-reranker-v2-m3">BAAI 模型卡</a>。</p></div>
+    </section>
+
+    <section id="agent">
+      <h2><span class="num">05</span>Agent 动态决策</h2>
+      <p class="intro">检索和读取由模型选择，工具结果回到模型。补充检索、追问和停止都必须基于本次观察。</p>
+      <figure><div class="figure-title">图 3 / ReAct 调用时序<small>预算内重复模型选择与工具执行</small></div>
+        <div class="svg-wrap"><svg class="diagram" viewBox="0 0 1040 485" role="img" aria-labelledby="react-title react-desc">
+          <title id="react-title">模型工具决策循环</title><desc id="react-desc">调用方提交问题与历史，AgentScope 请求 DeepSeek 选择动作，应用执行知识工具并返回观察结果，模型再决定读取、补充检索、追问或结束，校验后返回任务结果。</desc>
+          <defs><marker id="arrow-r" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="#758bad"/></marker></defs>
+          <rect x="28" y="15" width="150" height="48" rx="9" class="node"/><text x="103" y="46" text-anchor="middle" class="title">调用方</text>
+          <rect x="275" y="15" width="190" height="48" rx="9" class="node blue"/><text x="370" y="46" text-anchor="middle" class="title">AgentScope</text>
+          <rect x="555" y="15" width="190" height="48" rx="9" class="node green"/><text x="650" y="46" text-anchor="middle" class="title">知识工具</text>
+          <rect x="835" y="15" width="175" height="48" rx="9" class="node blue"/><text x="922" y="46" text-anchor="middle" class="title">DeepSeek</text>
+          <path d="M103 63 V455 M370 63 V455 M650 63 V455 M922 63 V455" class="lifeline"/>
+          <path d="M103 104 H370" class="edge" marker-end="url(#arrow-r)"/><text x="220" y="94" text-anchor="middle" class="detail">问题＋可选历史</text>
+          <rect x="300" y="132" width="687" height="270" rx="10" fill="#f2f5ff" fill-opacity=".65" stroke="#bac9ee" stroke-dasharray="5 5"/><text x="316" y="154" class="label">循环：观察结果不同，下一步可以不同</text>
+          <path d="M370 182 H922" class="edge" marker-end="url(#arrow-r)"/><text x="650" y="174" text-anchor="middle" class="detail">上下文＋工具定义</text>
+          <path d="M922 226 H370" class="edge" marker-end="url(#arrow-r)"/><text x="650" y="217" text-anchor="middle" class="detail">模型选择 searchKnowledge(query)</text>
+          <path d="M370 270 H650" class="edge" marker-end="url(#arrow-r)"/><text x="510" y="261" text-anchor="middle" class="detail">执行检索或读取</text>
+          <path d="M650 313 H370" class="edge" marker-end="url(#arrow-r)"/><text x="510" y="304" text-anchor="middle" class="detail">候选／原文／错误观察</text>
+          <path d="M370 352 H922" class="edge" marker-end="url(#arrow-r)"/><text x="650" y="344" text-anchor="middle" class="detail">回传工具结果</text>
+          <path d="M922 388 H370" class="edge" marker-end="url(#arrow-r)"/><text x="650" y="380" text-anchor="middle" class="detail">读取／改写检索／追问／结束</text>
+          <path d="M370 445 H103" class="edge" marker-end="url(#arrow-r)"/><text x="237" y="436" text-anchor="middle" class="detail">校验后返回任务结果</text>
+        </svg></div><figcaption>固定执行骨架允许存在。仅有预设分支、自动重试或预写日志不能作为模型动态决策的证明。框架负责调度，真实运行记录证明模型如何调整动作。</figcaption>
+      </figure>
+      <h3>预期路径对比</h3>
+      <p class="scenario-note">下列交互为设计示意，用于说明行为差异，不是真实模型输出或已通过的测试。</p>
+      <div class="scenario-tabs" role="group" aria-label="选择预期执行路径"><button type="button" data-scenario="normal" aria-pressed="true">明确答案</button><button type="button" data-scenario="conflict" aria-pressed="false">文档冲突</button><button type="button" data-scenario="rerankFallback" aria-pressed="false">重排序失败</button><button type="button" data-scenario="failure" aria-pressed="false">必要工具失败</button></div>
+      <div class="scenario-panel" aria-live="polite">
+        <div class="scenario-heading"><h3 id="scenario-title">明确答案：找到依据后结束</h3><span id="scenario-status">预期状态：ANSWERED</span></div>
+        <ol class="steps" id="scenario-steps"><li><strong>选择检索</strong>模型以「报销期限」检索，工具返回相关制度候选。</li><li><strong>选择读取</strong>模型读取支持答案的指定版本条款。</li><li><strong>检查依据是否充分</strong>模型根据条款回答，提供原文引用和必要条件。</li><li><strong>校验并结束</strong>应用校验本次证据与引用后返回结果。</li></ol>
+        <p id="scenario-foot" class="scenario-foot">必要检索完成、关联主题未截断，且已读资料没有冲突时，可以按 D01 回答；检索预览必须进一步读取核对。</p>
+      </div>
+    </section>
+
+    <section id="data">
+      <h2><span class="num">06</span>资料与版本模型</h2>
+      <p class="intro">将原文、制度版本与检索配置绑定，确保一次请求的回答和引用来自同一份资料快照。</p>
+      <figure><div class="figure-title">图 4 / 三张表与资料归属<small>字段为建议模型，尚未执行建表</small></div>
+        <div class="svg-wrap"><svg class="diagram" viewBox="0 0 1070 345" role="img" aria-labelledby="data-title data-desc">
+          <title id="data-title">知识库三表数据模型</title><desc id="data-desc">资料快照关联文档版本，每个文档版本关联原文片段。片段同时保存原文定位、关键词索引和1024维向量，不能跨版本混用。</desc>
+          <defs><marker id="arrow-d" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7" fill="#758bad"/></marker></defs>
+          <rect x="20" y="35" width="280" height="270" rx="12" class="node blue"/><text x="40" y="74" class="title">kb_corpus</text><path d="M20 94 H300" stroke="#c4d1ef"/>
+          <text x="40" y="123" class="detail">PK  snapshot_id</text><text x="40" y="155" class="detail">state：BUILDING / READY</text><text x="40" y="187" class="detail">embedding_profile / dimension</text><text x="40" y="219" class="detail">tokenizer_version</text><text x="40" y="251" class="detail">content_hash</text><text x="40" y="283" class="detail">一次问答固定一个快照</text>
+          <rect x="385" y="35" width="280" height="270" rx="12" class="node"/><text x="405" y="74" class="title">kb_document</text><path d="M385 94 H665" stroke="#cbd7e9"/>
+          <text x="405" y="123" class="detail">PK  snapshot＋document＋version</text><text x="405" y="155" class="detail">version_date / title</text><text x="405" y="187" class="detail">applicable_scope</text><text x="405" y="219" class="detail">supersedes（原文明确时）</text><text x="405" y="251" class="detail">content / content_hash</text><text x="405" y="283" class="detail">日期不自动决定优先级</text>
+          <rect x="750" y="35" width="300" height="270" rx="12" class="node green"/><text x="770" y="74" class="title">kb_chunk</text><path d="M750 94 H1050" stroke="#bfdcd7"/>
+          <text x="770" y="123" class="detail">FK  指定资料快照与文档版本</text><text x="770" y="155" class="detail">chunk_id / topic_key</text><text x="770" y="187" class="detail">content / 原文字符范围</text><text x="770" y="219" class="detail">search_vector：tsvector</text><text x="770" y="251" class="detail">embedding：vector(1024)</text><text x="770" y="283" class="detail">引用定位与检索共用片段键</text>
+          <path d="M300 170 H385" class="edge" marker-end="url(#arrow-d)"/><path d="M665 170 H750" class="edge" marker-end="url(#arrow-d)"/><text x="342" y="156" text-anchor="middle" class="label">1 → N</text><text x="708" y="156" text-anchor="middle" class="label">1 → N</text>
+        </svg></div><figcaption>先导入合成 JSON，再按条款分段、生成索引，全部完成后将快照切换为 READY。查询与文档使用相同 Embedding 配置；更换 Embedding 模型或词典后重建快照，单独更换 Reranker 无需重建向量。</figcaption>
+      </figure>
+      <div class="grid"><div class="card"><h3>保持引用原文不变</h3><p>分词、大小写和全半角处理只用于索引。原文保留字符范围与哈希，建议使用 Java UTF-16 索引区间验证 substring 一致性。</p></div><div class="card"><h3>小数据先做精确向量检索</h3><p>全文索引使用 GIN，版本与主题使用普通索引。HNSW 可以后续加入；先保证资料召回与可复现性，再依据性能结果调整。</p></div></div>
+    </section>
+
+    <section id="contracts">
+      <h2><span class="num">07</span>接口与工具契约</h2>
+      <p class="intro">拟定问答接口 <code>POST /api/qa</code>，复用现有 <code>Result&lt;AnswerEnvelope&gt;</code>。下列契约为设计草案。</p>
+      <div class="grid">
+        <div class="card"><h3>searchKnowledge(query, topK)</h3><p>分别返回主候选与关联版本，包含预览、两路排名、RRF 分数和重排序分数（若有）。topK 由服务端夹取至 1 至 6，关联扩展最多另加 12 条；资料快照由应用注入。</p></div>
+        <div class="card"><h3>readKnowledge(documentId, version, chunkId)</h3><p>返回指定版本原文、字符范围和哈希，加入当前请求证据集合。版本不存在或读取失败时，返回明确的结构化工具错误。</p></div>
+      </div>
+      <pre><code>{
+  "question": "那差旅报销也是这个期限吗？",
+  "history": [
+    {"role": "user", "content": "普通费用报销期限多久？"},
+    {"role": "assistant", "content": "&lt;此前回答&gt;"}
+  ]
+}</code></pre>
+      <p class="compact">历史只接受 user 与 assistant，限制数量与总长度；超限明确拒绝。每个请求使用独立运行 ID 和 Agent 状态。历史不直接充当制度证据。</p>
+      <div class="table-wrap"><table><thead><tr><th>输出字段</th><th>用途</th></tr></thead><tbody>
+        <tr><td>runId / snapshotId</td><td>由应用填充，定位本次运行与固定资料版本。</td></tr><tr><td>answer / status / reason</td><td>模型提供业务草稿，应用校验后形成任务结果与结束原因。</td></tr><tr><td>citations[]</td><td>文档 ID、版本、片段 ID 与实际原文，支持核对回答。</td></tr><tr><td>evidenceGaps[]</td><td>明确缺少的资料、适用范围或必要背景。</td></tr><tr><td>clarifyingQuestion</td><td>需要补充的信息，例如本次报销应适用哪份制度。</td></tr><tr><td>retrieval</td><td>应用填充 routes、rankingMode、rankingWarnings、degraded、truncated、unresolvedErrors，区分排序回退与必要召回失败。</td></tr><tr><td>budget</td><td>实际轮次、业务工具调用数与超时信息；Embedding 和 Rerank 是检索工具内部调用，纳入总超时。</td></tr>
+      </tbody></table></div>
+      <div class="table-wrap"><table><thead><tr><th>任务状态</th><th>适用情况</th></tr></thead><tbody>
+        <tr><td><span class="pill green">ANSWERED</span></td><td>已有本次读取的资料支持回答。</td></tr><tr><td><span class="pill">NEEDS_CLARIFICATION</span></td><td>缺少必要背景，先请求补充。</td></tr><tr><td><span class="pill amber">CONFLICT</span></td><td>存在现有资料无法消解的制度冲突，保留双方引用。</td></tr><tr><td><span class="pill">NO_EVIDENCE</span></td><td>在当前已完成的查找范围中缺少充分依据，说明缺口。</td></tr><tr><td><span class="pill amber">INCOMPLETE</span></td><td>上限、超时、工具或模型失败、无效输出导致未完成。</td></tr>
+      </tbody></table></div>
+      <p class="compact">HTTP 状态和 Result.code 表达接口处理情况，status 表达任务结果；资料冲突和无依据不应被包装成「成功回答」。</p>
+    </section>
+
+    <section id="reliability">
+      <h2><span class="num">08</span>引用、冲突与失败</h2>
+      <p class="intro">明确哪些约束由代码检查，哪些结论仍需要模型判断和效果评估。</p>
+      <div class="grid">
+        <div class="card"><div class="label">EVIDENCE / 证据</div><h3>引用必须真实存在</h3><p>校验快照、已读片段、版本与原文。ANSWERED 需要支持引用，CONFLICT 至少引用双方已读版本；NO_EVIDENCE 需要已完成相关检索且主题未截断。</p></div>
+        <div class="card"><div class="label">CONFLICT / 冲突</div><h3>有分歧就查证适用关系</h3><p>D01 的 30 天与 D02 的 15 天不能凭日期或排名取舍。查不到适用范围、优先级或替代关系时，展示冲突并请求确认。</p></div>
+        <div class="card"><div class="label">FAILURE / 失败</div><h3>区分排序回退与召回失败</h3><p>重排序失败可回退 RRF，查证充分时披露降级后回答；Embedding 等必要召回未恢复或主题被截断时，通常返回未完成。错误不伪装成空结果。</p></div>
+        <div class="card"><div class="label">BUDGET / 预算</div><h3>预算由服务端强制限制</h3><p>建议 maxIters＝6、业务工具最多 12 次、总超时 120 秒，均为待验证初值。包装层原子计数，并限制候选、读取和输入长度；触发上限返回未完成。</p></div>
+      </div>
+      <div class="callout warn"><p><strong>两项评估边界：</strong>字符串一致只能证明引用存在，不能证明答案受其支持；向量检索返回近邻，也不能证明问题在资料范围内。两者均需要用例和语义核对。</p></div>
+      <p class="compact">框架达到 MAX_ITERATIONS 后可能追加汇总，应先检查结束原因，不能把汇总标为成功。Trace 保存工具参数、结果摘要、后续动作与公开依据，不保存密钥或内部思维。历史与制度正文不能覆盖系统约束。</p>
+    </section>
+
+    <section id="integration">
+      <h2><span class="num">09</span>Maven 与模型接入</h2>
+      <p class="intro">已确认基线：Java 17、现有 Spring Boot 3.5.10、AgentScope Java 2.0.4。已核对本地 v2.0.4 标签；实际依赖兼容性待编译和运行验证。</p>
+      <div class="callout teal"><p><strong>源码核查结论：</strong>当前架构能承接题目要求。保留单 ReAct Agent、两个业务工具、应用层混合检索与重排序。旧 core.rag API 已弃用，继续由业务服务管理知识检索；参考源码工作区为 2.1.0-SNAPSHOT，实施依赖仍固定 2.0.4。</p></div>
+      <div class="callout warn"><p><strong>优先验证依赖基线：</strong>AgentScope 2.0.4 使用 Reactor BOM 2025.0.2、Jackson 2.21.1；Boot 3.5.10 管理 Reactor BOM 2024.0.14、Jackson 2.19.4。普通模块接入仍可能受 Boot 依赖管理影响，尚不能宣称兼容。先核查依赖树、启动与工具结构化调用，再继续业务实现。<a href="framework-verification.md#需要优先验证的依赖基线差异">查看来源与处理边界</a>。</p></div>
+      <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;io.agentscope&lt;/groupId&gt;
+  &lt;artifactId&gt;agentscope-core&lt;/artifactId&gt;
+  &lt;version&gt;2.0.4&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;io.agentscope&lt;/groupId&gt;
+  &lt;artifactId&gt;agentscope-extensions-model-openai&lt;/artifactId&gt;
+  &lt;version&gt;2.0.4&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;org.mybatis.spring.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;mybatis-spring-boot-starter&lt;/artifactId&gt;
+  &lt;version&gt;3.0.5&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;com.huaban&lt;/groupId&gt;
+  &lt;artifactId&gt;jieba-analysis&lt;/artifactId&gt;
+  &lt;version&gt;1.0.2&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+      <p class="compact">另加入 PostgreSQL 驱动。MyBatis 3.0 系列的官方兼容范围覆盖 Boot 3.2 至 3.5、Java 17 及以上，候选版本仍待实际验证。AgentScope 该发行版 starter 的 Boot 基线与现有工程不同，建议通过普通 Spring 配置创建模型和 Agent。</p>
+      <div class="table-wrap"><table><thead><tr><th>源码行为</th><th>本项目的落地约束</th></tr></thead><tbody>
+        <tr><td>同轮工具默认并行</td><td>首期用 <code>ToolkitConfig.parallel(false)</code> 顺序执行，便于管理证据、预算和 Trace；下一步仍由模型选择。</td></tr>
+        <tr><td>同步工具运行于工作线程</td><td>ToolExecutor 已使用 boundedElastic；普通 <code>@Tool</code> 方法可直接调用 MyBatis。短事务在工具调用的 Spring 代理服务内开启。</td></tr>
+        <tr><td>模型和工具默认超时 5 分钟</td><td>显式设置 modelExecutionConfig 与 toolExecutionConfig；首期 maxAttempts＝1，应用另强制 120 秒总预算，包含追加汇总。</td></tr>
+        <tr><td>工具异常可能转为错误观察结果</td><td>业务边界记录错误类别与恢复情况，不只依赖控制器捕获异常，不把失败当作无结果。</td></tr>
+        <tr><td>上下文支持按类型注入</td><td>RunContext 通过 RuntimeContext 传递快照、预算和证据，不成为模型输入参数，不依赖跨线程 ThreadLocal。</td></tr>
+      </tbody></table></div>
+      <div class="card mybatis-card"><div class="label">PERSISTENCE / 数据访问</div><h3>MyBatis Mapper 管理查询与映射</h3><p>CorpusMapper 管理快照，DocumentMapper 管理版本原文，ChunkMapper 管理入库、两路召回、主题扩展与读取。XML 位于 resources/mapper/knowledge/；服务层负责事务、RRF 与重排序协调，云 API 调用在数据库事务外执行。</p>
+        <div class="mapper-flow"><span>HybridSearchService</span><b>→</b><span>ChunkMapper</span><b>→</b><span>Mapper XML</span><b>→</b><span>PostgreSQL</span></div>
+        <details><summary>查看向量查询映射示意</summary><pre><code>&lt;select id="searchByVector" resultType="ChunkCandidate"&gt;
+  &lt;![CDATA[
+  SELECT document_id, version, chunk_id, topic_key,
+         embedding &lt;=&gt; CAST(#{queryVector} AS vector) AS distance
+  FROM kb_chunk
+  WHERE snapshot_id = #{snapshotId}
+  ORDER BY distance, document_id, version, chunk_id
+  LIMIT #{limit}
+  ]]&gt;
+&lt;/select&gt;</code></pre><p class="compact">映射为说明草案，需注册结果别名。向量先校验 1024 维与有限数值，再序列化为绑定参数；tsvector 在 SQL 内构造。查询值均通过 <code>#{queryVector}</code> 等占位符绑定，每条 SQL 都限定快照；排序表达式固定。XML 使用 CDATA 或转义处理比较运算符。</p></details>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>DeepSeek：明确绑定模型配置</h3><p>应用读取基础地址与模型名，通过 ModelCreationContext.builder().enableThinking(false) 创建模型。为 deepseek-flash 显式设置核查后的 contextWindowSize；省略思考开关不代表默认关闭。</p></div>
+        <div class="card"><h3>硅基流动：两类检索能力分别校验</h3><p>Embedding 校验响应下标、数量与 1024 维度，不发送 dimensions；Rerank 校验输入下标映射、唯一性和有限分数，失败回退 RRF，独立记录超时与耗时。</p></div>
+      </div>
+      <pre><code>DEEPSEEK_API_KEY=&lt;由运行环境注入&gt;
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+DEEPSEEK_MODEL=deepseek-flash
+
+SILICONFLOW_API_KEY=&lt;由运行环境注入&gt;
+SILICONFLOW_BASE_URL=https://api.siliconflow.cn/v1
+EMBEDDING_MODEL=BAAI/bge-m3
+RERANK_MODEL=BAAI/bge-reranker-v2-m3
+RERANK_TIMEOUT_MS=10000</code></pre>
+      <div class="callout"><p><strong>发行版行为需要注意：</strong>2.0.4 的结构化调用使用 call(..., 输出类型, RuntimeContext)，DeepSeek 默认走工具回退；streamEvents 没有同样的结构化类型重载。使用中间件记录调用事件，先检查最大轮次退出原因，再解析结构化结果。详见 <a href="framework-verification.md">接入核查</a>。</p></div>
+      <p class="compact">2.0.4 在汇总失败时也保留 MAX_ITERATIONS，并标记 SUMMARY_FAILED；应用仍返回未完成。generate_response 是框架内部工具，不增加第三个业务工具。真实 Trace 需证明读取完成后模型再次推理，不能把同轮预先生成的最终草稿当作已观察原文。</p>
+      <p class="source-note">完整环境变量模板见 <a href="../.env.example">.env.example</a>。Spring Boot 不会默认自动读取根目录 .env，需由终端、IDE 或容器注入。本次文档未使用真实密钥调用服务。</p>
+    </section>
+
+    <section id="evaluation">
+      <h2><span class="num">10</span>测试与评审证据</h2>
+      <p class="intro">以可执行测试和实际 Trace 证明效果。至少 3 组材料覆盖正常、资料不足和工具失败，完整覆盖题目验收点。</p>
+      <div class="table-wrap"><table><thead><tr><th>验收内容</th><th>需要观察的行为</th><th>计划证据目录</th></tr></thead><tbody>
+        <tr><td>明确答案</td><td>检索、读取、带原文回答；引用保留适用条件。</td><td><code>examples/real/normal/</code></td></tr>
+        <tr><td>相似改写</td><td>改变问法，核对是否仍召回并读取正确资料。</td><td><code>examples/real/normal/</code></td></tr>
+        <tr><td>文档冲突</td><td>双方召回与读取，继续查证，无法消解时保留冲突。</td><td><code>examples/real/conflict/</code></td></tr>
+        <tr><td>资料外问题</td><td>不凭常识回答，区分无依据和工具不可用。</td><td><code>examples/real/no-evidence/</code></td></tr>
+        <tr><td>上下文追问</td><td>从历史理解省略对象，重新读取当前资料。</td><td><code>examples/real/follow-up/</code></td></tr>
+        <tr><td>工具失败</td><td>暴露错误或降级，记录模型根据观察改变动作。</td><td><code>examples/real/tool-failure/</code></td></tr>
+        <tr><td>重排序回退</td><td>超时、限流或异常下标时回退 RRF；保留关联版本，披露排序降级。</td><td><code>examples/real/rerank-fallback/</code></td></tr>
+        <tr><td>执行上限</td><td>持续工具调用到达上限时，状态为 INCOMPLETE。</td><td><code>examples/mock/budget/</code></td></tr>
+        <tr><td>文档替换</td><td>用新快照重跑，答案、引用和动作随资料变化。</td><td><code>examples/real/mutation/</code></td></tr>
+      </tbody></table></div>
+      <div class="grid"><div class="card"><h3>真实模式验证决策与检索</h3><p>正常路径验证检索后读取并回答；冲突路径验证读取双方后针对适用关系继续查证。按动作的先后关系检查真实 Trace，不强制固定完整序列。</p></div><div class="card"><h3>Mock 模式验证流程与异常</h3><p>模型与工具替身无需云 API 或真实数据库，可复现预算与失败。标记为 Mock，不能用来证明真实模型决策或 PG 检索效果。</p></div></div>
+      <p class="compact">评估配置可在 EmbeddingClient、RerankClient 或 EvidenceReader 包装层注入固定次数的超时、异常下标或读取错误，保留真实模型与 PostgreSQL。标注「真实系统＋注入故障」及注入点，不能与完全离线 Mock 混写。</p>
+      <div class="callout teal"><p><strong>检索改进要有对比：</strong>相同问题集比较关键词、向量、RRF 混合、混合＋重排序。固定候选池核对排序收益，记录 Recall@K、MRR@6 或 nDCG@6、冲突成对召回、答案支持性、延迟与回退率；主候选与扩展后的指标分别报告。未运行的指标不填写数值。</p></div>
+      <p class="compact">最终评估文档引用实际输入、输出和 Trace 文件。本页所有路径均为计划，不代表对应文件已生成或测试已通过。</p>
+    </section>
+
+    <section id="delivery">
+      <h2><span class="num">11</span>目录与实施顺序</h2>
+      <p class="intro">保持根目录现有 Maven 单模块，按职责分包；以下是建议落地结构，不是当前文件清单。</p>
+      <pre><code>README.md / .env.example / GLOSSARY.md
+pom.xml
+src/main/java/com/mango/backend/
+  qa/api/                  # HTTP 与输入输出
+  qa/application/          # 请求预算、快照与编排
+  qa/agent/                # Agent 工厂与两个工具
+  knowledge/               # 混合检索、重排序协调与原文读取
+  knowledge/ingest/        # 合成资料批量导入
+  infra/pg/mapper/         # MyBatis Mapper 接口
+  infra/model/             # Embedding、Rerank 与模型配置
+  evaluation/              # Trace 与引用校验
+src/main/resources/mapper/knowledge/  # Mapper XML
+src/test/                  # 可执行测试
+data/                      # 合成制度与领域词典
+examples/real/ / mock/      # 输入、实际输出、Trace
+docs/
+  01-requirements.md / 02-solution.md
+  03-evaluation.md / 04-ai-usage.md / 05-retrospective.md
+  architecture.html / framework-verification.md / adr/</code></pre>
+      <div class="timeline">
+        <div class="day"><div class="day-number">DAY 01 / 基础</div><h3>模型、资料与数据库</h3><p>三类模型能力冒烟，接入 MyBatis 与 PG，构造制度，jieba 分词、向量化并完成导入。</p></div>
+        <div class="day"><div class="day-number">DAY 02 / 核心</div><h3>检索、Agent 与结果</h3><p>完成两路召回、RRF、重排序及回退，注册工具，实现动态循环、引用校验与状态。</p></div>
+        <div class="day"><div class="day-number">DAY 03 / 验证</div><h3>真实记录与交付</h3><p>运行正常、冲突、失败与变更用例，比较检索效果，整理 Trace、AI 使用与复盘材料。</p></div>
+      </div>
+      <p class="source-note">顺序与工期是建议，实际投入及未完成项如实记录。当前 Git 根目录、pom.xml、src 与 docs 已处于同一项目根目录；提交前补齐题目要求的代码、资料与实际验证记录。</p>
+    </section>
+
+    <section id="references">
+      <h2><span class="num">12</span>来源与待验证项</h2>
+      <p class="intro">核查日期：2026-10-31。本地 v2.0.4 标签提交为 0b6743b；优先使用发行版源码与官方 API 文档，不将工作区 main 自动视为固定版本行为。</p>
+      <div class="card sources">
+        <div><strong>项目要求：</strong><a href="题目要求.md">本地题目原文</a> · <a href="01-requirements.md">需求基线</a> · <a href="../GLOSSARY.md">业务术语表</a></div>
+        <div><strong>AgentScope：</strong><a href="https://github.com/agentscope-ai/agentscope-java/releases/tag/v2.0.4">2.0.4 发行说明</a> · <a href="https://github.com/agentscope-ai/agentscope-java/blob/v2.0.4/agentscope-core/src/main/java/io/agentscope/core/ReActAgent.java">ReActAgent 发行版源码</a> · <a href="framework-verification.md">版本与接入核查</a></div>
+        <div><strong>混合检索：</strong><a href="https://github.com/pgvector/pgvector#hybrid-search">pgvector 官方说明</a> · <a href="https://www.postgresql.org/docs/17/textsearch-controls.html">PostgreSQL 全文检索</a></div>
+        <div><strong>中文分词：</strong><a href="https://github.com/huaban/jieba-analysis">jieba Java 项目</a> · <a href="https://central.sonatype.com/artifact/com.huaban/jieba-analysis/1.0.2">Maven Central 1.0.2</a></div>
+        <div><strong>数据访问：</strong><a href="https://mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/">MyBatis Spring Boot 兼容表</a> · <a href="https://github.com/mybatis/spring-boot-starter/releases/tag/mybatis-spring-boot-3.0.5">3.0.5 发行说明</a></div>
+        <div><strong>模型：</strong><a href="https://api-docs.deepseek.com/">DeepSeek 官方 API</a> · <a href="https://api-docs.deepseek.com/guides/tool_calls/">工具调用</a> · <a href="https://docs.siliconflow.cn/docs/api/embeddings-post">硅基流动 Embedding API</a> · <a href="https://huggingface.co/BAAI/bge-m3">BAAI/bge-m3 模型卡</a></div>
+        <div><strong>重排序：</strong><a href="https://docs.siliconflow.cn/docs/api/rerank-post">硅基流动 Rerank API</a> · <a href="https://huggingface.co/BAAI/bge-reranker-v2-m3">BAAI/bge-reranker-v2-m3 模型卡</a></div>
+      </div>
+      <div class="callout warn"><p><strong>实施前后需要验证：</strong>Maven 与 Java 17 编译、Boot 3.5.10 启动、MyBatis 类型转换与事务；DeepSeek 工具调用和结构化回退；硅基流动向量维度、重排序下标与超时回退；jieba 词典与并发；真实 PG 两路召回及排序收益。本文不宣称这些组合已经运行通过。</p></div>
+    </section>
+    <footer><span>企业知识问答 Agent · 架构设计 1.2 · 2026-10-31</span><span>单文件 HTML · 图示内嵌 · 无外部脚本与字体依赖</span></footer>
+  </main>
+  <script>
+    const scenarios = {
+      normal: {title:'明确答案：找到依据后结束',status:'ANSWERED',steps:[['选择检索','模型以「报销期限」检索，工具返回相关制度候选。'],['选择读取','模型读取支持答案的指定版本条款。'],['检查依据是否充分','模型根据条款回答，提供原文引用和必要条件。'],['校验并结束','应用校验本次证据与引用后返回结果。']],foot:'必要检索完成、关联主题未截断，且已读资料没有冲突时，可以按 D01 回答；检索预览必须进一步读取核对。'},
+      conflict: {title:'文档冲突：继续查证后请求确认',status:'CONFLICT',steps:[['检索发现两份资料','候选包含 D01 与 D02，主题扩展保留相关版本。'],['读取双方原文','模型观察到一份规定 30 天，另一份规定 15 天。'],['补充查证适用关系','模型再次检索或读取适用范围、优先级或明确替代条款。'],['保留冲突并追问','若仍无适用依据，列出双方引用，请求确认应适用哪份制度。']],foot:'不能凭发布日期、检索排名或模型偏好选择某个期限。补充检索与读取应由真实模型工具调用体现。'},
+      rerankFallback: {title:'重排序失败：回退后继续查证',status:'ANSWERED（依据充分时）',steps:[['工具内部观察排序错误','Rerank 超时或返回无效下标，应用整批回退 RRF，不增加模型业务工具。'],['返回可解释的候选','保留主候选及独立主题扩展，标记 RRF_FALLBACK、degraded 与具体排序警告。'],['模型选择原文读取','召回正常时，模型仍需读取支持条款；若资料存在分歧，继续查证双方。'],['校验并披露限制','原文充分且必要查证完整时允许回答；有冲突或缺口时按实际证据结束。']],foot:'重排序回退是应用的确定性处理，不能单独证明 Agent 动态决策。排序分数不决定制度优先级；自动回退也不免除原文查证。'},
+      failure: {title:'工具失败：根据错误选择下一步',status:'继续执行或 INCOMPLETE',steps:[['观察真实工具错误','Embedding、原文读取或数据库出现错误，工具返回错误类别与路由状态；重排序回退见单独示例。'],['判断能否继续','若有明确标记的关键词候选，模型可选择读取；否则决定调整查询或停止。'],['再次观察工具结果','模型可补充查询查证；必要召回路由仍失败时，不把已有片段当作完整检索结果。'],['说明结果及限制','后续检索恢复且证据充分才正常回答；否则保留已知材料并返回 INCOMPLETE。']],foot:'自动重试本身不证明 Agent 决策。真实模型应在观察错误后选择下一步，最终响应保留未恢复的错误、降级与截断信息。'}
+    };
+    document.querySelectorAll('[data-scenario]').forEach(button => button.addEventListener('click', () => {
+      const plan = scenarios[button.dataset.scenario];
+      document.querySelectorAll('[data-scenario]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+      document.getElementById('scenario-title').textContent = plan.title;
+      document.getElementById('scenario-status').textContent = '预期状态：' + plan.status;
+      const list = document.getElementById('scenario-steps');
+      list.replaceChildren(...plan.steps.map(([title, detail]) => { const item = document.createElement('li'); const label = document.createElement('strong'); label.textContent = title; item.append(label, document.createTextNode(detail)); return item; }));
+      document.getElementById('scenario-foot').textContent = plan.foot;
+    }));
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => { for (const entry of entries) if (entry.isIntersecting) document.querySelectorAll('.sidebar nav a').forEach(link => link.classList.toggle('active', link.hash === '#' + entry.target.id)); }, {rootMargin:'-10% 0px -65% 0px',threshold:0});
+      document.querySelectorAll('main section[id]').forEach(section => observer.observe(section));
+    }
+  </script>
+</body>
+</html>
