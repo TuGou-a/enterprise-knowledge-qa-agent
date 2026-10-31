@@ -1,6 +1,6 @@
 # 验收输入与运行证据
 
-当前目录只有计划输入和未填写的标注模板，没有实际输出、实际 Trace 或已通过的测试记录。
+当前目录只有计划输入和未填写的标注模板，没有完整问答的实际输出或 Trace。已有 48 个契约/模型中断测试通过，T04 的数据库与资料导入验证记录见[运行验证](../docs/t04-ingestion-verification.md)；这些结果不能替代 E01–E10 的完整问答验收。
 
 - [cases.json](cases.json)：E01 至 E10 的请求、前置条件、预期检查及需求映射。`request` 可在 HTTP 接口实现并获得测试指令后作为请求体；其余字段供测试执行者阅读，不传给 API。
 - [retrieval-labels.template.json](retrieval-labels.template.json)：检索标注模板。`null` 表示尚未标注，不能当成「没有相关条款」或计入指标。
@@ -24,6 +24,6 @@ Trace 保留步骤、实际工具参数与返回摘要、后续动作、公开�
 
 ## 收集自动化测试证据
 
-本轮测试只验证契约。获准执行后，记录命令、commit、时间、退出码及实际结果，并将本次 `target/surefire-reports/` 中的相关报告保存到 `mock/contracts/<executionId>/`。这里的 `mock` 表示离线验证分类，不表示已经验证完整 Mock 问答流程。执行失败也须保留报告；没有生成报告时保存实际错误信息。
+当前 48 个测试已通过；`target/surefire-reports/` 是本地生成物，未复制到仓库。T04 的编译、测试、数据库、导入及失败路径摘要记录在[运行验证](../docs/t04-ingestion-verification.md)。这里的契约与导入验证不表示已经验证完整 Mock 问答流程。后续完整离线 Mock 应继续按 `mock/contracts/<executionId>/` 保存命令、commit、退出码和实际报告。
 
 最终至少提交三组真实输入、实际输出和 Trace，覆盖正常、资料不足及工具失败，并用 E01/E02 等至少两条实际路径证明真实模型的动作调整。其余用例补足全部验收点。契约测试、Mock 和故障注入应分别说明边界，不能互相替代。

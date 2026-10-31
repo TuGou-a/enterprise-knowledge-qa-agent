@@ -4,12 +4,12 @@
 
 准备 PostgreSQL 数据库，使用 UTF-8 编码，并在数据库服务器安装 pgvector 扩展文件。数据库管理员负责创建数据库及应用角色；初始化角色须有目标 schema 的建表权限和创建 `vector` 扩展的权限。应用用户名、密码及 JDBC 地址继续通过 T01 定义的环境变量提供。
 
-本目录不创建角色或保存密码。脚本为一次性初始版本，尚未在真实 PostgreSQL 执行；不要将文件存在视为初始化已经成功。
+本目录不创建角色或保存密码。脚本为一次性初始版本，已在本机临时 PostgreSQL 17／pgvector 0.8.6 数据库成功执行；尚未在团队共享、测试或生产数据库执行，不要将文件存在视为目标环境初始化已经成功。
 
 ## 执行
 
 1. 在项目根目录为 `psql` 设置 `PGHOST`、`PGPORT`、`PGDATABASE`、`PGUSER`。使用本机凭据文件或交互式提示提供密码。
-2. 运行以下命令。当前开发阶段不执行，等待用户后续验证指令。
+2. 在目标环境运行以下命令。单事务失败会整体回滚，已存在表时明确报错。
 
 ```sh
 psql -X --set ON_ERROR_STOP=on --single-transaction \
@@ -31,4 +31,6 @@ psql -X --set ON_ERROR_STOP=on --single-transaction \
 
 关键词先使用相同分词配置产生词元，入库时以空格连接词元并调用 `to_tsvector('simple', ...)`；查询对每个绑定词元调用 `plainto_tsquery('simple', ...)` 后用 `||` 合成 OR 条件。词元作为数据传递，不作为 `tsquery` 语法拼接。原文不做上述归一化。
 
-依据：[PostgreSQL 全文检索](https://www.postgresql.org/docs/17/textsearch-controls.html)、[查询组合运算](https://www.postgresql.org/docs/17/textsearch-features.html)、[pgvector](https://github.com/pgvector/pgvector)。这些来源只用于核对设计，不构成本项目运行验证。
+本机运行验证已确认脚本创建 `vector` 扩展、三张 `kb_*` 表和三个索引；T04 在这个临时数据库中完成导入。完整记录见[T04 运行验证](../../../../docs/t04-ingestion-verification.md)。
+
+依据：[PostgreSQL 全文检索](https://www.postgresql.org/docs/17/textsearch-controls.html)、[查询组合运算](https://www.postgresql.org/docs/17/textsearch-features.html)、[pgvector](https://github.com/pgvector/pgvector)。这些来源只用于核对设计与本机 schema 验证，不代表真实检索查询已经验证。

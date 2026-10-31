@@ -1,6 +1,6 @@
 # 合成资料与导入
 
-本目录提供企业知识问答的合成报销、差旅资料及导入步骤。所有制度、日期和金额规则均用于项目验收，不代表真实公司的制度。当前代码与命令仅经静态审查，尚未执行编译、启动、测试、真实导入或模型调用。
+本目录提供企业知识问答的合成报销、差旅资料及导入步骤。所有制度、日期和金额规则均用于项目验收，不代表真实公司的制度。T04 已完成编译、全量测试、PostgreSQL／pgvector 初始化、三组资料导入及失败路径验证；外部 Embedding 使用本地受控服务替代，真实模型调用仍未覆盖。完整证据见[运行验证](../docs/t04-ingestion-verification.md)。
 
 ## 资料集合
 
@@ -50,7 +50,7 @@
 
 ## 导入命令
 
-下列命令供获得用户后续验证指令后执行；本次开发未执行这些命令，不能据此认定能够编译或运行。
+下列命令已在本地 PostgreSQL 17／pgvector 0.8.6 和受控 Embedding 服务下验证。实际使用需要按“导入前置条件”注入真实数据库和模型环境变量；本次没有验证真实硅基流动账号、网络或模型质量。
 
 在项目根目录执行独立导入主类：
 
@@ -88,4 +88,4 @@ mvn -DskipTests \
 - 设置 `JIEBA_DICTIONARY_LOCATION` 时，将 `JIEBA_DICTIONARY_VERSION` 改为实际资源版本；设置 `JIEBA_STOP_WORDS_LOCATION` 时，同样更新 `JIEBA_STOP_WORDS_VERSION`。没有自定义路径时分别使用 `builtin-v1`、`none-v1`。
 - 现有实现只接受 `INDEX_PREPROCESSING_VERSION=source-preserving-v1` 和 `JIEBA_TOKENIZER_VERSION=jieba-analysis-1.0.2`，不以修改标签冒充新算法。资源与版本在进程启动时固定，修改后重启并建立新快照。
 
-资料快照记录完整 `IndexProfile`。T07 在建立问答上下文时须按 T01 核对配置；模型、分词或资源版本变化时重建索引。jieba 的自定义词典加载限制见 [T04 踩坑记录](../docs/pitfalls/T04-jieba-dictionary-loading.md)。
+资料快照记录完整 `IndexProfile`。T07 在建立问答上下文时须按 T01 核对配置；模型、分词或资源版本变化时重建索引。jieba 的自定义词典加载限制见 [T04 词典踩坑记录](../docs/pitfalls/T04-jieba-dictionary-loading.md)；本机 Java 代理导致 `127.0.0.1` 连接失败时的排查见 [本机代理踩坑记录](../docs/pitfalls/T04-java-local-proxy.md)。
