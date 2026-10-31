@@ -46,9 +46,6 @@ final class SiliconFlowHttpClient {
 
     JsonNode post(String resource, ModelRequest payload, CallBudget budget) {
         budget.remainingNanos();
-        if (Thread.currentThread().isInterrupted()) {
-            throw failure(UPSTREAM_UNAVAILABLE, "模型调用已中断");
-        }
         byte[] body;
         try {
             body = mapper.writeValueAsBytes(payload);
@@ -192,6 +189,10 @@ final class SiliconFlowHttpClient {
             long remaining = timeoutNanos - (System.nanoTime() - startedAt);
             if (remaining <= 0) {
                 throw failure(TIMEOUT, "模型调用超时");
+            }
+            // 解析与结果校验不会自动响应线程中断，在共享检查点拒绝已中断的结果。
+            if (Thread.currentThread().isInterrupted()) {
+                throw failure(UPSTREAM_UNAVAILABLE, "模型调用已中断");
             }
             return remaining;
         }
