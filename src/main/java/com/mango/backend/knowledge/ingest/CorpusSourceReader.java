@@ -53,7 +53,10 @@ final class CorpusSourceReader {
                     .map(reference -> reference.getFieldName() == null
                             ? "[" + reference.getIndex() + "]" : reference.getFieldName())
                     .reduce((left, right) -> left + "." + right).orElse("documents");
-            throw new IllegalArgumentException("资料 JSON 字段格式不正确：" + field);
+            var location = exception.getLocation();
+            String position = location == null ? ""
+                    : "（第 " + location.getLineNr() + " 行，第 " + location.getColumnNr() + " 列）";
+            throw new IllegalArgumentException("资料 JSON 字段格式不正确：" + field + position);
         } catch (JsonProcessingException exception) {
             var location = exception.getLocation();
             String position = location == null ? "" : "（第 " + location.getLineNr() + " 行，第 " + location.getColumnNr() + " 列）";
