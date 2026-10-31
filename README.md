@@ -2,7 +2,7 @@
 
 面向报销与差旅制度的知识问答项目。通过检索和原文读取工具，帮助员工获得有文档依据的回答；资料冲突或不足时，明确说明限制并请求补充信息。
 
-本轮 T09 以 T01 的配置与共享契约为测试基线，补充契约测试和交付材料。集成时已同步 `dev` 上的 T02 模型客户端、T03 持久化与 T06 校验/Trace 实现，这些模块的实现测试仍待补齐；其他并行模块的最新状态见开发计划及 Git 历史。完整问答、离线 Mock、真实输出及评估结论仍待完成，尚未执行依赖解析、编译、启动或测试。
+本轮 T09 以 T01 的配置与共享契约为测试基线，补充契约测试和交付材料。集成时已同步 `dev` 上的 T02 模型客户端、T03 持久化与 T06 校验/Trace 实现；48 个现有测试已通过，T04 已完成本机临时 PostgreSQL／pgvector 与受控 Embedding 的导入验证。这些模块的业务实现测试仍需补齐，完整问答、离线 Mock、真实模型输出及评估结论仍待完成。其他并行模块的最新状态见开发计划及 Git 历史。
 
 ## 文档入口
 
@@ -12,7 +12,7 @@
 - [框架接入核查](docs/framework-verification.md)：官方来源、发行版 API 与兼容性边界。
 - [开发计划](docs/06-parallel-development-plan.md)与[T01 契约](docs/08-t01-contracts.md)：任务边界、类型及待验证事项。
 - [测试与评估](docs/03-evaluation.md)、[AI 使用记录](docs/04-ai-usage.md)和[阶段复盘](docs/05-retrospective.md)。
-- [示例与证据说明](examples/README.md)：验收输入、标注模板和后续运行证据的保存方式，当前没有实际输出或 Trace。
+- [示例与证据说明](examples/README.md)：验收输入、标注模板和后续运行证据的保存方式，当前没有完整问答的实际输出或 Trace。
 - [业务术语表](GLOSSARY.md)与[数据库选型决策](docs/adr/0001-postgres-hybrid-retrieval.md)。
 
 ## 当前测试入口
@@ -23,9 +23,9 @@
 mvn -Dtest='*ContractTest' test
 ```
 
-测试覆盖向量合法性、配置约束、读取结果互斥、资料排序和 JSON 契约；不加载完整应用。实际命令尚未运行，测试报告待生成。依赖全部缓存后才可尝试加 `-o` 断网执行。当前入口不能证明完整 Mock 问答、真实检索或模型决策。
+测试覆盖向量合法性、配置约束、读取结果互斥、资料排序、JSON 契约和模型调用中断；当前 48 个测试已通过，其中 4 个内嵌 HTTP 服务用例需要在允许本机端口绑定的环境运行。依赖全部缓存后才可尝试加 `-o` 断网执行。当前入口不能证明完整 Mock 问答、真实检索或模型决策。
 
-评审可先阅读 [需求映射和测试边界](docs/03-evaluation.md)，再检查 `src/test/` 和 `examples/`。完整问答运行步骤、真实数据库初始化及资料导入命令待对应模块合并后补充并验证。
+评审可先阅读 [需求映射和测试边界](docs/03-evaluation.md)，再检查 `src/test/` 和 `examples/`。T03 数据库初始化与 T04 资料导入已在本地临时环境验证，详见 [T04 运行验证](docs/t04-ingestion-verification.md)；完整问答运行步骤仍待 T05/T07 完成。
 
 ## 已确认的项目范围
 
@@ -56,7 +56,7 @@ mvn -Dtest='*ContractTest' test
 
 已对照本地源码的 `v2.0.4` 标签核查：ReAct 循环、Java 工具、结构化调用与中间件可承接本方案；旧 `core.rag` API 已标记弃用，检索与重排序由应用实现。`reference-code/agentscope-java` 当前工作区是 `2.1.0-SNAPSHOT`，仅作为源码参考；业务工程仍通过 Maven 获取 `2.0.4`，不依赖该目录构建。
 
-需优先验证依赖基线：AgentScope 2.0.4 使用 Reactor BOM `2025.0.2`、Jackson `2.21.1`，Boot 3.5.10 管理 Reactor BOM `2024.0.14`、Jackson `2.19.4`。实际依赖树及运行兼容性尚未验证；暂不盲目覆盖版本或升级后端，先完成最小集成验证。具体来源见[依赖基线差异](docs/framework-verification.md#需要优先验证的依赖基线差异)。
+需优先验证依赖基线：AgentScope 2.0.4 使用 Reactor BOM `2025.0.2`、Jackson `2.21.1`，Boot 3.5.10 管理 Reactor BOM `2024.0.14`、Jackson `2.19.4`。实际依赖树已成功解析，当前采用 Boot 管理的 Jackson 2.19.4 和 Reactor 3.7.15；T04 的非 Web 导入上下文已运行，但 AgentScope 参与完整问答与模型调用后的兼容性仍需后续验证。暂不盲目覆盖版本或升级后端。具体来源见[依赖基线差异](docs/framework-verification.md#需要优先验证的依赖基线差异)。
 
 ### 使用 PostgreSQL＋pgvector：由一个数据库承载原文与两路检索
 
@@ -137,8 +137,8 @@ PostgreSQL 驱动版本交由现有 Spring Boot 依赖管理。业务服务通�
 
 ## 运行与验证状态
 
-本轮测试基线只有应用启动骨架、配置与共享契约。集成时已同步 T03 的[手动数据库初始化脚本及说明](src/main/resources/db/README.md)，尚未执行或验证，自动初始化仍未启用；完整问答、知识导入和完整 Mock 流程仍待完成。问答启动、资料导入及 Mock 流程命令待对应模块合并后补充。当前仅提供上文的契约测试命令，未执行验证。
+48 个现有测试已通过，`mvn -DskipTests package` 可生成可执行 JAR。T03 的[手动数据库初始化脚本及说明](src/main/resources/db/README.md)已在 PostgreSQL 17／pgvector 0.8.6 临时数据库中成功执行；T04 的三组资料、严格失败路径、自定义词典和快照隔离已用受控 Embedding 服务完成验证，详见[T04 运行验证](docs/t04-ingestion-verification.md)。真实硅基流动调用、完整问答、HTTP 接口和 Mock 流程仍待后续任务与真实模型验证。
 
 验收材料至少覆盖明确答案、文档冲突、资料外问题、相似改写、上下文追问和工具失败；另验证执行上限与文档替换。Mock 验证流程，真实模型 Trace 证明动作调整，二者分别标注，结果引用对应文件。
 
-当前 Git 根目录、`pom.xml`、`src/`、README 与 `docs/` 位于同一项目根目录。最终交付仍需补齐业务代码、资料、R01–R10 验收证据与实测结论，记录实际投入时间和未完成项，并提交题号、GitHub URL 与最终 commit SHA；当前不预填。T09 按独立 Worktree 开发、子代理静态审查并合并 `dev` 的流程交付，合并后等待用户测试指令。
+当前 Git 根目录、`pom.xml`、`src/`、README 与 `docs/` 位于同一项目根目录。最终交付仍需补齐完整问答业务、R01–R10 验收证据、真实模型与检索评估及实测结论，记录实际投入时间和未完成项，并提交题号、GitHub URL 与最终 commit SHA；当前不预填。T04 已按独立 Worktree、子代理静态审查、合并后运行验证的流程完成资料导入；其他任务仍按相同流程推进。
