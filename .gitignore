@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Local files and reference sources ###
+.DS_Store
+.env
+.env.*
+!.env.example
+/reference-code/
