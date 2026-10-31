@@ -27,7 +27,7 @@ class WireContractTest {
     private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     @Test
-    void mapsOnlyCallerHistoryRolesAndNormalizesAbsentHistory() throws JsonProcessingException {
+    void mapsOnlyCallerHistoryRolesAndNormalizesMissingOrNullHistory() throws JsonProcessingException {
         var request = mapper.readValue("""
                 {"question":"那差旅补贴呢？","history":[
                   {"role":"user","content":"请查差旅制度"},
