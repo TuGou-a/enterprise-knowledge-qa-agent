@@ -23,7 +23,7 @@ T09 本阶段补齐已合并模块的测试、固定资料参考标注、四方�
 mvn test
 ```
 
-默认测试包含契约、模型协议、导入、检索读取、引用／Trace、HTTP 边界和评估指标。HTTP 使用实际 Controller、校验器与异常处理器，但 `QaService` 是替身；这不等于完整离线 Mock 问答。
+默认测试包含契约、模型协议、导入、检索读取、引用／Trace、HTTP 边界、评估指标及 T07 实际问答 Mock。HTTP 边界测试使用 `QaService` 替身；`QaOfflineMockTest` 则接入实际 `AgentQaService`、AgentScope、工具包装、读取和校验，只替换模型与资料存储。单独执行离线流程可用 `mvn -Dtest=QaOfflineMockTest test`，成功或失败的实际响应和 Trace 只在运行时保存到 `examples/mock/`。
 
 Docker PostgreSQL 集成回归通过以下入口显式启用；需要 Docker 与 `pgvector/pgvector:pg17` 镜像，模型仍为受控替身，不连接本机业务数据库：
 
@@ -46,6 +46,15 @@ mvn -Preal-evaluation -Dtest=RealRetrievalEvaluationTest \
 ```
 
 结果在实际运行时保存到 `examples/retrieval/real/<runId>/`。标注目前为 AI 辅助逐条核对形成的参考标注，待人工复核；7／8 条款的小语料无法证明普遍检索收益。命令及新增代码尚未执行，不能引用为通过结果。
+
+真实问答使用独立入口，先发布用例要求的资料并记录当前最新快照，再获得运行指令后执行：
+
+```bash
+mvn -Preal-evaluation -Dtest=RealQaEvaluationTest \
+  -Devaluation.case=E01 -Devaluation.snapshot='<当前最新normal快照ID>' test
+```
+
+支持 E01/E02/E03/E04/E05/E06/E08/E09，实际输入、输出、Trace 和元数据写入 `examples/real/<caseId>/<runId>/`。E02 要求 conflict，其他用例按[证据说明](examples/README.md)选择；E06/E09 固定注入一次 Embedding／Rerank 超时，仅在测试配置生效。该入口调用真实 DeepSeek 和硅基流动；状态和语义仍需人工核对，不自动声明验收通过。
 
 评审可先阅读 [需求映射和测试边界](docs/03-evaluation.md)，再检查 `src/test/` 和 `examples/`。T04／T05 的历史受控运行记录分别见 [T04 验证](docs/t04-ingestion-verification.md)与 [T05 验证](docs/t05-search-verification.md)，不能替代本次改动的运行结果。T07 已合并，获得运行指令后可使用 `examples/requests/E01.json` 等请求调用 `POST /api/qa`；当前不将完整应用启动列为已验证入口。
 
@@ -163,4 +172,4 @@ PostgreSQL 驱动版本交由现有 Spring Boot 依赖管理。业务服务通�
 
 验收材料至少覆盖明确答案、文档冲突、资料外问题、相似改写、上下文追问和工具失败；另验证执行上限与文档替换。Mock 验证流程，真实模型 Trace 证明动作调整，二者分别标注，结果引用对应文件。
 
-当前 Git 根目录、`pom.xml`、`src/`、README 与 `docs/` 位于同一项目根目录。最终交付仍需补齐完整问答业务、R01–R10 验收证据、T05 JUnit 测试运行结果、真实模型与检索评估及实测结论，记录实际投入时间和未完成项，并提交题号、GitHub URL 与最终 commit SHA；当前不预填。T04／T05 已按独立 Worktree、子代理静态审查、合并后运行验证的流程完成；其他任务仍按相同流程推进。
+当前 Git 根目录、`pom.xml`、`src/`、README 与 `docs/` 位于同一项目根目录。T07 问答业务及 T09 执行入口已编写；最终交付仍需实际运行、R01–R10 验收证据、真实模型与检索成绩及人工结论。实际投入时间、个人修改、题号、GitHub URL 与最终 commit SHA 等事实待补充，不预填。其他任务的历史通过记录不能替代最新代码的运行验证。

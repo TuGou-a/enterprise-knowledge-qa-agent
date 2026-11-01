@@ -119,7 +119,7 @@
       "preconditions": [
         "沿用 E01 资料，保留真实模型和 PostgreSQL",
         "仅在测试配置包装 EmbeddingClient，首次调用注入一次 TIMEOUT，之后恢复委托",
-        "注入包装器待业务实现合并后编写，不能通过生产 HTTP 参数启用"
+        "RealQaEvaluationTest 的测试配置已提供单次故障包装器，不能通过生产 HTTP 参数启用"
       ],
       "expected": [
         "Trace 记录注入点、次数、错误观察及后续模型动作",
@@ -133,13 +133,14 @@
       "requirements": [
         "R08"
       ],
-      "plannedMode": "MOCK_AFTER_T07",
+      "plannedMode": "MOCK",
       "request": {
         "question": "请继续查找报销规定。"
       },
       "preconditions": [
-        "待实际问答服务合并后接入持续请求工具的确定性模型替身",
-        "分别触发业务工具次数、模型轮次与总超时边界"
+        "QaOfflineMockTest 已接入实际 AgentQaService 与持续请求工具的确定性模型替身，尚未执行",
+        "分别触发业务工具次数、模型轮次与总超时边界",
+        "工具和轮次上限通过实际框架循环验证；总超时另有强制截止状态单元测试，真实流式计时仍待运行"
       ],
       "expected": [
         "INCOMPLETE，分别给出 BUDGET_EXHAUSTED、MAX_ITERATIONS 或 DEADLINE_EXCEEDED",
@@ -180,7 +181,7 @@
       },
       "preconditions": [
         "沿用 E01 资料，必要召回正常且证据充分",
-        "在测试配置中为 RerankClient 注入超时或无效响应，具体包装器待实现"
+        "RealQaEvaluationTest 的测试配置为 RerankClient 首次调用注入一次 TIMEOUT，后续委托真实客户端"
       ],
       "expected": [
         "整批回退 RRF，保留关联版本和排序警告",
@@ -194,12 +195,12 @@
       "requirements": [
         "R10"
       ],
-      "plannedMode": "MOCK_AFTER_T07",
+      "plannedMode": "MOCK",
       "request": {
         "question": "报销期限是多久？"
       },
       "preconditions": [
-        "待业务实现合并后，通过 Maven 接入模型与工具替身",
+        "通过 mvn -Dtest=QaOfflineMockTest test 接入实际服务和模型／资料替身，尚未执行",
         "不绑定真实运行配置，不创建真实数据源，无业务密钥也能运行"
       ],
       "expected": [

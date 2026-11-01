@@ -1,6 +1,6 @@
 # 验收输入与运行证据
 
-当前目录包含计划请求和参考标注，没有完整问答的实际回答、真实 Trace 或检索成绩。48 个既有测试与 T04／T05 的历史记录见[评估文档](../docs/03-evaluation.md)，本阶段新增／修改测试尚未执行。
+当前目录包含计划请求和参考标注，没有完整问答的实际回答、真实 Trace 或检索成绩。历史基线 `5ff4dd0` 的 63 项测试与 T04／T05 记录见[评估文档](../docs/03-evaluation.md)，本阶段新增／修改测试和 T07 尚未执行。
 
 ## 已提供材料
 
@@ -15,7 +15,7 @@
 
 ## HTTP 调用
 
-T07 合并、应用具备运行条件且收到测试指令后，在项目根目录调用：
+T07 已合并，应用通过运行验证并收到测试指令后，在项目根目录调用：
 
 ```bash
 curl --fail-with-body -sS http://localhost:8080/api/qa \
@@ -46,7 +46,11 @@ python3 scripts/run-tests.py postgres
 
 ## 完整问答证据
 
-T07 具备且获得运行指令后，每次真实问答在 `real/<caseId>/<runId>/` 保存 `request.json`、`response.json`、`trace.json` 和 `run.md`；完全离线问答替身运行放在 `mock/<caseId>/<runId>/`。当前不创建这些实际产物。
+实际服务的离线入口为 `mvn -Dtest=QaOfflineMockTest test`，真实问答入口为 `mvn -Preal-evaluation -Dtest=RealQaEvaluationTest -Devaluation.case=E01 -Devaluation.snapshot='<实际最新normal快照ID>' test`。两者都已编写但尚未执行，均需等运行指令。
+
+离线用例将实际服务及框架生成的响应与 Trace 放在 `mock/<caseId>/<runId>/`，标明确定性模型／资料替身。真实问答在 `real/<caseId>/<runId>/` 保存 `request.json`、`response.json`、`trace.json`、`run.json` 和 `run.md`。当前不创建这些实际产物。
+
+真实入口支持 E01/E02/E03/E04/E05/E06/E08/E09，E02 使用最新 conflict，其他普通用例使用 normal。E08 分别在 normal、mutation 发布后运行，设置 `evaluation.corpus` 和实际快照。E06/E09 的测试配置只在对应客户端首次调用注入一次 TIMEOUT，并记录实际注入次数，后续调用委托真实客户端。此入口直接调用实际服务，不代替 HTTP 端到端验证。
 
 `run.md` 记录时间、实际 commit、命令、Java／框架／模型版本、资料快照与索引配置、前置条件、结束状态、失败或限制、人工核对者及意见。输入、输出与 Trace 必须属于同次运行。真实模型与 PostgreSQL 加故障注入的用例仍放在 `real/`，注明 `REAL_WITH_INJECTED_FAULT`、注入点和次数。
 
