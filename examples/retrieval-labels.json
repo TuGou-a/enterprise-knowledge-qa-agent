@@ -1,0 +1,276 @@
+{
+  "materialType": "REFERENCE_ANNOTATIONS",
+  "annotationStatus": "REFERENCE_REVIEW_PENDING",
+  "annotationSource": "AI_ASSISTED_SOURCE_REVIEW",
+  "relevanceScale": "BINARY",
+  "corpora": [
+    {
+      "corpusId": "normal",
+      "path": "data/corpus/normal.json",
+      "sourceSha256": "24086f70043ed1b3ebc116c738f5b64405bab332e84deb6ed202d7849501249b",
+      "contentHash": "f6dd50e861105ab38b1bed3d18c62e71322f73b53611e064419361c74c866de7"
+    },
+    {
+      "corpusId": "conflict",
+      "path": "data/corpus/conflict.json",
+      "sourceSha256": "64d03765076add8af893f79ac8a8ef04a92a02ca228759d558d08d6f200f6ac1",
+      "contentHash": "f7f42a3d39c26838b26ac74c241de71631309355cb1a7e37b3705bc447f70d36"
+    },
+    {
+      "corpusId": "mutation",
+      "path": "data/corpus/mutation.json",
+      "sourceSha256": "248c95cb749c86ffaff763e555e38698c0044257c6f7bb70cd072aab43a69595",
+      "contentHash": "437c3055fbad7ed61f2bcb5bf654165df5402a1442b7b22aae115fc14db9b15f"
+    }
+  ],
+  "queries": [
+    {
+      "queryId": "E01",
+      "corpusId": "normal",
+      "query": "报销期限是多久？",
+      "relevantClauses": [
+        {
+          "documentId": "D01",
+          "version": "v1",
+          "chunkId": "clause-1"
+        }
+      ],
+      "conflictPairs": [],
+      "expectedAnswer": "报销申请应在费用发生之日起 30 个自然日内提交。"
+    },
+    {
+      "queryId": "E04",
+      "corpusId": "normal",
+      "query": "费用发生后，最迟多长时间内要提交报销？",
+      "relevantClauses": [
+        {
+          "documentId": "D01",
+          "version": "v1",
+          "chunkId": "clause-1"
+        }
+      ],
+      "conflictPairs": [],
+      "expectedAnswer": "从费用发生之日起计算，30 个自然日内提交报销申请。"
+    },
+    {
+      "queryId": "N03",
+      "corpusId": "normal",
+      "query": "申请报销时要填写哪些信息并提交什么？",
+      "relevantClauses": [
+        {
+          "documentId": "D01",
+          "version": "v1",
+          "chunkId": "clause-2"
+        }
+      ],
+      "conflictPairs": [],
+      "expectedAnswer": "提交对应费用的有效凭证，填写费用用途和实际金额。"
+    },
+    {
+      "queryId": "N04",
+      "corpusId": "normal",
+      "query": "报销凭证不齐或用途说不清，应该先做什么？",
+      "relevantClauses": [
+        {
+          "documentId": "D01",
+          "version": "v1",
+          "chunkId": "clause-3"
+        }
+      ],
+      "conflictPairs": [],
+      "expectedAnswer": "先补充材料，再提交报销申请。"
+    },
+    {
+      "queryId": "N05",
+      "corpusId": "normal",
+      "query": "出差之前需要谁审批？",
+      "relevantClauses": [
+        {
+          "documentId": "D03",
+          "version": "v1",
+          "chunkId": "clause-1"
+        }
+      ],
+      "conflictPairs": [],
+      "expectedAnswer": "出发前提交出差申请，取得直属主管审批后再安排出行。"
+    },
+    {
+      "queryId": "N06",
+      "corpusId": "normal",
+      "query": "差旅报销需要准备哪些凭证？",
+      "relevantClauses": [
+        {
+          "documentId": "D03",
+          "version": "v1",
+          "chunkId": "clause-2"
+        }
+      ],
+      "conflictPairs": [],
+      "expectedAnswer": "已审批的出差申请、交通票据、住宿发票及对应付款记录；未发生的费用无需提供该类凭证。"
+    },
+    {
+      "queryId": "N07",
+      "corpusId": "normal",
+      "query": "没有住宿支出，也需要交住宿发票吗？",
+      "relevantClauses": [
+        {
+          "documentId": "D03",
+          "version": "v1",
+          "chunkId": "clause-2"
+        }
+      ],
+      "conflictPairs": [],
+      "expectedAnswer": "未发生的费用无需提供该类凭证，不能省略其他已发生费用的凭证要求。"
+    },
+    {
+      "queryId": "N08",
+      "corpusId": "normal",
+      "query": "交通票据遗失了还能报销吗？",
+      "relevantClauses": [
+        {
+          "documentId": "D03",
+          "version": "v1",
+          "chunkId": "clause-4"
+        }
+      ],
+      "conflictPairs": [],
+      "expectedAnswer": "补充行程记录、对应付款记录和遗失原因，由财务核对后确认能否报销，不能保证一定报销。"
+    },
+    {
+      "queryId": "N09",
+      "corpusId": "normal",
+      "query": "住宿报销按什么金额，私人消费能一起报吗？",
+      "relevantClauses": [
+        {
+          "documentId": "D03",
+          "version": "v1",
+          "chunkId": "clause-3"
+        }
+      ],
+      "conflictPairs": [],
+      "expectedAnswer": "按住宿发票列明的实际金额申请；私人消费不得混入住宿费用。"
+    },
+    {
+      "queryId": "N10",
+      "corpusId": "normal",
+      "query": "车票找不到了，是不是说明原因就可以直接报销？",
+      "relevantClauses": [
+        {
+          "documentId": "D03",
+          "version": "v1",
+          "chunkId": "clause-4"
+        }
+      ],
+      "conflictPairs": [],
+      "expectedAnswer": "还需补充行程记录和对应付款记录，经财务核对后确认能否报销。"
+    },
+    {
+      "queryId": "E02",
+      "corpusId": "conflict",
+      "query": "报销期限是多久？",
+      "relevantClauses": [
+        {
+          "documentId": "D01",
+          "version": "v1",
+          "chunkId": "clause-1"
+        },
+        {
+          "documentId": "D02",
+          "version": "v1",
+          "chunkId": "clause-1"
+        }
+      ],
+      "conflictPairs": [
+        {
+          "left": {
+            "documentId": "D01",
+            "version": "v1",
+            "chunkId": "clause-1"
+          },
+          "right": {
+            "documentId": "D02",
+            "version": "v1",
+            "chunkId": "clause-1"
+          }
+        }
+      ],
+      "expectedAnswer": "D01 规定 30 个自然日，D02 规定 15 个自然日；适用范围与优先级未知，应引用双方并确认适用制度。"
+    },
+    {
+      "queryId": "C02",
+      "corpusId": "conflict",
+      "query": "费用发生之后最迟几天提交报销？",
+      "relevantClauses": [
+        {
+          "documentId": "D01",
+          "version": "v1",
+          "chunkId": "clause-1"
+        },
+        {
+          "documentId": "D02",
+          "version": "v1",
+          "chunkId": "clause-1"
+        }
+      ],
+      "conflictPairs": [
+        {
+          "left": {
+            "documentId": "D01",
+            "version": "v1",
+            "chunkId": "clause-1"
+          },
+          "right": {
+            "documentId": "D02",
+            "version": "v1",
+            "chunkId": "clause-1"
+          }
+        }
+      ],
+      "expectedAnswer": "30 天与 15 天规定冲突，不能按版本日期或相关性分数选一方，应补查并请求确认。"
+    },
+    {
+      "queryId": "E08",
+      "corpusId": "mutation",
+      "query": "报销期限是多久？",
+      "relevantClauses": [
+        {
+          "documentId": "D01",
+          "version": "v2",
+          "chunkId": "clause-1"
+        }
+      ],
+      "conflictPairs": [],
+      "expectedAnswer": "依据 D01 v2，从费用发生之日起 20 个自然日内提交。"
+    },
+    {
+      "queryId": "M02",
+      "corpusId": "mutation",
+      "query": "花钱后多久内必须申请报销？",
+      "relevantClauses": [
+        {
+          "documentId": "D01",
+          "version": "v2",
+          "chunkId": "clause-1"
+        }
+      ],
+      "conflictPairs": [],
+      "expectedAnswer": "费用发生之日起 20 个自然日内提交，不沿用旧资料的 30 天。"
+    },
+    {
+      "queryId": "E03",
+      "corpusId": "normal",
+      "query": "公司的股票期权兑现价格是多少？",
+      "relevantClauses": [],
+      "conflictPairs": [],
+      "expectedAnswer": "当前资料没有股票期权规则，应说明缺口，不提供推测价格。"
+    },
+    {
+      "queryId": "O02",
+      "corpusId": "conflict",
+      "query": "员工一年可以休几天年假？",
+      "relevantClauses": [],
+      "conflictPairs": [],
+      "expectedAnswer": "当前资料不包含年假天数规则，应说明缺少年假制度。"
+    }
+  ]
+}

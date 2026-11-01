@@ -3,89 +3,209 @@
   "cases": [
     {
       "id": "E01",
-      "requirements": ["R01", "R07"],
+      "requirements": [
+        "R01",
+        "R07"
+      ],
       "plannedMode": "REAL",
-      "request": {"question": "报销期限是多久？"},
-      "preconditions": ["使用只有一项明确期限规定的 READY 快照", "待 T04 合并后绑定实际条款和标准答案"],
-      "expected": ["先检索并读取相关原文", "读取后模型再次推理再结束", "ANSWERED，引用支持期限及适用条件"]
+      "request": {
+        "question": "报销期限是多久？"
+      },
+      "preconditions": [
+        "使用只有一项明确期限规定的 READY 快照",
+        "使用 normal 资料与 retrieval-labels.json 中 E01 的参考标注，复核状态单独记录"
+      ],
+      "expected": [
+        "先检索并读取相关原文",
+        "读取后模型再次推理再结束",
+        "ANSWERED，引用支持期限及适用条件"
+      ],
+      "corpusId": "normal"
     },
     {
       "id": "E02",
-      "requirements": ["R02", "R07"],
+      "requirements": [
+        "R02",
+        "R07"
+      ],
       "plannedMode": "REAL",
-      "request": {"question": "报销期限是多久？"},
-      "preconditions": ["使用同时包含 30 天与 15 天规定、未给适用范围或优先级的 READY 快照"],
-      "expected": ["读取冲突双方", "针对适用范围或替代关系至少补充查证一次", "CONFLICT，引用双方并请求确认适用制度，不按日期或分数擅选一方"]
+      "request": {
+        "question": "报销期限是多久？"
+      },
+      "preconditions": [
+        "使用同时包含 30 天与 15 天规定、未给适用范围或优先级的 READY 快照"
+      ],
+      "expected": [
+        "读取冲突双方",
+        "针对适用范围或替代关系至少补充查证一次",
+        "CONFLICT，引用双方并请求确认适用制度，不按日期或分数擅选一方"
+      ],
+      "corpusId": "conflict"
     },
     {
       "id": "E03",
-      "requirements": ["R03"],
+      "requirements": [
+        "R03"
+      ],
       "plannedMode": "REAL",
-      "request": {"question": "公司的股票期权兑现价格是多少？"},
-      "preconditions": ["确认所用快照没有股票期权相关资料", "必要检索路由正常完成，查证没有被截断"],
-      "expected": ["NO_EVIDENCE，说明资料范围和缺口", "不使用模型常识补造价格"]
+      "request": {
+        "question": "公司的股票期权兑现价格是多少？"
+      },
+      "preconditions": [
+        "确认所用快照没有股票期权相关资料",
+        "必要检索路由正常完成，查证没有被截断"
+      ],
+      "expected": [
+        "NO_EVIDENCE，说明资料范围和缺口",
+        "不使用模型常识补造价格"
+      ]
     },
     {
       "id": "E04",
-      "requirements": ["R04"],
+      "requirements": [
+        "R04"
+      ],
       "plannedMode": "REAL",
-      "request": {"question": "费用发生后，最迟多长时间内要提交报销？"},
-      "preconditions": ["与 E01 使用同一快照和相关条款标注"],
-      "expected": ["召回并读取与 E01 相同或等价的依据", "期限结论与适用条件一致"]
+      "request": {
+        "question": "费用发生后，最迟多长时间内要提交报销？"
+      },
+      "preconditions": [
+        "与 E01 使用同一快照和相关条款标注"
+      ],
+      "expected": [
+        "召回并读取与 E01 相同或等价的依据",
+        "期限结论与适用条件一致"
+      ],
+      "corpusId": "normal"
     },
     {
       "id": "E05",
-      "requirements": ["R05"],
+      "requirements": [
+        "R05"
+      ],
       "plannedMode": "REAL",
       "request": {
         "question": "需要准备哪些凭证？",
         "history": [
-          {"role": "user", "content": "我想了解差旅报销。"},
-          {"role": "assistant", "content": "你想了解差旅报销的哪方面？"}
+          {
+            "role": "user",
+            "content": "我想了解差旅报销。"
+          },
+          {
+            "role": "assistant",
+            "content": "你想了解差旅报销的哪方面？"
+          }
         ]
       },
-      "preconditions": ["历史是人工编写的请求输入，不是运行记录", "快照包含差旅报销凭证条款，具体条款待 T04 合并后标注"],
-      "expected": ["利用历史理解问题指向差旅报销", "重新检索和读取当前快照，历史回答不能作为制度证据"]
+      "preconditions": [
+        "历史是人工编写的请求输入，不是运行记录",
+        "normal 资料 D03 v1 clause-2 为差旅凭证条款，参考标注见 N06；历史消歧仍需实际问答验证"
+      ],
+      "expected": [
+        "利用历史理解问题指向差旅报销",
+        "重新检索和读取当前快照，历史回答不能作为制度证据"
+      ],
+      "corpusId": "normal"
     },
     {
       "id": "E06",
-      "requirements": ["R06"],
+      "requirements": [
+        "R06"
+      ],
       "plannedMode": "REAL_WITH_INJECTED_FAULT",
-      "request": {"question": "报销期限是多久？"},
-      "preconditions": ["沿用 E01 资料，保留真实模型和 PostgreSQL", "仅在测试配置包装 EmbeddingClient，首次调用注入一次 TIMEOUT，之后恢复委托", "注入包装器待业务实现合并后编写，不能通过生产 HTTP 参数启用"],
-      "expected": ["Trace 记录注入点、次数、错误观察及后续模型动作", "相同查询的必要失败路由恢复且查证补足后才可清除未恢复限制", "若未恢复，返回 INCOMPLETE 而非 NO_EVIDENCE"]
+      "request": {
+        "question": "报销期限是多久？"
+      },
+      "preconditions": [
+        "沿用 E01 资料，保留真实模型和 PostgreSQL",
+        "仅在测试配置包装 EmbeddingClient，首次调用注入一次 TIMEOUT，之后恢复委托",
+        "注入包装器待业务实现合并后编写，不能通过生产 HTTP 参数启用"
+      ],
+      "expected": [
+        "Trace 记录注入点、次数、错误观察及后续模型动作",
+        "相同查询的必要失败路由恢复且查证补足后才可清除未恢复限制",
+        "若未恢复，返回 INCOMPLETE 而非 NO_EVIDENCE"
+      ],
+      "corpusId": "normal"
     },
     {
       "id": "E07",
-      "requirements": ["R08"],
+      "requirements": [
+        "R08"
+      ],
       "plannedMode": "MOCK_AFTER_T07",
-      "request": {"question": "请继续查找报销规定。"},
-      "preconditions": ["待实际问答服务合并后接入持续请求工具的确定性模型替身", "分别触发业务工具次数、模型轮次与总超时边界"],
-      "expected": ["INCOMPLETE，分别给出 BUDGET_EXHAUSTED、MAX_ITERATIONS 或 DEADLINE_EXCEEDED", "预算耗尽后不发起新的业务调用"]
+      "request": {
+        "question": "请继续查找报销规定。"
+      },
+      "preconditions": [
+        "待实际问答服务合并后接入持续请求工具的确定性模型替身",
+        "分别触发业务工具次数、模型轮次与总超时边界"
+      ],
+      "expected": [
+        "INCOMPLETE，分别给出 BUDGET_EXHAUSTED、MAX_ITERATIONS 或 DEADLINE_EXCEEDED",
+        "预算耗尽后不发起新的业务调用"
+      ]
     },
     {
       "id": "E08",
-      "requirements": ["R09"],
+      "requirements": [
+        "R09"
+      ],
       "plannedMode": "REAL",
-      "request": {"question": "报销期限是多久？"},
-      "preconditions": ["先使用 E01 快照运行并记录", "替换期限条款后重新导入并发布新 READY 快照，替换文本和新旧快照 ID 另行记录", "同一个进行中的请求保持原有快照，新请求使用新快照"],
-      "expected": ["新请求的答案、引用与动作依据新资料重新生成", "引用原文能定位到各自快照，不沿用旧答案"]
+      "request": {
+        "question": "报销期限是多久？"
+      },
+      "preconditions": [
+        "先使用 E01 快照运行并记录",
+        "替换期限条款后重新导入并发布新 READY 快照，替换文本和新旧快照 ID 另行记录",
+        "同一个进行中的请求保持原有快照，新请求使用新快照"
+      ],
+      "expected": [
+        "新请求的答案、引用与动作依据新资料重新生成",
+        "引用原文能定位到各自快照，不沿用旧答案"
+      ],
+      "corpusIds": [
+        "normal",
+        "mutation"
+      ]
     },
     {
       "id": "E09",
-      "requirements": ["R06"],
+      "requirements": [
+        "R06"
+      ],
       "plannedMode": "REAL_WITH_INJECTED_FAULT",
-      "request": {"question": "报销期限是多久？"},
-      "preconditions": ["沿用 E01 资料，必要召回正常且证据充分", "在测试配置中为 RerankClient 注入超时或无效响应，具体包装器待实现"],
-      "expected": ["整批回退 RRF，保留关联版本和排序警告", "披露排序降级，允许在依据充分时 ANSWERED", "排序回退本身不能证明模型动态决策"]
+      "request": {
+        "question": "报销期限是多久？"
+      },
+      "preconditions": [
+        "沿用 E01 资料，必要召回正常且证据充分",
+        "在测试配置中为 RerankClient 注入超时或无效响应，具体包装器待实现"
+      ],
+      "expected": [
+        "整批回退 RRF，保留关联版本和排序警告",
+        "披露排序降级，允许在依据充分时 ANSWERED",
+        "排序回退本身不能证明模型动态决策"
+      ],
+      "corpusId": "normal"
     },
     {
       "id": "E10",
-      "requirements": ["R10"],
+      "requirements": [
+        "R10"
+      ],
       "plannedMode": "MOCK_AFTER_T07",
-      "request": {"question": "报销期限是多久？"},
-      "preconditions": ["待业务实现合并后，通过 Maven 接入模型与工具替身", "不绑定真实运行配置，不创建真实数据源，无业务密钥也能运行"],
-      "expected": ["验证实际问答服务的循环、输出校验及异常路径", "明确标记 Mock，不宣称真实模型决策或真实检索效果"]
+      "request": {
+        "question": "报销期限是多久？"
+      },
+      "preconditions": [
+        "待业务实现合并后，通过 Maven 接入模型与工具替身",
+        "不绑定真实运行配置，不创建真实数据源，无业务密钥也能运行"
+      ],
+      "expected": [
+        "验证实际问答服务的循环、输出校验及异常路径",
+        "明确标记 Mock，不宣称真实模型决策或真实检索效果"
+      ]
     }
   ]
 }

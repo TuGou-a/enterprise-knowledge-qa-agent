@@ -21,6 +21,7 @@ import com.mango.backend.knowledge.evidence.KnowledgeEvidenceReader;
 import com.mango.backend.knowledge.ingest.CorpusImporter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.mybatis.spring.annotation.MapperScan;
@@ -42,6 +43,7 @@ import javax.sql.DataSource;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,8 +53,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.mango.backend.contract.knowledge.KnowledgeTypes.*;
 import static com.mango.backend.contract.search.SearchTypes.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Testcontainers
+@Tag("postgres")
 @SpringBootTest(classes = T05PostgresIntegrationTest.Config.class,
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -114,6 +118,62 @@ class T05PostgresIntegrationTest {
                 Path.of("data/corpus/normal.json"), Duration.ofMinutes(2)).snapshotId();
         conflictSnapshotId = importer.importCorpus(
                 Path.of("data/corpus/conflict.json"), Duration.ofMinutes(2)).snapshotId();
+    }
+
+    @Test
+    void failedPublicationLeavesBuildingSnapshotAndPreviousReadySnapshotAvailable() {
+        var previous = store.findSnapshot(normalSnapshotId, Duration.ofSeconds(5)).orElseThrow();
+        var building = new CorpusSnapshot("failed-publication", SnapshotState.BUILDING,
+                previous.indexProfile(), previous.contentHash(), Instant.now(), null);
+        store.createSnapshot(building, Duration.ofSeconds(5));
+        var failure = assertThrows(DependencyException.class, () -> store.publishSnapshot(building.snapshotId(),
+                new SnapshotManifest(2, 7, building.contentHash()), Duration.ofSeconds(5)));
+        assertThat(failure.failure().code()).isEqualTo(Failure.Code.INVALID_ARGUMENT);
+        assertThat(store.findSnapshot(building.snapshotId(), Duration.ofSeconds(5)).orElseThrow().state())
+                .isEqualTo(SnapshotState.BUILDING);
+        assertThat(store.latestReadySnapshot(Duration.ofSeconds(5)).orElseThrow().snapshotId())
+                .isEqualTo(conflictSnapshotId);
+        var key = new ChunkKey(new DocumentKey(building.snapshotId(), "D01", "v1"), "clause-1");
+        assertThat(assertThrows(DependencyException.class, () -> store.read(key, Duration.ofSeconds(5)))
+                .failure().code()).isEqualTo(Failure.Code.SNAPSHOT_UNAVAILABLE);
+    }
+
+    @Test
+    void duplicateDocumentBatchRollsBackAndReadySnapshotsRejectWrites() {
+        var normal = store.findSnapshot(normalSnapshotId, Duration.ofSeconds(5)).orElseThrow();
+        var building = new CorpusSnapshot("rollback-test", SnapshotState.BUILDING,
+                normal.indexProfile(), normal.contentHash(), Instant.now(), null);
+        store.createSnapshot(building, Duration.ofSeconds(5));
+        var document = new KnowledgeDocument(new DocumentMetadata(new DocumentKey(building.snapshotId(), "D", "v1"),
+                "测试", java.time.LocalDate.of(2026, 1, 1), null, List.of(), "0".repeat(64)), "正文");
+        assertThat(assertThrows(DependencyException.class,
+                () -> store.insertDocuments(List.of(document, document), Duration.ofSeconds(5)))
+                .failure().code()).isEqualTo(Failure.Code.INVALID_ARGUMENT);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM kb_document WHERE snapshot_id = ?",
+                Integer.class, building.snapshotId())).isZero();
+        var published = new KnowledgeDocument(new DocumentMetadata(new DocumentKey(normalSnapshotId, "D", "v1"),
+                "测试", java.time.LocalDate.of(2026, 1, 1), null, List.of(), "0".repeat(64)), "正文");
+        assertThat(assertThrows(DependencyException.class,
+                () -> store.insertDocuments(List.of(published), Duration.ofSeconds(5)))
+                .failure().code()).isEqualTo(Failure.Code.INVALID_ARGUMENT);
+    }
+
+    @Test
+    void keywordParametersRemainDataAndMutationPublishesANewVersion() {
+        assertThat(store.searchKeyword(normalSnapshotId, List.of("不存在') OR true --"), 20,
+                Duration.ofSeconds(5))).isEmpty();
+        var mutation = importer.importCorpus(Path.of("data/corpus/mutation.json"), Duration.ofMinutes(2));
+        var old = store.read(new ChunkKey(new DocumentKey(normalSnapshotId, "D01", "v1"), "clause-1"),
+                Duration.ofSeconds(5)).orElseThrow();
+        var updated = store.read(new ChunkKey(new DocumentKey(mutation.snapshotId(), "D01", "v2"), "clause-1"),
+                Duration.ofSeconds(5)).orElseThrow();
+        assertThat(old.chunk().content()).contains("30 个自然日");
+        assertThat(updated.chunk().content()).contains("20 个自然日");
+        assertThat(old.chunk().contentHash()).isNotEqualTo(updated.chunk().contentHash());
+        assertThat(store.latestReadySnapshot(Duration.ofSeconds(5)).orElseThrow().snapshotId())
+                .isEqualTo(mutation.snapshotId());
+        assertThat(store.read(new ChunkKey(new DocumentKey(mutation.snapshotId(), "D01", "v1"), "clause-1"),
+                Duration.ofSeconds(5))).isEmpty();
     }
 
     @Test

@@ -2,7 +2,7 @@
 
 面向报销与差旅制度的知识问答项目。通过检索和原文读取工具，帮助员工获得有文档依据的回答；资料冲突或不足时，明确说明限制并请求补充信息。
 
-本轮 T09 以 T01 的配置与共享契约为测试基线，补充契约测试和交付材料。集成时已同步 `dev` 上的 T02 模型客户端、T03 持久化、T04 资料导入、T05 检索读取与 T06 校验/Trace 实现；48 个既有测试已通过，T04／T05 已完成先前受控验证，T05 JUnit 与 Docker PostgreSQL 集成测试已补充。完整问答、离线 Mock、真实模型输出及评估结论仍待完成。其他并行模块的最新状态见开发计划及 Git 历史。
+T09 本阶段补齐已合并模块的测试、固定资料参考标注、四方案检索评估工具及交付说明。48 个既有测试有历史通过记录；本阶段新增和修改的测试均未编译或执行。完整问答、离线 Mock、真实模型路径和最终验收继续依赖 T07；新增测试和参考标注不能视为验收通过。范围与交接见 [T09 设计记录](docs/t09-testing-delivery-design.md)。
 
 ## 文档入口
 
@@ -12,20 +12,42 @@
 - [框架接入核查](docs/framework-verification.md)：官方来源、发行版 API 与兼容性边界。
 - [开发计划](docs/06-parallel-development-plan.md)与[T01 契约](docs/08-t01-contracts.md)：任务边界、类型及待验证事项。
 - [测试与评估](docs/03-evaluation.md)、[AI 使用记录](docs/04-ai-usage.md)和[阶段复盘](docs/05-retrospective.md)。
-- [示例与证据说明](examples/README.md)：验收输入、标注模板和后续运行证据的保存方式，当前没有完整问答的实际输出或 Trace。
+- [示例与证据说明](examples/README.md)：验收请求、16 个参考标注问题及实际运行证据的保存方式，当前没有完整问答的实际输出或 Trace。
 - [业务术语表](GLOSSARY.md)与[数据库选型决策](docs/adr/0001-postgres-hybrid-retrieval.md)。
 
 ## 当前测试入口
 
-需要 Java 17、已安装的 Maven（可使用 Maven 3.9 系列）和正在运行的 Docker。T05 PostgreSQL 集成测试使用 Testcontainers 自动启动 `pgvector/pgvector:pg17`，执行现有 `V001__knowledge.sql` 并导入合成资料，不使用本机临时 PostgreSQL 集群，也不需要真实模型密钥。首次准备依赖和容器镜像可能需要网络。收到测试指令后，在项目根目录执行：
+需要 Java 17 和 Maven，仓库没有 Maven Wrapper。默认入口不创建真实数据源、不调用云模型、不启动 Docker；模型协议测试只访问受控的本机 HTTP 服务。首次下载 Maven 依赖仍可能需要网络，依赖缓存完整后才能尝试 `-o`。收到合并后的测试指令，再在项目根目录执行：
 
 ```bash
 mvn test
 ```
 
-测试覆盖向量合法性、配置约束、读取结果互斥、资料排序、JSON 契约、模型调用中断，以及 T05 的融合、回退、主题扩展和证据读取。`T05PostgresIntegrationTest` 通过 Docker 中的 pgvector 容器验证真实 Mapper、分词、快照隔离和读取。新增 15 个测试尚未运行，不能引用为通过结果。依赖和镜像全部缓存后才可尝试 `-o` 断网执行。当前入口不能证明完整 Mock 问答、真实模型决策或线上检索质量。
+默认测试包含契约、模型协议、导入、检索读取、引用／Trace、HTTP 边界和评估指标。HTTP 使用实际 Controller、校验器与异常处理器，但 `QaService` 是替身；这不等于完整离线 Mock 问答。
 
-评审可先阅读 [需求映射和测试边界](docs/03-evaluation.md)，再检查 `src/test/` 和 `examples/`。T03 数据库初始化、T04 资料导入和 T05 检索读取已有受控运行记录，详见 [T04 运行验证](docs/t04-ingestion-verification.md)与 [T05 运行验证](docs/t05-search-verification.md)。完整问答运行步骤仍待 T07 完成。
+Docker PostgreSQL 集成回归通过以下入口显式启用；需要 Docker 与 `pgvector/pgvector:pg17` 镜像，模型仍为受控替身，不连接本机业务数据库：
+
+```bash
+mvn -Ppostgres-it test
+```
+
+如需保存同一次运行的命令、commit、退出码、日志与独立 Surefire 报告，使用下列等价入口，需要 Python 3。脚本只在显式调用时执行 Maven，不复用旧报告：
+
+```bash
+python3 scripts/run-tests.py unit
+python3 scripts/run-tests.py postgres
+```
+
+真实检索评估需要已初始化的 PostgreSQL、三组已发布快照及模型环境变量。先按 [资料导入说明](data/README.md)导入，再将导入输出的真实快照 ID 填入下列命令；该入口调用硅基流动，不调用 DeepSeek，但共享配置仍要求全部必填变量。它不导入、发布或覆盖资料：
+
+```bash
+mvn -Preal-evaluation -Dtest=RealRetrievalEvaluationTest \
+  -Devaluation.snapshots='normal=<正常快照ID>,conflict=<冲突快照ID>,mutation=<替换快照ID>' test
+```
+
+结果在实际运行时保存到 `examples/retrieval/real/<runId>/`。标注目前为 AI 辅助逐条核对形成的参考标注，待人工复核；7／8 条款的小语料无法证明普遍检索收益。命令及新增代码尚未执行，不能引用为通过结果。
+
+评审可先阅读 [需求映射和测试边界](docs/03-evaluation.md)，再检查 `src/test/` 和 `examples/`。T04／T05 的历史受控运行记录分别见 [T04 验证](docs/t04-ingestion-verification.md)与 [T05 验证](docs/t05-search-verification.md)，不能替代本次改动的运行结果。T07 合并并获得运行指令后，可使用 `examples/requests/E01.json` 等请求调用 `POST /api/qa`；当前不将完整应用启动列为已验证入口。
 
 ## 已确认的项目范围
 
@@ -108,7 +130,7 @@ AgentScope 默认并行执行同轮工具。首期显式采用 `ToolkitConfig.pa
 
 ## Maven 依赖声明
 
-根目录 [pom.xml](pom.xml) 已声明 AgentScope core/OpenAI 扩展 2.0.4、MyBatis starter 3.0.5、jieba 1.0.2、PostgreSQL 驱动、Reactor、Validation 和 Spring Boot Test；沿用现有 Spring Boot parent。T09 复用已有测试依赖，没有新增依赖或覆盖 BOM。实际依赖树、Java 17 编译和启动结果待后续验证。
+根目录 [pom.xml](pom.xml) 已声明 AgentScope core/OpenAI 扩展 2.0.4、MyBatis starter 3.0.5、jieba 1.0.2、PostgreSQL 驱动、Reactor、Validation、Spring Boot Test 和 Testcontainers；沿用现有 Spring Boot parent。T09 复用已有依赖，仅调整 Surefire 标签选择、报告目录及显式测试 profile，不新增依赖或覆盖 BOM。历史依赖解析与打包见 T04／T05 记录，本次改动仍未编译。
 
 PostgreSQL 驱动版本交由现有 Spring Boot 依赖管理。业务服务通过 MyBatis Mapper 完成持久化；Mapper XML 集中维护参数化 SQL，RRF 与重排序协调在 `HybridSearchService` 中完成。
 
@@ -137,7 +159,7 @@ PostgreSQL 驱动版本交由现有 Spring Boot 依赖管理。业务服务通�
 
 ## 运行与验证状态
 
-新增 T05 JUnit 前已有 48 个测试通过，新增 15 个测试尚未执行；`mvn -DskipTests package` 可生成可执行 JAR。T03 的[手动数据库初始化脚本及说明](src/main/resources/db/README.md)已在 PostgreSQL 17／pgvector 0.8.6 数据库中成功执行；T04 的资料导入及 T05 的两路召回、重排序回退、主题扩展、快照隔离和证据读取已有受控运行记录，详见[T04 运行验证](docs/t04-ingestion-verification.md)与[T05 运行验证](docs/t05-search-verification.md)。真实硅基流动调用、完整问答、HTTP 接口和 Mock 流程仍待后续任务与真实模型验证。
+新增 T05 JUnit 前已有 48 个测试通过；T05 和本阶段新增／修改测试均等待测试指令。T03 的[手动数据库初始化脚本及说明](src/main/resources/db/README.md)已在历史受控环境执行；T04 资料导入与 T05 检索读取的历史事实见对应验证文档。本阶段未执行编译、打包、Docker、HTTP、模型调用或评估，尚无新增通过率、回答或 Trace。
 
 验收材料至少覆盖明确答案、文档冲突、资料外问题、相似改写、上下文追问和工具失败；另验证执行上限与文档替换。Mock 验证流程，真实模型 Trace 证明动作调整，二者分别标注，结果引用对应文件。
 
