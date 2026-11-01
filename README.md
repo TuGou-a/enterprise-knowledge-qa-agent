@@ -2,7 +2,7 @@
 
 面向报销与差旅制度的知识问答项目。通过检索和原文读取工具，帮助员工获得有文档依据的回答；资料冲突或不足时，明确说明限制并请求补充信息。
 
-T09 本阶段补齐已合并模块的测试、固定资料参考标注、四方案检索评估工具及交付说明。48 个既有测试有历史通过记录；本阶段新增和修改的测试均未编译或执行。完整问答、离线 Mock、真实模型路径和最终验收继续依赖 T07；新增测试和参考标注不能视为验收通过。范围与交接见 [T09 设计记录](docs/t09-testing-delivery-design.md)。
+T09 本阶段补齐已合并模块的测试、固定资料参考标注、四方案检索评估工具及交付说明。并行任务已在 `5ff4dd0` 完成 63 个测试，0 失败、0 错误、0 跳过；本阶段新增和修改代码尚未编译或执行。T07 已以 `7da2897` 合入，继续补齐实际问答 Mock 与验收入口；新增测试和参考标注不能视为验收通过。范围与交接见 [T09 设计记录](docs/t09-testing-delivery-design.md)。
 
 ## 文档入口
 
@@ -47,7 +47,7 @@ mvn -Preal-evaluation -Dtest=RealRetrievalEvaluationTest \
 
 结果在实际运行时保存到 `examples/retrieval/real/<runId>/`。标注目前为 AI 辅助逐条核对形成的参考标注，待人工复核；7／8 条款的小语料无法证明普遍检索收益。命令及新增代码尚未执行，不能引用为通过结果。
 
-评审可先阅读 [需求映射和测试边界](docs/03-evaluation.md)，再检查 `src/test/` 和 `examples/`。T04／T05 的历史受控运行记录分别见 [T04 验证](docs/t04-ingestion-verification.md)与 [T05 验证](docs/t05-search-verification.md)，不能替代本次改动的运行结果。T07 合并并获得运行指令后，可使用 `examples/requests/E01.json` 等请求调用 `POST /api/qa`；当前不将完整应用启动列为已验证入口。
+评审可先阅读 [需求映射和测试边界](docs/03-evaluation.md)，再检查 `src/test/` 和 `examples/`。T04／T05 的历史受控运行记录分别见 [T04 验证](docs/t04-ingestion-verification.md)与 [T05 验证](docs/t05-search-verification.md)，不能替代本次改动的运行结果。T07 已合并，获得运行指令后可使用 `examples/requests/E01.json` 等请求调用 `POST /api/qa`；当前不将完整应用启动列为已验证入口。
 
 ## 已确认的项目范围
 
@@ -130,7 +130,7 @@ AgentScope 默认并行执行同轮工具。首期显式采用 `ToolkitConfig.pa
 
 ## Maven 依赖声明
 
-根目录 [pom.xml](pom.xml) 已声明 AgentScope core/OpenAI 扩展 2.0.4、MyBatis starter 3.0.5、jieba 1.0.2、PostgreSQL 驱动、Reactor、Validation、Spring Boot Test 和 Testcontainers；沿用现有 Spring Boot parent。T09 复用已有依赖，仅调整 Surefire 标签选择、报告目录及显式测试 profile，不新增依赖或覆盖 BOM。历史依赖解析与打包见 T04／T05 记录，本次改动仍未编译。
+根目录 [pom.xml](pom.xml) 已声明 AgentScope core/OpenAI 扩展 2.0.4、MyBatis starter 3.0.5、jieba 1.0.2、PostgreSQL 驱动、Reactor、Validation、Spring Boot Test 和 Testcontainers；沿用现有 Spring Boot parent。T09 复用已有依赖，仅调整 Surefire 标签选择、报告目录及显式测试 profile，不新增依赖或覆盖 BOM。历史基线 Java 17 目标编译与 JAR 打包已通过，见 T04／T05 记录；当时 JAR 启动因缺少 T07 Bean 失败，依赖树尚未单独记录。本次改动和 T07 仍未编译或启动。
 
 PostgreSQL 驱动版本交由现有 Spring Boot 依赖管理。业务服务通过 MyBatis Mapper 完成持久化；Mapper XML 集中维护参数化 SQL，RRF 与重排序协调在 `HybridSearchService` 中完成。
 
@@ -159,7 +159,7 @@ PostgreSQL 驱动版本交由现有 Spring Boot 依赖管理。业务服务通�
 
 ## 运行与验证状态
 
-新增 T05 JUnit 前已有 48 个测试通过；T05 和本阶段新增／修改测试均等待测试指令。T03 的[手动数据库初始化脚本及说明](src/main/resources/db/README.md)已在历史受控环境执行；T04 资料导入与 T05 检索读取的历史事实见对应验证文档。本阶段未执行编译、打包、Docker、HTTP、模型调用或评估，尚无新增通过率、回答或 Trace。
+历史基线 `5ff4dd0` 的 63 个测试已通过，包含原有 15 个 T05 JUnit；本阶段新增／修改测试仍等待指令。T03 的[手动数据库初始化脚本及说明](src/main/resources/db/README.md)已在历史受控环境执行；T04 资料导入与 T05 检索读取的历史事实见对应验证文档。本阶段未执行编译、打包、Docker、HTTP、模型调用或评估，尚无新增通过率、回答或 Trace。
 
 验收材料至少覆盖明确答案、文档冲突、资料外问题、相似改写、上下文追问和工具失败；另验证执行上限与文档替换。Mock 验证流程，真实模型 Trace 证明动作调整，二者分别标注，结果引用对应文件。
 

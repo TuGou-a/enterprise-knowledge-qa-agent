@@ -1,8 +1,8 @@
 # 测试与评估
 
-T09 按用户于 2026-11-01 确认的范围分阶段交付。本阶段补齐已合并模块的测试、固定资料参考标注、四方案检索评估工具和交付说明；完整离线 Mock、真实问答路径与最终验收依赖 T07。具体决定与交接见 [T09 设计记录](t09-testing-delivery-design.md)。
+T09 按用户于 2026-11-01 确认的范围分阶段交付。本阶段补齐已合并模块的测试、固定资料参考标注、四方案检索评估工具和交付说明；T07 已以 `7da2897` 合入，继续补齐实际问答 Mock 与后续验收入口。具体决定与交接见 [T09 设计记录](t09-testing-delivery-design.md)。
 
-48 个既有测试有历史通过记录，T04／T05 已完成相应层次的受控运行，见 [T04 验证](t04-ingestion-verification.md)和 [T05 验证](t05-search-verification.md)。这些历史结果不能证明本阶段改动通过。本阶段未执行依赖解析、编译、启动、测试、Docker、HTTP 或真实模型调用；没有实际问答输出、真实 Trace 或新的评估成绩。
+历史基线 `5ff4dd0` 已完成 63 个测试，包含原有 15 个 T05 JUnit，0 失败、0 错误、0 跳过；T04／T05 已完成相应层次的受控运行，见 [T04 验证](t04-ingestion-verification.md)和 [T05 验证](t05-search-verification.md)。这些历史结果不能证明本阶段改动通过。本阶段未执行依赖解析、编译、启动、测试、Docker、HTTP 或真实模型调用；没有实际问答输出、真实 Trace 或新的评估成绩。
 
 ## 已确认的交付边界
 
@@ -13,6 +13,19 @@ T09 按用户于 2026-11-01 确认的范围分阶段交付。本阶段补齐已�
 5. 沿用 normal、conflict、mutation 三组资料，保留四方案持平或退化的结果。正常组 7 条款、冲突组 8 条款、替换组 7 条款，Recall@6 容易饱和，不据此声称普遍收益。
 6. AI 辅助生成的原文参考标注与人工语义复核分开记录。实际用时、个人修改和学习经历等待用户提供事实；不得推测填写。
 
+## 历史基线 5ff4dd0 的执行记录
+
+| 检查 | 实际结果 |
+| --- | --- |
+| `mvn test` | 通过，63 个测试，0 失败、0 错误、0 跳过 |
+| T05 PostgreSQL 集成 | 通过，`T05PostgresIntegrationTest` 的 2 个用例在 Docker `pgvector/pgvector:pg17` 中完成 |
+| `mvn -DskipTests package` | 通过，生成可执行 JAR |
+| 可执行 JAR 启动 | 未通过；当时缺少 T07 `QaService` Bean，不是测试环境问题。T07 后已合入，尚未重验 |
+
+运行环境为 macOS、Java 21.0.12、Maven 3.9.9 和已启动的 Docker Desktop，项目按 Java 17 编译目标构建。首次执行还发现并修复了以下测试缺陷：AssertJ 断言链错误、Testcontainers 动态属性早于容器启动，以及 Maven/Surefire 测试 JVM 的 SOCKS 代理阻断本地 JDBC。修复均经子代理静态审查后合并，记录见 [Testcontainers 启动时序](pitfalls/T09-testcontainers-startup.md)和 [本地 JDBC SOCKS 代理](pitfalls/T09-local-jdbc-socks-proxy.md)。
+
+以上记录属于并行任务在本阶段新增代码和 T07 合并前的实际运行，不能据此声称最新代码已通过。
+
 ## 测试代码与运行入口
 
 | 资产 | 断言或职责 | 当前证据边界 |
@@ -21,7 +34,7 @@ T09 按用户于 2026-11-01 确认的范围分阶段交付。本阶段补齐已�
 | `SiliconFlowProtocolTest` | 请求字段、批序、结果数量／下标、向量、重排分数、计量、HTTP 错误和脱敏。 | 使用本机受控 HTTP，不证明真实服务可用性；未执行。 |
 | `PgKnowledgeStoreBoundaryTest` | 不足预算不启动事务、空关键词和跨快照边界。 | 无真实数据源；未执行。 |
 | `CorpusIngestionTest` | 严格 JSON、资料与条款身份、UTF-16 偏移／哈希、分词资源、失败不发布、写入与发布顺序。 | 使用实际解析器、切分器、分词器和导入器，数据库／模型为替身；未执行。 |
-| `HybridSearchServiceTest`、`KnowledgeEvidenceReaderTest` | 融合、排序回退、主题截断、原文读取和证据登记。 | T05 已有 JUnit，等待运行；历史临时验证不能替代这些测试。 |
+| `HybridSearchServiceTest`、`KnowledgeEvidenceReaderTest` | 融合、排序回退、主题截断、原文读取和证据登记。 | 原有 15 个 T05 JUnit 在 `5ff4dd0` 已通过；本阶段新增和修改用例尚未执行。 |
 | `AnswerValidationTest` | 已读引用、全量拒绝无效引用、失败优先级、冲突例外、无依据门槛、UTF-16 定位和 Trace 快照。 | 机械校验不证明答案支持性；未执行。 |
 | `QaHttpTest` | 严格 JSON、历史、全部长度边界、五类任务状态、全部依赖错误码、空结果、协议头和异步超时分派。 | 使用实际 Controller、配置和异常处理器，服务为替身；未执行。超时由测试触发 Servlet 超时事件，不是实测等待 125 秒。 |
 | `RetrievalEvaluationTest` | 指标分母、排名、去重、冲突成对召回、空相关集、融合／排序与生产实现对齐、回退。 | 确定性回归，不是检索质量成绩；未执行。 |
