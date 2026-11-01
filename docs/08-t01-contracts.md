@@ -4,11 +4,11 @@
 
 ## 依赖、配置与启动边界
 
-沿用 Java 17、Spring Boot 3.5.10，声明 AgentScope core 与 OpenAI 模型扩展 2.0.4、MyBatis starter 3.0.5、jieba 1.0.2，以及由 Boot 管理的 PostgreSQL 驱动、Reactor 和 Jakarta Validation 实现。没有引入 AgentScope Boot starter，没有覆盖 Reactor 或 Jackson BOM。已有的基线差异见 [框架接入核查](framework-verification.md)；依赖解析、编译、启动及真实工具兼容性尚未验证。
+沿用 Java 17、Spring Boot 3.5.10，声明 AgentScope core 与 OpenAI 模型扩展 2.0.4、MyBatis starter 3.0.5、jieba 1.0.2，以及由 Boot 管理的 PostgreSQL 驱动、Reactor 和 Jakarta Validation 实现。没有引入 AgentScope Boot starter，没有覆盖 Reactor 或 Jackson BOM。已有的基线差异见 [框架接入核查](framework-verification.md)；依赖解析、Java 17 目标编译、Spring 启动和真实工具兼容性已在最终运行中验证。
 
 `BackendApplication` 扫描 `contract.config`。`AgentProperties` 绑定 `knowledge-agent`，`DatabaseProperties` 绑定 `spring.datasource`，使用 `@Validated` 及嵌套 `@Valid` 做启动校验。真实模式缺少任一模型密钥或数据库密码时启动失败；数据库用户名有默认值，显式配置为空也会校验失败；数值必须满足声明的范围和组合约束。启动校验不调用真实模型，不证明密钥有效或服务可用。配置对象的 `toString()` 隐藏密钥及数据库连接信息；异常、HTTP 响应、提示词和 Trace 不得输出配置对象的原始字段或外部原始错误体。
 
-当前默认只有真实配置。用户在 T09 范围讨论中确认：离线入口放在 `src/test/`，通过 Maven 测试运行，不新增 Mock HTTP 服务。本轮只准备契约测试与隔离配置绑定测试，不扫描真实应用、不创建数据源，也不用占位密钥启动真实模式；完整 Mock 问答待 T07 等业务实现合并后以模型和工具替身补齐，R10 仍待完成。此决定替代先前 Mock profile 的入口设想，见 [评估文档](03-evaluation.md)。根目录 `.env` 不会自动加载。
+当前默认只有真实配置。用户在 T09 范围讨论中确认：离线入口放在 `src/test/`，通过 Maven 测试运行，不新增 Mock HTTP 服务。最终默认测试、实际问答 Mock 和真实模型入口均已执行，见 [评估文档](03-evaluation.md)。根目录 `.env` 不会自动加载。
 
 ### 配置清单
 
@@ -17,7 +17,7 @@
 | 环境变量 | 绑定键 | 初值与语义 |
 | --- | --- | --- |
 | `DEEPSEEK_API_KEY` | `deepseek.api-key` | 必填，无真实默认值。 |
-| `DEEPSEEK_BASE_URL` / `DEEPSEEK_MODEL` | `deepseek.base-url` / `deepseek.model` | `https://api.deepseek.com` / `deepseek-flash`；服务可用性待验证。 |
+| `DEEPSEEK_BASE_URL` / `DEEPSEEK_MODEL` | `deepseek.base-url` / `deepseek.model` | `https://api.deepseek.com` / `deepseek-chat`；已通过真实工具调用与 HTTP 问答验证。 |
 | `DEEPSEEK_CONTEXT_WINDOW` / `DEEPSEEK_MAX_OUTPUT_TOKENS` | `deepseek.context-window` / `deepseek.max-output-tokens` | 32768 / 2048；应用采用的保守窗口与输出初值，不宣称是服务商最大窗口。输出上限须小于窗口。 |
 | `SILICONFLOW_API_KEY` / `SILICONFLOW_BASE_URL` | `siliconflow.api-key` / `siliconflow.base-url` | 必填密钥 / `https://api.siliconflow.cn/v1`。基础地址限 HTTP(S)，不带认证信息、查询串或片段。 |
 | `EMBEDDING_MODEL` / `RERANK_MODEL` | `siliconflow.embedding-model` / `siliconflow.rerank-model` | `BAAI/bge-m3` / `BAAI/bge-reranker-v2-m3`。向量固定为 1024 维，不支持靠配置修改数据库维度。 |
@@ -176,4 +176,4 @@ Mono<Result<AnswerEnvelope>> response = qaService.answer(request).map(Result::su
 
 T02/T03 完成后核对实际参数映射及超时；T04 核对原文/索引标识和批次顺序；T05 核对工具结果及每次登记；T06/T07 核对状态优先级、恢复、证据和 Trace；T08 核对输入、错误映射及响应外层。所有任务依赖已合并 dev 的类型，不自行复制 DTO 或修改公共配置。
 
-未执行：依赖树、编译、启动、测试、Mock 冒烟、真实 PostgreSQL 或云模型调用。上述组合是否可用、配置绑定的实际启动表现及行为验收，都等待用户后续测试指令。
+最终已完成依赖解析、编译、启动、测试、Mock、真实 PostgreSQL、云模型和 HTTP 调用；结果见 [测试与评估](03-evaluation.md#最终运行结果2026-11-01)。

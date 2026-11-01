@@ -2,6 +2,8 @@
 
 本文记录 T09 第二阶段的澄清、开发边界与后续交接。用户已确认分阶段实施、测试入口、检索评估范围和整体理解，并明确指令「开始实施」。本阶段测试与材料由主代理开发，编译和运行继续等待合并后的指令。
 
+以下静态交接和“等待测试”描述保留为开发阶段历史。真实模型、数据库、HTTP 和检索评估结果见文末「最终运行与收口」。
+
 开发基线为 `dev` 的 `afd94ca`，任务分支为 `task/t09-testing-delivery`，独立 worktree 为 `/private/tmp/agent-t09-testing-delivery`。此前 T09 第一阶段已有契约测试、E01–E10 计划输入与标注模板，继续沿用，不重新创建另一套验收标准。
 
 ## 已确认决定
@@ -86,7 +88,7 @@ T07 随后以 `7da2897` 合入 `dev`，符合已确认的继续条件。主代�
 - `RealQaEvaluationTest` 接入真实模型、数据库及问答服务，显式选择 E01/E02/E03/E04/E05/E06/E08/E09 并校验最新资料。测试配置提供固定一次的 Embedding／Rerank 超时包装器，默认关闭，不提供生产 HTTP 开关；`FaultInjectionTest` 核对固定次数与后续委托。
 - `QaEvidence` 与 `RecordingTraceFactory` 只收集实际服务事件和结果，不预写步骤或模型行为；真实质量仍由人工核对，真实运行、Trace 与评估成绩继续等待指令。
 
-T07 部分新增代码的子代理审查与复核记录在完成后追加。整个本阶段仍未执行编译、测试、启动、Docker 或模型调用。
+上述内容是最终运行前的静态交接状态。后续实际执行结果见文末「最终运行与收口」。
 
 T07 新增部分的规范轴未发现阻断；需求轴要求补齐真实问答的资料元数据绑定，以及同次命令／退出码与问答证据的关联。主代理抽取仅测试侧的 `CorpusEvaluationBinding`，供两个真实评估入口复用，并补漂移回归；扩展现有脚本的 mock／qa／retrieval 模式，通过运行记录路径关联同次命令、时间与退出码。问答元数据显式记录实际 `IndexProfile` 和模型版本，直接 Maven 调用缺少外层记录时标明不完整。相关原因见 [资料身份踩坑](pitfalls/T09-evaluation-corpus-identity.md)。
 
@@ -100,3 +102,32 @@ T07 新增部分的规范轴未发现阻断；需求轴要求补齐真实问答�
 - 按已确认流程合并到 `dev` 后删除本任务 worktree，保留任务分支与 Git 历史。最终合并提交以 `dev` 历史为准；其他并行任务的 worktree 不由本任务清理。
 
 开发准备材料已齐，运行验收仍待用户指令。后续运行按评估文档与证据脚本执行，保留失败和实际 Trace；人工复核参考标注、答案支持性、真实模型动态路径及个人贡献事实后，才能完成最终交付验收。
+
+## 最终运行与收口（2026-11-01）
+
+用户在 T07 合并后提供真实模型配置并确认继续测试。最终验证以源码基线 `3cddda8` 和最终证据工作树执行：
+
+| 入口 | 实际结果 | 证据 |
+| --- | --- | --- |
+| `scripts/run-tests.py unit` | 184 个测试通过，0 失败／错误／跳过 | `examples/tests/unit/` |
+| `scripts/run-tests.py postgres` | 189 个测试通过，真实 pgvector | `examples/tests/postgres/` |
+| `scripts/run-tests.py qa` | E01/E02/E03/E04/E05/E06/E08/E09 完成 | `examples/real/`、`examples/tests/qa/` |
+| 真实 HTTP E01 | HTTP 200，`ANSWERED`，2 条引用 | `examples/http/E01_HTTP_REAL/` |
+| `scripts/run-tests.py retrieval` | 16 题 0 失败，四方案完成 | `examples/retrieval/real/`、`examples/tests/retrieval/` |
+| `QaOfflineMockTest` | 8 个场景通过，覆盖 R10 与执行上限 | `examples/mock/` |
+
+真实运行暴露出两项实现缺陷并由后续提交修复：工具返回把内部排名字段、计量、哈希、偏移和快照 UUID
+带入模型上下文，造成输入预算膨胀；提示词未明确 status/reason 唯一配对，模型会生成
+`NEEDS_CLARIFICATION/APPLICABILITY_UNKNOWN`。修复以 `1505e86` 审查后合入 `3cddda8`，详见
+[工具上下文踩坑](pitfalls/T07-tool-result-context-bloat.md)和
+[状态原因配对踩坑](pitfalls/T07-status-reason-pairing.md)。
+
+`deepseek-flash` 在 E01/E04/E09 采样中出现偶发无效草稿，运行时均拒绝；切换 `deepseek-chat` 后
+完成全部最终用例。对照范围和限制见[模型输出稳定性踩坑](pitfalls/T07-model-output-stability.md)。
+
+仍未自动判为通过的部分：
+
+- 16 个参考标注仍为 `REFERENCE_REVIEW_PENDING`，需要人工语义复核。
+- R08 的真实流式总时限、取消后迟到结果仍由确定性状态测试覆盖，未做真实并发压测。
+- R09 的同一进行中请求固定旧快照由单元回归覆盖，未做真实并发请求实验。
+- 用户实际投入、亲自修改内容、题号与 GitHub URL 仍需用户补充。

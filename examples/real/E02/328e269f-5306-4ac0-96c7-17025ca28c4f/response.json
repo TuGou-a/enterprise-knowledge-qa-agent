@@ -1,0 +1,62 @@
+{
+  "runId" : "328e269f-5306-4ac0-96c7-17025ca28c4f",
+  "snapshotId" : "cc9a31be-a954-48b7-b0a6-61bd2acc44c8",
+  "status" : "CONFLICT",
+  "reason" : "APPLICABILITY_UNKNOWN",
+  "answer" : "资料中存在两份对“报销期限”作出不同规定的文件，且均未标明适用范围、也未声明相互替代关系，因此无法确定适用哪一个期限：\n\n1. 《费用报销制度》第1条：报销申请应在费用发生之日起 **30 个自然日内**提交。\n2. 《费用报销办理规定》第1条：报销申请应在费用发生之日起 **15 个自然日内**提交。\n\n两者的版本日期分别为 2026-01-01 和 2026-02-01，但日期较新并不能证明后者优先适用，因为《费用报销办理规定》未声明替代《费用报销制度》（supersedes 为空），两份文件的适用对象与范围也未载明，因此构成适用冲突，需由制度归口部门确认以哪份为准（或各自的适用对象）。\n\n此外，《差旅报销制度》仅规定出差前需提交出差申请审批（第1条）及差旅报销的凭证要求（第2条），未规定差旅报销的提交期限；若您问的是差旅费用，也同样缺少针对差旅期限的明确规定。",
+  "citations" : [ {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 报销申请应在费用发生之日起 30 个自然日内提交。",
+    "startOffset" : 14,
+    "endOffset" : 43,
+    "contentHash" : "0fa4d47274108f3a7167aa5aa1cf96cf7ecaaed26108bd8e44e9e55dec74ff04"
+  }, {
+    "documentId" : "D02",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 报销申请应在费用发生之日起 15 个自然日内提交。",
+    "startOffset" : 16,
+    "endOffset" : 45,
+    "contentHash" : "2b2e58a2d4a24dee16942f033d7fd341afd22f1ed44243ceeb87726e61da8c9b"
+  }, {
+    "documentId" : "D03",
+    "version" : "v1",
+    "chunkId" : "clause-2",
+    "quote" : "第2条 提交差旅报销时，应提供已审批的出差申请、交通票据、住宿发票及对应付款记录；未发生的费用无需提供该类凭证。",
+    "startOffset" : 54,
+    "endOffset" : 110,
+    "contentHash" : "3aa27b98ed66044af01e031af9b13583d05ebde2d921bebb0d4cbba8adece396"
+  } ],
+  "evidenceGaps" : [ "《费用报销制度》与《费用报销办理规定》对报销期限分别为30个自然日与15个自然日，两者均未载明适用对象/范围，且后者 supersedes 为空，无法判断优先级或分工", "《差旅报销制度》未规定差旅报销的提交期限" ],
+  "clarifyingQuestion" : "请确认报销类型（一般费用报销还是差旅报销），以及应以《费用报销制度》（30个自然日）还是《费用报销办理规定》（15个自然日）为准，或两份文件各自的适用对象；若涉及差旅费用，请补充差旅报销期限的现行规定。",
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 3,
+    "toolCalls" : 6,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 7979,
+    "remainingMillis" : 112020,
+    "readCharacters" : 159,
+    "toolTextCharacters" : 825,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

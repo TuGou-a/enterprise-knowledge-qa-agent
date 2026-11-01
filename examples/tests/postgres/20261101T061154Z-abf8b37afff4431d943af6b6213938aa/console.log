@@ -1,0 +1,286 @@
+Picked up JAVA_TOOL_OPTIONS: -Djava.net.useSystemProxies=false -Dhttp.proxyHost= -Dhttps.proxyHost= -DsocksProxyHost=
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------------< com.mango:backend >--------------------------
+[INFO] Building backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ backend ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 3 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ backend ---
+[INFO] skip non existing resourceDirectory /private/tmp/agent-t09-final-validation2/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ backend ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Djava.net.useSystemProxies=false -Dhttp.proxyHost= -Dhttps.proxyHost= -DsocksProxyHost=
+[INFO] Running com.mango.backend.contract.ReadResultContractTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.029 s -- in com.mango.backend.contract.ReadResultContractTest
+[INFO] Running com.mango.backend.contract.WireContractTest
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.140 s -- in com.mango.backend.contract.WireContractTest
+[INFO] Running com.mango.backend.contract.DenseVectorContractTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in com.mango.backend.contract.DenseVectorContractTest
+[INFO] Running com.mango.backend.contract.KnowledgeOrderingContractTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.mango.backend.contract.KnowledgeOrderingContractTest
+[INFO] Running com.mango.backend.contract.ConfigurationContractTest
+14:11:55.742 [main] INFO org.hibernate.validator.internal.util.Version -- HV000001: Hibernate Validator 8.0.3.Final
+14:11:55.892 [main] WARN org.springframework.context.annotation.AnnotationConfigApplicationContext -- Exception encountered during context initialization - cancelling refresh attempt: org.springframework.boot.context.properties.ConfigurationPropertiesBindException: Error creating bean with name 'spring.datasource-com.mango.backend.contract.config.DatabaseProperties': Could not bind properties to 'DatabaseProperties' : prefix=spring.datasource, ignoreInvalidFields=false, ignoreUnknownFields=true
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.229 s -- in com.mango.backend.contract.ConfigurationContractTest
+[INFO] Running com.mango.backend.infra.pg.PgKnowledgeStoreBoundaryTest
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/Users/mango/.m2/repository/net/bytebuddy/byte-buddy-agent/1.17.8/byte-buddy-agent-1.17.8.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.383 s -- in com.mango.backend.infra.pg.PgKnowledgeStoreBoundaryTest
+[INFO] Running com.mango.backend.infra.model.SiliconFlowInterruptionTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.137 s -- in com.mango.backend.infra.model.SiliconFlowInterruptionTest
+[INFO] Running com.mango.backend.infra.model.SiliconFlowProtocolTest
+[INFO] Tests run: 30, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.099 s -- in com.mango.backend.infra.model.SiliconFlowProtocolTest
+[INFO] Running com.mango.backend.qa.api.QaHttpTest
+14:11:56.658 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.658 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.658 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.714 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.714 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.714 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.724 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.724 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.724 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.734 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.734 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.734 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.742 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.742 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.742 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.751 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.751 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.751 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.755 [main] ERROR com.mango.backend.qa.api.QaExceptionHandler -- 问答依赖异常，类别=TIMEOUT
+14:11:56.761 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.761 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.761 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.763 [main] ERROR com.mango.backend.qa.api.QaExceptionHandler -- 问答依赖异常，类别=RATE_LIMITED
+14:11:56.767 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.767 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.767 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.769 [main] ERROR com.mango.backend.qa.api.QaExceptionHandler -- 问答依赖异常，类别=AUTHENTICATION_FAILED
+14:11:56.773 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.773 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.773 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.776 [main] ERROR com.mango.backend.qa.api.QaExceptionHandler -- 问答依赖异常，类别=UPSTREAM_UNAVAILABLE
+14:11:56.779 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.779 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.779 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.781 [main] ERROR com.mango.backend.qa.api.QaExceptionHandler -- 问答依赖异常，类别=INVALID_RESPONSE
+14:11:56.784 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.784 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.784 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.786 [main] ERROR com.mango.backend.qa.api.QaExceptionHandler -- 问答依赖异常，类别=DATABASE_UNAVAILABLE
+14:11:56.789 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.789 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.789 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.791 [main] ERROR com.mango.backend.qa.api.QaExceptionHandler -- 问答依赖异常，类别=NOT_FOUND
+14:11:56.795 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.795 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.795 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.798 [main] ERROR com.mango.backend.qa.api.QaExceptionHandler -- 问答依赖异常，类别=INVALID_ARGUMENT
+14:11:56.801 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.801 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.801 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.803 [main] ERROR com.mango.backend.qa.api.QaExceptionHandler -- 问答依赖异常，类别=INPUT_LIMIT_EXCEEDED
+14:11:56.806 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.806 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.806 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.808 [main] ERROR com.mango.backend.qa.api.QaExceptionHandler -- 问答依赖异常，类别=SNAPSHOT_UNAVAILABLE
+14:11:56.812 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.812 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.812 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.814 [main] ERROR com.mango.backend.qa.api.QaExceptionHandler -- 问答依赖异常，类别=INDEX_PROFILE_MISMATCH
+14:11:56.817 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.817 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.817 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.819 [main] ERROR com.mango.backend.qa.api.QaExceptionHandler -- 问答依赖异常，类别=BUDGET_EXHAUSTED
+14:11:56.822 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.822 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.822 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.823 [main] ERROR com.mango.backend.qa.api.QaExceptionHandler -- 问答依赖异常，类别=INTERNAL_ERROR
+14:11:56.828 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.828 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.829 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.837 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.837 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.838 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.872 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.872 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.872 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.886 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.886 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.886 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.897 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.897 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.897 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.907 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.907 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.907 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.910 [main] ERROR com.mango.backend.qa.api.QaExceptionHandler -- 问答接口未处理异常，类型=java.lang.IllegalStateException
+14:11:56.914 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.914 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.914 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.933 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.933 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.933 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.941 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.941 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.941 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.946 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.946 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.946 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.951 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.951 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.951 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.955 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.955 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.955 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.958 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.958 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.958 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.962 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.962 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.962 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.967 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.967 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.967 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.971 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.971 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.971 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.975 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.975 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.975 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.979 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.979 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.979 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.982 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.982 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.982 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+14:11:56.984 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+14:11:56.984 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+14:11:56.985 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 1 ms
+[INFO] Tests run: 38, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.422 s -- in com.mango.backend.qa.api.QaHttpTest
+[INFO] Running com.mango.backend.qa.application.QaOfflineMockTest
+14:11:57.053 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.054 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.054 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.054 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.166 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.166 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.166 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.166 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.204 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.204 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.204 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.204 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.233 [boundedElastic-2] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.234 [boundedElastic-2] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.234 [boundedElastic-2] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.234 [boundedElastic-2] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.268 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.268 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.268 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.268 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.298 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.298 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.298 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.298 [boundedElastic-1] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.326 [boundedElastic-2] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.326 [boundedElastic-2] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.326 [boundedElastic-2] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.326 [boundedElastic-2] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.357 [boundedElastic-2] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+14:11:57.357 [boundedElastic-2] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.357 [boundedElastic-2] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'searchKnowledge' in group 'ungrouped'
+14:11:57.357 [boundedElastic-2] INFO io.agentscope.core.tool.Toolkit -- Registered tool 'readKnowledge' in group 'ungrouped'
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.393 s -- in com.mango.backend.qa.application.QaOfflineMockTest
+[INFO] Running com.mango.backend.qa.application.FaultInjectionTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.032 s -- in com.mango.backend.qa.application.FaultInjectionTest
+[INFO] Running com.mango.backend.qa.application.RequestStateTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in com.mango.backend.qa.application.RequestStateTest
+[INFO] Running com.mango.backend.qa.application.AgentQaServiceBoundaryTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in com.mango.backend.qa.application.AgentQaServiceBoundaryTest
+[INFO] Running com.mango.backend.knowledge.evidence.KnowledgeEvidenceReaderTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in com.mango.backend.knowledge.evidence.KnowledgeEvidenceReaderTest
+[INFO] Running com.mango.backend.knowledge.ingest.CorpusIngestionTest
+main dict load finished, time elapsed 304 ms
+model load finished, time elapsed 17 ms.
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.459 s -- in com.mango.backend.knowledge.ingest.CorpusIngestionTest
+[INFO] Running com.mango.backend.knowledge.search.T05PostgresIntegrationTest
+14:11:57.916 [main] INFO org.testcontainers.images.PullPolicy -- Image pull policy will be performed by: DefaultPullPolicy()
+14:11:57.916 [main] INFO org.testcontainers.utility.ImageNameSubstitutor -- Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.10)
+
+2026-11-01T14:11:58.030+08:00  INFO 49339 --- [backend] [           main] org.testcontainers.DockerClientFactory   : Testcontainers version: 1.21.4
+2026-11-01T14:11:58.187+08:00  INFO 49339 --- [backend] [           main] o.t.d.DockerClientProviderStrategy       : Found Docker environment with Docker accessed via Unix socket (/Users/mango/.docker/run/docker.sock)
+2026-11-01T14:11:58.188+08:00  INFO 49339 --- [backend] [           main] org.testcontainers.DockerClientFactory   : Docker host IP address is localhost
+2026-11-01T14:11:58.198+08:00  INFO 49339 --- [backend] [           main] org.testcontainers.DockerClientFactory   : Connected to docker: 
+  Server Version: 29.9.2
+  API Version: 1.56
+  Operating System: Docker Desktop
+  Total Memory: 7934 MB
+  Labels: 
+    com.docker.desktop.address=unix:///Users/mango/Library/Containers/com.docker.docker/Data/docker-cli.sock
+2026-11-01T14:11:58.248+08:00  INFO 49339 --- [backend] [           main] tc.testcontainers/ryuk:0.12.0            : Creating container for image: testcontainers/ryuk:0.12.0
+2026-11-01T14:11:58.302+08:00  INFO 49339 --- [backend] [           main] o.t.utility.RegistryAuthLocator          : Credential helper/store (docker-credential-desktop) does not have credentials for https://index.docker.io/v1/
+2026-11-01T14:11:58.353+08:00  INFO 49339 --- [backend] [           main] tc.testcontainers/ryuk:0.12.0            : Container testcontainers/ryuk:0.12.0 is starting: 838c93019e3b9947fac73b5a96f45003218290e3d3c813cf276284cfe3ceae9d
+2026-11-01T14:11:58.456+08:00  INFO 49339 --- [backend] [           main] tc.testcontainers/ryuk:0.12.0            : Container testcontainers/ryuk:0.12.0 started in PT0.208798S
+2026-11-01T14:11:58.458+08:00  INFO 49339 --- [backend] [           main] o.t.utility.RyukResourceReaper           : Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+2026-11-01T14:11:58.458+08:00  INFO 49339 --- [backend] [           main] org.testcontainers.DockerClientFactory   : Checking the system...
+2026-11-01T14:11:58.459+08:00  INFO 49339 --- [backend] [           main] org.testcontainers.DockerClientFactory   : ✔︎ Docker server version should be at least 1.6.0
+2026-11-01T14:11:58.459+08:00  INFO 49339 --- [backend] [           main] tc.pgvector/pgvector:pg17                : Creating container for image: pgvector/pgvector:pg17
+2026-11-01T14:11:58.484+08:00  INFO 49339 --- [backend] [           main] tc.pgvector/pgvector:pg17                : Container pgvector/pgvector:pg17 is starting: 6285bee9747883956fabc61569a1dbb7ca78a6f33105220242e690a3952efb97
+2026-11-01T14:11:59.124+08:00  INFO 49339 --- [backend] [           main] tc.pgvector/pgvector:pg17                : Container pgvector/pgvector:pg17 started in PT0.665099S
+2026-11-01T14:11:59.124+08:00  INFO 49339 --- [backend] [           main] tc.pgvector/pgvector:pg17                : Container is started (JDBC URL: jdbc:postgresql://localhost:62207/knowledge_agent?loggerLevel=OFF)
+2026-11-01T14:11:59.132+08:00  INFO 49339 --- [backend] [           main] c.m.b.k.s.T05PostgresIntegrationTest     : Starting T05PostgresIntegrationTest using Java 21.0.12 with PID 49339 (started by mango in /private/tmp/agent-t09-final-validation2)
+2026-11-01T14:11:59.132+08:00  INFO 49339 --- [backend] [           main] c.m.b.k.s.T05PostgresIntegrationTest     : No active profile set, falling back to 1 default profile: "default"
+2026-11-01T14:11:59.495+08:00  INFO 49339 --- [backend] [           main] c.m.b.k.s.T05PostgresIntegrationTest     : Started T05PostgresIntegrationTest in 1.533 seconds (process running for 4.187)
+2026-11-01T14:11:59.500+08:00  INFO 49339 --- [backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-11-01T14:11:59.557+08:00  INFO 49339 --- [backend] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7798de95
+2026-11-01T14:11:59.558+08:00  INFO 49339 --- [backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.080 s -- in com.mango.backend.knowledge.search.T05PostgresIntegrationTest
+[INFO] Running com.mango.backend.knowledge.search.HybridSearchServiceTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in com.mango.backend.knowledge.search.HybridSearchServiceTest
+[INFO] Running com.mango.backend.evaluation.AnswerValidationTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.091 s -- in com.mango.backend.evaluation.AnswerValidationTest
+[INFO] Running com.mango.backend.evaluation.RetrievalEvaluationTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in com.mango.backend.evaluation.RetrievalEvaluationTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 189, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.724 s
+[INFO] Finished at: 2026-11-01T14:12:02+08:00
+[INFO] ------------------------------------------------------------------------

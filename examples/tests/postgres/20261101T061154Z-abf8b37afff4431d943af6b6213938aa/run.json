@@ -1,0 +1,160 @@
+{
+  "materialType": "ACTUAL_AUTOMATED_TEST_RUN",
+  "mode": "POSTGRES_WITH_MODEL_STUBS",
+  "commit": "3cddda899ab6f7a11ae9409374c1a83317de28d3",
+  "workingTreeDirtyAtStart": true,
+  "startedAt": "2026-11-01T06:11:54.433388+00:00",
+  "command": [
+    "mvn",
+    "-Dstyle.color=never",
+    "-Dtest.reports-directory=/private/tmp/agent-t09-final-validation2/examples/tests/postgres/20261101T061154Z-abf8b37afff4431d943af6b6213938aa/reports",
+    "-Devaluation.executionMetadata=examples/tests/postgres/20261101T061154Z-abf8b37afff4431d943af6b6213938aa/run.json",
+    "-Ppostgres-it",
+    "test"
+  ],
+  "status": "FINISHED",
+  "finishedAt": "2026-11-01T06:12:02.578173+00:00",
+  "exitCode": 0,
+  "suites": [
+    {
+      "file": "TEST-com.mango.backend.contract.ConfigurationContractTest.xml",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.contract.DenseVectorContractTest.xml",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.contract.KnowledgeOrderingContractTest.xml",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.contract.ReadResultContractTest.xml",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.contract.WireContractTest.xml",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.evaluation.AnswerValidationTest.xml",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.evaluation.RetrievalEvaluationTest.xml",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.infra.model.SiliconFlowInterruptionTest.xml",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.infra.model.SiliconFlowProtocolTest.xml",
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.infra.pg.PgKnowledgeStoreBoundaryTest.xml",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.knowledge.evidence.KnowledgeEvidenceReaderTest.xml",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.knowledge.ingest.CorpusIngestionTest.xml",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.knowledge.search.HybridSearchServiceTest.xml",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.knowledge.search.T05PostgresIntegrationTest.xml",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.qa.api.QaHttpTest.xml",
+      "tests": 38,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.qa.application.AgentQaServiceBoundaryTest.xml",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.qa.application.FaultInjectionTest.xml",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.qa.application.QaOfflineMockTest.xml",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.qa.application.RequestStateTest.xml",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "reportCollectionErrors": [],
+  "testCounts": {
+    "tests": 189,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

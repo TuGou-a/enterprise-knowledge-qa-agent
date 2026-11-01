@@ -1,0 +1,54 @@
+{
+  "runId" : "57ed4ba0-7460-451f-b4e8-623e60e44471",
+  "snapshotId" : "fee7a379-f551-4232-bcea-d50be84de4f1",
+  "status" : "NO_EVIDENCE",
+  "reason" : "OUT_OF_CORPUS",
+  "answer" : "本次资料快照中没有关于股票期权的制度，因此无法提供股票期权兑现（行权）价格。\n\n资料范围内仅包含两份制度：\n- 《费用报销制度（合成资料）》（D01，v1）：规定报销申请应在费用发生之日起 30 个自然日内提交（第1条）。\n- 《差旅报销制度（合成资料）》（D03，v1），适用于员工因公出差的差旅报销：规定提交差旅报销应提供已审批的出差申请、交通票据、住宿发票及对应付款记录等（第2条）。\n\n这两份制度均不涉及股权激励、期权授予或行权定价事项，其内容属于费用报销与差旅报销范围，与股票期权兑现价格无关。建议就期权兑现价格咨询股权激励/人力资源或董事会相关决议文件；如你手头另有股权激励计划文本，也可补充提供后再行核对。",
+  "citations" : [ {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 报销申请应在费用发生之日起 30 个自然日内提交。",
+    "startOffset" : 14,
+    "endOffset" : 43,
+    "contentHash" : "0fa4d47274108f3a7167aa5aa1cf96cf7ecaaed26108bd8e44e9e55dec74ff04"
+  }, {
+    "documentId" : "D03",
+    "version" : "v1",
+    "chunkId" : "clause-2",
+    "quote" : "第2条 提交差旅报销时，应提供已审批的出差申请、交通票据、住宿发票及对应付款记录；未发生的费用无需提供该类凭证。",
+    "startOffset" : 54,
+    "endOffset" : 110,
+    "contentHash" : "3aa27b98ed66044af01e031af9b13583d05ebde2d921bebb0d4cbba8adece396"
+  } ],
+  "evidenceGaps" : [ "本次快照仅有《费用报销制度（合成资料）》（D01，v1）与《差旅报销制度（合成资料）》（D03，v1）两份文件，均不含股权激励、股票期权或行权/兑现价格的任何条款，故该事项在资料范围内无依据。" ],
+  "clarifyingQuestion" : "",
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 3,
+    "toolCalls" : 4,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 6313,
+    "remainingMillis" : 113686,
+    "readCharacters" : 89,
+    "toolTextCharacters" : 695,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

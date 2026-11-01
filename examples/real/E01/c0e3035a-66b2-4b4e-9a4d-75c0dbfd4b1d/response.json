@@ -1,0 +1,46 @@
+{
+  "runId" : "c0e3035a-66b2-4b4e-9a4d-75c0dbfd4b1d",
+  "snapshotId" : "fee7a379-f551-4232-bcea-d50be84de4f1",
+  "status" : "ANSWERED",
+  "reason" : "EVIDENCE_SUFFICIENT",
+  "answer" : "《费用报销制度（合成资料）》第1条规定：报销申请应在费用发生之日起 30 个自然日内提交。\n\n适用说明：\n- 该制度未在资料中标注特定适用范围的限制，属于报销期限的一般规定，对报销申请普遍适用。\n- 差旅报销另有《差旅报销制度（合成资料）》，该制度仅就出差审批、差旅凭证、住宿报销和票据遗失补充做了规定，其中未见单独的报销期限条款，也未声明排除或替代上述 30 日要求；因此差旅报销在期限上仍按上述一般规定执行（以费用发生之日起算）。\n- 关于逾期未提交是否可补报、是否有例外审批，资料中未见规定。",
+  "citations" : [ {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 报销申请应在费用发生之日起 30 个自然日内提交。",
+    "startOffset" : 14,
+    "endOffset" : 43,
+    "contentHash" : "0fa4d47274108f3a7167aa5aa1cf96cf7ecaaed26108bd8e44e9e55dec74ff04"
+  } ],
+  "evidenceGaps" : [ "资料未规定报销逾期未提交的处理方式、是否可申请例外或补报。", "《差旅报销制度（合成资料）》未对差旅报销期限单独规定，也未明确其与费用报销制度的一般期限的关系。" ],
+  "clarifyingQuestion" : null,
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 4,
+    "toolCalls" : 4,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 7427,
+    "remainingMillis" : 112572,
+    "readCharacters" : 71,
+    "toolTextCharacters" : 677,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

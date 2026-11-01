@@ -1,0 +1,38 @@
+{
+  "runId" : "b1fbcd7c-0f15-4d2f-a1f7-49a46d340f01",
+  "snapshotId" : "snapshot-1",
+  "status" : "INCOMPLETE",
+  "reason" : "BUDGET_EXHAUSTED",
+  "answer" : "业务工具调用预算已耗尽，尚未完成查证。",
+  "citations" : [ ],
+  "evidenceGaps" : [ "业务工具调用预算已耗尽，尚未完成查证。" ],
+  "clarifyingQuestion" : null,
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 3,
+    "toolCalls" : 2,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 2,
+    "elapsedMillis" : 6,
+    "remainingMillis" : 119993,
+    "readCharacters" : 0,
+    "toolTextCharacters" : 22,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : true,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

@@ -1,5 +1,7 @@
 # T02 模型客户端设计与交接
 
+> 本文记录任务交付时的静态状态。后续真实 Embedding／Rerank、完整问答和 HTTP 验证见[测试与评估](03-evaluation.md#最终运行结果2026-11-01)。
+
 ## 状态与范围
 
 - 基线：`dev` 的 `ccdda70`；分支：`task/t02-model-clients`。

@@ -1,0 +1,10 @@
+{
+  "question" : "需要准备哪些凭证？",
+  "history" : [ {
+    "role" : "user",
+    "content" : "我想了解差旅报销。"
+  }, {
+    "role" : "assistant",
+    "content" : "你想了解差旅报销的哪方面？"
+  } ]
+}

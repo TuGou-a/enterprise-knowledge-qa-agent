@@ -23,7 +23,7 @@
 
 按用户确认，采用 AgentScope Java `2.0.4` 发行版。该版本的[根 POM](https://github.com/agentscope-ai/agentscope-java/blob/v2.0.4/pom.xml) 声明版本 `2.0.4`，编译目标为 Java 17；另见[发行说明](https://github.com/agentscope-ai/agentscope-java/releases/tag/v2.0.4)。
 
-本项目需要 ReAct 决策与 Java 工具调用，可依赖 `agentscope-core` 和 OpenAI 兼容模型扩展。T01 已将以下依赖声明写入根 POM；配置与共享契约见 [T01 交接](08-t01-contracts.md)，尚未进行依赖解析或运行验证：
+本项目需要 ReAct 决策与 Java 工具调用，可依赖 `agentscope-core` 和 OpenAI 兼容模型扩展。T01 已将以下依赖声明写入根 POM；配置与共享契约见 [T01 交接](08-t01-contracts.md)。最终已在 AgentScope 2.0.4、Boot 3.5.10、Reactor 3.7.15 和 Jackson 2.19.4 上完成真实工具循环、问答、HTTP 与测试：
 
 ```xml
 <properties>
@@ -56,13 +56,13 @@
 | Reactor BOM | `2025.0.2`，对应 `reactor-core 3.8.2`。 | `2024.0.14`，对应 `reactor-core 3.7.15`。 |
 | Jackson BOM | `2.21.1`。 | `2.19.4`。 |
 
-依据：发行版 [AgentScope dependencies BOM 第 72、73 行](https://github.com/agentscope-ai/agentscope-java/blob/v2.0.4/agentscope-dependencies-bom/pom.xml#L72)，以及本机 Maven 缓存中的 `spring-boot-dependencies-3.5.10.pom` 与 `reactor-bom-2024.0.14.pom`。应用父 POM 的依赖管理会影响传递依赖，普通模块接入仍可能选中低于框架构建基线的版本。这里确认的是版本基线差异，尚未证明发生缺失方法或链接错误，实际选中版本以实施后的依赖树为准。
+依据：发行版 [AgentScope dependencies BOM 第 72、73 行](https://github.com/agentscope-ai/agentscope-java/blob/v2.0.4/agentscope-dependencies-bom/pom.xml#L72)，以及本机 Maven 缓存中的 `spring-boot-dependencies-3.5.10.pom` 与 `reactor-bom-2024.0.14.pom`。应用父 POM 的依赖管理会影响传递依赖。最终运行未出现由该版本差异导致的缺失方法或链接错误，实际选中版本为 Boot 管理的 Reactor 3.7.15 与 Jackson 2.19.4。
 
 收到用户测试指令后，首先核查 `mvn dependency:tree -Dincludes=io.projectreactor:*,io.projectreactor.netty:*,com.fasterxml.jackson.core:*,com.fasterxml.jackson.datatype:*`，随后按项目约定验证 Java 17 编译、Boot 启动和真实工具结构化调用；本轮没有执行这些命令。保留用户选择的 Boot 3.5.10，不在设计阶段未经验证地覆盖整个 Reactor/Jackson BOM，也不引入面向 Boot 4 的 starter。若验证失败，根据实际错误调整兼容依赖后再继续业务实现。
 
 ## DeepSeek 官方 API
 
-DeepSeek 官方提供 OpenAI 兼容 API，官方基础地址为 `https://api.deepseek.com`。截至核查日，官方入门文档列出 `deepseek-flash` 与 `deepseek-v4-pro`，并建议使用 `deepseek-flash` 名称。来源：[官方入门文档](https://api-docs.deepseek.com/)。
+DeepSeek 官方提供 OpenAI 兼容 API，官方基础地址为 `https://api.deepseek.com`。初始核查记录列出过 `deepseek-flash` 与 `deepseek-v4-pro`；最终运行按实际稳定性测试选择 `deepseek-chat`。来源：[官方入门文档](https://api-docs.deepseek.com/)。
 
 DeepSeek 支持模型返回工具调用，再由应用执行工具并回传结果。官方非思考模式示例使用 `thinking: {"type": "disabled"}`。来源：[工具调用文档](https://api-docs.deepseek.com/guides/tool_calls/)。建议第一版从非思考模式开始验证；该设置与 ReAct 多轮工具决策是不同维度，关闭思考模式不等于取消模型选择动作。
 
@@ -71,18 +71,18 @@ DeepSeek 支持模型返回工具调用，再由应用执行工具并回传结�
 ```text
 DEEPSEEK_API_KEY=<运行时设置>
 DEEPSEEK_BASE_URL=https://api.deepseek.com
-DEEPSEEK_MODEL=deepseek-flash
+DEEPSEEK_MODEL=deepseek-chat
 ```
 
 AgentScope 的[当前 DeepSeek 接入文档](https://java.agentscope.io/v2/en/integration/model/deepseek)说明 DeepSeek 通过 OpenAI 模型扩展接入。在线文档会随项目更新，其中的模型名称、字段处理修复与工厂 API 仍需对照 `v2.0.4` 源码核对，不能直接当作该发行版已具备的行为。
 
-对照 [v2.0.4 DeepSeekModelProvider](https://github.com/agentscope-ai/agentscope-java/blob/v2.0.4/agentscope-extensions/agentscope-extensions-model/agentscope-extensions-model-openai/src/main/java/io/agentscope/extensions/model/openai/compat/deepseek/DeepSeekModelProvider.java)，可用 `ModelRegistry.resolve("deepseek:deepseek-flash", context)`，其中 `context` 使用 `ModelCreationContext.builder().enableThinking(false)` 创建。直接向 `ReActAgent.builder().model("deepseek:deepseek-flash")` 传字符串时无法在该重载中指定这一开关；应先创建模型实例再传入。
+对照 [v2.0.4 DeepSeekModelProvider](https://github.com/agentscope-ai/agentscope-java/blob/v2.0.4/agentscope-extensions/agentscope-extensions-model/agentscope-extensions-model-openai/src/main/java/io/agentscope/extensions/model/openai/compat/deepseek/DeepSeekModelProvider.java)，可用 `ModelRegistry.resolve("deepseek:deepseek-chat", context)`，其中 `context` 使用 `ModelCreationContext.builder().enableThinking(false)` 创建。直接向 `ReActAgent.builder().model("deepseek:deepseek-chat")` 传字符串时无法在该重载中指定这一开关；应先创建模型实例再传入。
 
 该 Provider 默认关闭原生结构化输出，结构化结果采用框架工具回退。发行版中的 DeepSeek formatter 与当前主分支对历史 reasoning 字段的处理不同，因此第一版显式采用非思考模式，并以真实工具调用验证。省略 `enableThinking(false)` 时 Provider 不发送 `thinking` 字段，不能认为此时默认关闭思考。
 
 `DEEPSEEK_BASE_URL` 与 `DEEPSEEK_MODEL` 是本项目的配置约定，Provider 不会自动读取这两个环境变量。应用读取后分别传入 `ModelCreationContext.builder().baseUrl(...)` 与 `ModelRegistry.resolve("deepseek:" + modelName, context)`；`deepseek:` 选择 Provider，后缀原样作为模型名称发给服务端。Provider 可以直接读取 `DEEPSEEK_API_KEY`，应用也可显式传入。
 
-发行版 [ModelContextWindows](https://github.com/agentscope-ai/agentscope-java/blob/v2.0.4/agentscope-core/src/main/java/io/agentscope/core/model/ModelContextWindows.java#L80) 只列出 `deepseek-v4-flash` 和 `deepseek-v4-pro`，对当前官方建议的 `deepseek-flash` 查找返回 0。继续使用官方当前名称，通过 `ModelCreationContext.builder().option("contextWindowSize", configuredWindow)` 显式设置核查后的窗口；应用仍限制实际历史、检索内容和输出预算。不能把工作区 main 新增的窗口识别及 formatter 修复视为 `2.0.4` 已有能力。
+发行版 [ModelContextWindows](https://github.com/agentscope-ai/agentscope-java/blob/v2.0.4/agentscope-core/src/main/java/io/agentscope/core/model/ModelContextWindows.java#L80) 只列出 `deepseek-v4-flash` 和 `deepseek-v4-pro`，不包含项目最终选择的 `deepseek-chat`。通过 `ModelCreationContext.builder().option("contextWindowSize", configuredWindow)` 显式设置核查后的窗口；应用仍限制实际历史、检索内容和输出预算。不能把工作区 main 新增的窗口识别及 formatter 修复视为 `2.0.4` 已有能力。
 
 ## 硅基流动 Embedding 与 jieba
 

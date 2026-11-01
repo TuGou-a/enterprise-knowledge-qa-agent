@@ -2,6 +2,8 @@
 
 本文记录 T07 的设计与交接。用户于 2026-11-01 确认两项开放决策及整体方案，并授权开始实现。生产代码、两名子代理静态审查及修复复核均已完成，无剩余阻断；尚未执行编译、启动、依赖树、测试或模型请求。开发基线为 `dev` 的 `052bffb`，任务分支为 `task/t07-agent-qa`，开发 worktree 为 `/private/tmp/agent-t07-agent-qa`。
 
+以下“尚未执行”描述保留为 T07 初始静态交接状态。后续运行验证、真实缺陷修复和最终结果见文末「运行验证与最终修复」。
+
 ## 目标与已有约束
 
 按[开发计划](06-parallel-development-plan.md)，T07 实现 `qa/agent/**`、`qa/application/**`，为已有 HTTP 入口提供可被 Spring 发现的 `QaService` 实现。接入 T05 的检索和原文读取、T06 的输出校验和 Trace 工厂，实现真实模型根据工具观察选择下一步的问答循环。
@@ -101,3 +103,35 @@ Anscombe 首次发现两项阻断：致命检索错误覆盖高优先级草稿�
 Socrates 对照目标标签确认 API、注解及上下文注入可行，`onAgent` 可以接收真实工具结果事件；`ToolResultBlock.text` 的初始 RUNNING 状态会在框架发出结果事件前归一化为 SUCCESS，因此可用于建立下一次模型调用的已观察证据。审查发现校验跨过截止点时终态与最终预算可能不一致，以及 SDK 包装超时的 Trace 分类错误。主代理在 `18c8e86` 统一最终预算判定并识别异常 cause 链中的超时，Socrates 定向复核确认两项均闭环、无新阻断，可以推进合并。静态接线成立不代表 Boot/Reactor 二进制兼容、数据库取消或真实模型行为已验证。
 
 集成保留 `dev` 在本任务期间已合入的文档、Testcontainers 编译及启动时序修正；这些变更来自其他任务，T07 没有执行其测试。交付按项目规则合并至 `dev` 后删除 T07 开发 worktree，保留任务分支和上述提交记录；合并提交以 Git 历史为准。下一阶段由用户另行授权编译及运行验证。
+
+## 运行验证与最终修复（2026-11-01）
+
+用户在 T07 合并后提供真实 DeepSeek 与硅基流动配置并授权测试。真实运行先在 `b1c8abb` 上发现两项缺陷：
+
+1. `KnowledgeTools` 把内部 `SearchResult`／`ReadResult` 全量回传模型，单次 JSON 包含排名、计量、
+   哈希、偏移和快照 UUID。多轮检索后消息超过 24,000 字符预算，E03 返回
+   `INPUT_LIMIT_EXCEEDED`。问题、测量和修复见[工具上下文踩坑](pitfalls/T07-tool-result-context-bloat.md)。
+2. 模型曾输出 `NEEDS_CLARIFICATION/APPLICABILITY_UNKNOWN` 的非法组合。系统提示词改为严格枚举配对，
+   并补齐未恢复路由、冲突双方引用和无资料门槛；校验器继续拒绝非法草稿，不自动修复。见
+   [状态原因配对踩坑](pitfalls/T07-status-reason-pairing.md)。
+
+修复提交 `1505e86` 经两名子代理规范／需求双轴复核和定向复核后，以 `3cddda8` 合并到 `dev`。工具返回
+仅保留模型完成任务所需字段；内部排名、计量、哈希、偏移和快照 UUID 继续留在 Trace。回归测试从实际模型
+输入收集所有工具文本，禁止这些字段重新进入上下文，并覆盖失败检索的 `unresolvedErrors`。
+
+模型对照中，`deepseek-flash` 在 E01 HTTP、E04 和 E09 采样中出现偶发无效草稿；运行时均正确拒绝。
+切换 `deepseek-chat` 后，E01 连续 `3/3` 通过，E03、E04、E09 各一次均通过（关键场景合计 `6/6`），
+随后完成全部 8 个真实用例。原因、采样边界和取舍见[模型输出稳定性踩坑](pitfalls/T07-model-output-stability.md)。
+最终 `.env.example` 和 `application.properties` 默认模型更新为 `deepseek-chat`。
+
+| 最终检查（源码基线 `3cddda8` + 最终证据工作树） | 结果 |
+| --- | --- |
+| 默认测试 | 184 个通过，0 失败／错误／跳过 |
+| PostgreSQL 集成 | 189 个通过，真实 pgvector |
+| 真实问答 | E01/E02/E03/E04/E05/E06/E08/E09 均按预期完成 |
+| 真实 HTTP E01 | HTTP 200，`ANSWERED`，2 条引用 |
+| 16 题检索评估 | 16 题无失败，混合重排序 MRR@6 `1.0` |
+
+真实输入、响应和 Trace 在 `examples/real/`，HTTP 证据在 `examples/http/`，检索结果在
+`examples/retrieval/real/`，自动化记录在 `examples/tests/`。R08 的真实流式总时限／取消后迟到结果和
+R09 的并发进行中请求仍只由确定性状态回归覆盖，未做真实并发压测；人工语义复核仍待用户完成。

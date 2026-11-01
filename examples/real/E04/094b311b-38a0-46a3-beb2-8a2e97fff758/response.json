@@ -1,0 +1,54 @@
+{
+  "runId" : "094b311b-38a0-46a3-beb2-8a2e97fff758",
+  "snapshotId" : "fee7a379-f551-4232-bcea-d50be84de4f1",
+  "status" : "ANSWERED",
+  "reason" : "EVIDENCE_SUFFICIENT",
+  "answer" : "按《费用报销制度（合成资料）》第1条，报销申请应在费用发生之日起 30 个自然日内提交，即最迟不得超过费用发生之日起 30 个自然日。\n\n适用边界说明：该条属于费用报销的一般规定；《差旅报销制度（合成资料）》的适用范围为“员工因公出差的差旅报销”，但其中仅规定差旅报销需提供的凭证类型（出差申请、交通票据、住宿发票及付款记录）与票据遗失的处理方式，未就提交时限另行规定。因此差旅费用报销的提交时限仍按上述一般规定执行，即同样为费用发生之日起 30 个自然日内。\n\n注意：材料不齐时，按第3条应先补充有效凭证或明确费用用途再提交，但制度未说明补材料是否可延长上述 30 个自然日的期限，建议按期限要求尽早提交。",
+  "citations" : [ {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 报销申请应在费用发生之日起 30 个自然日内提交。",
+    "startOffset" : 14,
+    "endOffset" : 43,
+    "contentHash" : "0fa4d47274108f3a7167aa5aa1cf96cf7ecaaed26108bd8e44e9e55dec74ff04"
+  }, {
+    "documentId" : "D03",
+    "version" : "v1",
+    "chunkId" : "clause-2",
+    "quote" : "第2条 提交差旅报销时，应提供已审批的出差申请、交通票据、住宿发票及对应付款记录；未发生的费用无需提供该类凭证。",
+    "startOffset" : 54,
+    "endOffset" : 110,
+    "contentHash" : "3aa27b98ed66044af01e031af9b13583d05ebde2d921bebb0d4cbba8adece396"
+  } ],
+  "evidenceGaps" : [ ],
+  "clarifyingQuestion" : null,
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 3,
+    "toolCalls" : 4,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 6244,
+    "remainingMillis" : 113755,
+    "readCharacters" : 89,
+    "toolTextCharacters" : 695,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

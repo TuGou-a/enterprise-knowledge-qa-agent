@@ -1,0 +1,156 @@
+[ {
+  "runId" : "e4558e73-5bff-462b-aa48-97f2114248a4",
+  "sequence" : 1,
+  "timestamp" : 1793513517.203050000,
+  "detail" : {
+    "type" : "RUN_STARTED",
+    "snapshotId" : "snapshot-1",
+    "frameworkVersion" : "2.0.4",
+    "model" : "deterministic-test",
+    "indexProfile" : {
+      "embeddingModel" : "BAAI/bge-m3",
+      "embeddingDimension" : 1024,
+      "preprocessingVersion" : "source-preserving-v1",
+      "tokenizerVersion" : "jieba-analysis-1.0.2",
+      "dictionaryVersion" : "builtin-v1",
+      "stopWordsVersion" : "none-v1"
+    },
+    "rerankModel" : "BAAI/bge-reranker-v2-m3",
+    "routeLimit" : 20,
+    "candidatePoolLimit" : 20,
+    "primaryLimit" : 6,
+    "relatedLimit" : 12,
+    "rrfK" : 60
+  }
+}, {
+  "runId" : "e4558e73-5bff-462b-aa48-97f2114248a4",
+  "sequence" : 2,
+  "timestamp" : 1793513517.206828000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 1,
+    "phase" : "STARTED",
+    "publicSummary" : "模型根据本次对话及已交付的工具结果选择后续动作。",
+    "error" : null
+  }
+}, {
+  "runId" : "e4558e73-5bff-462b-aa48-97f2114248a4",
+  "sequence" : 3,
+  "timestamp" : 1793513517.207070000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 1,
+    "phase" : "COMPLETED",
+    "publicSummary" : "模型调用完成；具体动作由后续工具事件或最终任务结果记录。",
+    "error" : null
+  }
+}, {
+  "runId" : "e4558e73-5bff-462b-aa48-97f2114248a4",
+  "sequence" : 4,
+  "timestamp" : 1793513517.207623000,
+  "detail" : {
+    "type" : "TOOL_STARTED",
+    "callId" : "search-0",
+    "iteration" : 1,
+    "tool" : "SEARCH_KNOWLEDGE",
+    "requested" : {
+      "type" : "SEARCH_INPUT",
+      "query" : "报销期限",
+      "topK" : 6
+    },
+    "effective" : {
+      "type" : "SEARCH_INPUT",
+      "query" : "报销期限",
+      "topK" : 6
+    },
+    "publicPurpose" : "查找期限原文"
+  }
+}, {
+  "runId" : "e4558e73-5bff-462b-aa48-97f2114248a4",
+  "sequence" : 5,
+  "timestamp" : 1793513517.207855000,
+  "detail" : {
+    "type" : "TOOL_COMPLETED",
+    "callId" : "search-0",
+    "iteration" : 1,
+    "tool" : "SEARCH_KNOWLEDGE",
+    "outcome" : {
+      "type" : "SEARCH_RESULT",
+      "scope" : {
+        "snapshotId" : "snapshot-1",
+        "query" : "报销期限",
+        "topK" : 6
+      },
+      "primary" : [ ],
+      "related" : [ ],
+      "routes" : {
+        "vector" : "OK",
+        "keyword" : "OK",
+        "rerank" : "SKIPPED_EMPTY"
+      },
+      "rankingMode" : "NONE",
+      "rankingWarnings" : [ ],
+      "unresolvedErrors" : [ ],
+      "truncated" : false,
+      "metrics" : {
+        "vectorCount" : 0,
+        "keywordCount" : 0,
+        "uniqueCount" : 0,
+        "rerankInputCount" : 0,
+        "primaryCount" : 0,
+        "relatedCount" : 0,
+        "rerankMillis" : 0,
+        "rerankResponseId" : "mock",
+        "rerankUsage" : null,
+        "rerankInputKeys" : [ ]
+      }
+    },
+    "deliveryError" : null
+  }
+}, {
+  "runId" : "e4558e73-5bff-462b-aa48-97f2114248a4",
+  "sequence" : 6,
+  "timestamp" : 1793513517.208989000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 2,
+    "phase" : "STARTED",
+    "publicSummary" : "模型根据本次对话及已交付的工具结果选择后续动作。",
+    "error" : null
+  }
+}, {
+  "runId" : "e4558e73-5bff-462b-aa48-97f2114248a4",
+  "sequence" : 7,
+  "timestamp" : 1793513517.209208000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 2,
+    "phase" : "COMPLETED",
+    "publicSummary" : "模型调用完成；具体动作由后续工具事件或最终任务结果记录。",
+    "error" : null
+  }
+}, {
+  "runId" : "e4558e73-5bff-462b-aa48-97f2114248a4",
+  "sequence" : 8,
+  "timestamp" : 1793513517.210115000,
+  "detail" : {
+    "type" : "RUN_FINISHED",
+    "status" : "NO_EVIDENCE",
+    "reason" : "OUT_OF_CORPUS",
+    "budget" : {
+      "reactIterations" : 2,
+      "toolCalls" : 1,
+      "maxReactIterations" : 6,
+      "maxToolCalls" : 12,
+      "elapsedMillis" : 7,
+      "remainingMillis" : 119992,
+      "readCharacters" : 0,
+      "toolTextCharacters" : 0,
+      "deadlineExceeded" : false,
+      "toolLimitExceeded" : false,
+      "iterationLimitExceeded" : false,
+      "textLimitExceeded" : false
+    },
+    "citations" : [ ]
+  }
+} ]

@@ -1,0 +1,71 @@
+Picked up JAVA_TOOL_OPTIONS: -Djava.net.useSystemProxies=false -Dhttp.proxyHost= -Dhttps.proxyHost= -DsocksProxyHost=
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------------< com.mango:backend >--------------------------
+[INFO] Building backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ backend ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 3 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ backend ---
+[INFO] skip non existing resourceDirectory /private/tmp/agent-t09-final-validation2/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.4:test (default-test) @ backend ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Djava.net.useSystemProxies=false -Dhttp.proxyHost= -Dhttps.proxyHost= -DsocksProxyHost=
+[INFO] Running com.mango.backend.qa.application.RealQaEvaluationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.10)
+
+2026-11-01T14:17:46.784+08:00  INFO 50112 --- [backend] [           main] c.m.b.q.a.RealQaEvaluationTest           : Starting RealQaEvaluationTest using Java 21.0.12 with PID 50112 (started by mango in /private/tmp/agent-t09-final-validation2)
+2026-11-01T14:17:46.785+08:00  INFO 50112 --- [backend] [           main] c.m.b.q.a.RealQaEvaluationTest           : The following 1 profile is active: "real-qa-evaluation"
+2026-11-01T14:17:47.005+08:00  WARN 50112 --- [backend] [           main] o.m.s.mapper.ClassPathMapperScanner      : Skipping MapperFactoryBean with name 'knowledgeMapper' and 'com.mango.backend.infra.pg.KnowledgeMapper' mapperInterface. Bean already defined with the same name!
+2026-11-01T14:17:47.006+08:00  WARN 50112 --- [backend] [           main] o.m.s.mapper.ClassPathMapperScanner      : No MyBatis mapper was found in '[com.mango.backend.infra.pg]' package. Please check your configuration.
+main dict load finished, time elapsed 306 ms
+model load finished, time elapsed 14 ms.
+2026-11-01T14:17:47.672+08:00  INFO 50112 --- [backend] [           main] c.m.b.q.a.RealQaEvaluationTest           : Started RealQaEvaluationTest in 0.979 seconds (process running for 1.243)
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/Users/mango/.m2/repository/net/bytebuddy/byte-buddy-agent/1.17.8/byte-buddy-agent-1.17.8.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+2026-11-01T14:17:47.972+08:00  INFO 50112 --- [backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-11-01T14:17:48.032+08:00  INFO 50112 --- [backend] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3b2c8bda
+2026-11-01T14:17:48.032+08:00  INFO 50112 --- [backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-01T14:17:48.132+08:00  INFO 50112 --- [backend] [oundedElastic-1] io.agentscope.core.tool.Toolkit          : Registered tool 'readKnowledge' in group 'ungrouped'
+2026-11-01T14:17:48.133+08:00  INFO 50112 --- [backend] [oundedElastic-1] io.agentscope.core.tool.Toolkit          : Registered tool 'searchKnowledge' in group 'ungrouped'
+2026-11-01T14:17:48.133+08:00  INFO 50112 --- [backend] [oundedElastic-1] io.agentscope.core.tool.Toolkit          : Registered tool 'searchKnowledge' in group 'ungrouped'
+2026-11-01T14:17:48.134+08:00  INFO 50112 --- [backend] [oundedElastic-1] io.agentscope.core.tool.Toolkit          : Registered tool 'readKnowledge' in group 'ungrouped'
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.710 s -- in com.mango.backend.qa.application.RealQaEvaluationTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  9.856 s
+[INFO] Finished at: 2026-11-01T14:17:55+08:00
+[INFO] ------------------------------------------------------------------------

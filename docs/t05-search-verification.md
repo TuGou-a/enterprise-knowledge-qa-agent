@@ -4,6 +4,8 @@
 
 验证时间为 2026-11-01，`dev` 位于 `3a13376`。T05 的逻辑级验证、真实 PostgreSQL／pgvector 集成验证、现有测试与打包均已执行。实现在受控 Embedding／Rerank 服务下完成两路召回、RRF、完整候选池重排序、排序失败回退、主题扩展、固定快照读取与证据登记；没有发现需要修改 T05 实现的运行缺陷。
 
+以下受控记录保留为当时的验证事实。2026-11-01 最终收口又使用真实硅基流动 Embedding／Rerank 和 16 题标注完成四方案评估，见 [最终测试评估](03-evaluation.md#最终运行结果2026-11-01)。
+
 模型服务使用本地确定性 HTTP 桩，不能证明真实硅基流动模型的相关性排序质量、网络延迟、限流或账号可用性。T07 尚未合并，本次没有完整 Agent 工具循环、HTTP 问答或真实 DeepSeek 调用。
 
 后续已把关键行为写入永久 JUnit：`HybridSearchServiceTest`、`KnowledgeEvidenceReaderTest` 和 `T05PostgresIntegrationTest`。集成测试使用 Testcontainers 启动 Docker 中的 `pgvector/pgvector:pg17`，执行正式 schema 并导入 `normal.json`、`conflict.json`；2026 年 11 月 1 日已执行，全部通过。

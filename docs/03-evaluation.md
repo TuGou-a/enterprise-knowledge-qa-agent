@@ -2,7 +2,50 @@
 
 T09 按用户于 2026-11-01 确认的范围分阶段交付。本阶段补齐已合并模块的测试、固定资料参考标注、四方案检索评估工具和交付说明；T07 已以 `7da2897` 合入，实际问答 Mock 与后续验收采集入口已接入。具体决定与交接见 [T09 设计记录](t09-testing-delivery-design.md)。
 
-历史基线 `5ff4dd0` 已完成 63 个测试，包含原有 15 个 T05 JUnit，0 失败、0 错误、0 跳过；T04／T05 已完成相应层次的受控运行，见 [T04 验证](t04-ingestion-verification.md)和 [T05 验证](t05-search-verification.md)。这些历史结果不能证明本阶段改动通过。本阶段未执行依赖解析、编译、启动、测试、Docker、HTTP 或真实模型调用；没有实际问答输出、真实 Trace 或新的评估成绩。
+## 最终运行结果（2026-11-01）
+
+最终验证以源码基线 `3cddda8` 和最终证据工作树完成，运行环境为 macOS、Java 21.0.12、Maven 3.9.9、
+PostgreSQL 17／pgvector 0.8.6。真实模型为 DeepSeek `deepseek-chat`，Embedding 为
+`BAAI/bge-m3`，Rerank 为 `BAAI/bge-reranker-v2-m3`。
+
+| 检查 | 实际结果 |
+| --- | --- |
+| 默认 `python3 scripts/run-tests.py unit` | 通过，184 个测试，0 失败、0 错误、0 跳过 |
+| `python3 scripts/run-tests.py postgres` | 通过，189 个测试；Testcontainers 启动真实 pgvector |
+| 真实问答 E01/E02/E03/E04/E05/E06/E08/E09 | 8 个服务入口均完成；状态与引用见下表 |
+| 真实 HTTP `POST /api/qa` E01 | HTTP `200`，`ANSWERED/EVIDENCE_SUFFICIENT`，2 条引用 |
+| 真实检索评估 | `COMPLETED`，16 题、0 个失败；Rerank 回退率 0 |
+
+| 用例 | 实际终态 | 说明 |
+| --- | --- | --- |
+| E01 | `ANSWERED/EVIDENCE_SUFFICIENT` | 引用 D01 v1 的 30 天期限，说明差旅制度未另设期限 |
+| E02 | `CONFLICT/APPLICABILITY_UNKNOWN` | 同时引用 30 天与 15 天规定，不按日期擅选 |
+| E03 | `NO_EVIDENCE/OUT_OF_CORPUS` | 完成多次检索后明确股票期权资料缺口 |
+| E04 | `ANSWERED/EVIDENCE_SUFFICIENT` | 语义改写问题命中同一条款并引用已读片段 |
+| E05 | `ANSWERED/EVIDENCE_SUFFICIENT` | 使用历史消歧到差旅凭证，重新读取当前快照 |
+| E06 | `INCOMPLETE/ROUTE_FAILED` | 注入 1 次 Embedding 超时，未谎报无资料 |
+| E08 | `ANSWERED/EVIDENCE_SUFFICIENT` | 资料替换后引用 D01 v2 的 20 天规定 |
+| E09 | `ANSWERED/EVIDENCE_SUFFICIENT` | 注入 1 次 Rerank 超时，回退 RRF 并披露降级 |
+
+检索评估的 14 个正例、2 个资料外问题和 2 个冲突对结果：
+
+| 方案 | Recall@6 | MRR@6 | 扩展后 Recall | 冲突成对召回 |
+| --- | ---: | ---: | ---: | ---: |
+| 关键词 | 1.0000 | 0.8214 | 不适用 | 1.0000 |
+| 向量 | 1.0000 | 0.9643 | 不适用 | 1.0000 |
+| RRF 混合 | 1.0000 | 0.9643 | 1.0000 | 1.0000 |
+| 混合 + Rerank | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+
+Recall@6 在当前 7／8 条款小语料上饱和，不能据此推断普遍收益；结果文件、快照 UUID、原始召回与计量见
+`examples/retrieval/real/20261101T062009Z-5222daac-179c-4a87-95e4-7b5249fa2a52/`。
+
+真实模型对照发现 `deepseek-flash` 偶发结构化草稿或引用无效，运行时均按契约拒绝；切换
+`deepseek-chat` 后完成上述 8 个用例。非法引用和枚举不会被自动修复，相关排查见
+[工具上下文踩坑](pitfalls/T07-tool-result-context-bloat.md)、
+[状态原因配对](pitfalls/T07-status-reason-pairing.md)和
+[模型输出稳定性](pitfalls/T07-model-output-stability.md)。
+
+历史基线 `5ff4dd0` 已完成 63 个测试，包含原有 15 个 T05 JUnit，0 失败、0 错误、0 跳过；T04／T05 已完成相应层次的受控运行，见 [T04 验证](t04-ingestion-verification.md)和 [T05 验证](t05-search-verification.md)。这些历史结果早于最终运行，最终状态以上一节和实际证据文件为准。
 
 ## 已确认的交付边界
 
@@ -30,19 +73,19 @@ T09 按用户于 2026-11-01 确认的范围分阶段交付。本阶段补齐已�
 
 | 资产 | 断言或职责 | 当前证据边界 |
 | --- | --- | --- |
-| `contract/*ContractTest`、`SiliconFlowInterruptionTest` | 向量、配置、JSON、读取结果互斥、稳定排序、模型中断。 | 48 个既有测试有历史运行证据；本次没有重跑。 |
-| `SiliconFlowProtocolTest` | 请求字段、批序、结果数量／下标、向量、重排分数、计量、HTTP 错误和脱敏。 | 使用本机受控 HTTP，不证明真实服务可用性；未执行。 |
-| `PgKnowledgeStoreBoundaryTest` | 不足预算不启动事务、空关键词和跨快照边界。 | 无真实数据源；未执行。 |
-| `CorpusIngestionTest` | 严格 JSON、资料与条款身份、UTF-16 偏移／哈希、分词资源、失败不发布、写入与发布顺序。 | 使用实际解析器、切分器、分词器和导入器，数据库／模型为替身；未执行。 |
-| `HybridSearchServiceTest`、`KnowledgeEvidenceReaderTest` | 融合、排序回退、主题截断、原文读取和证据登记。 | 原有 15 个 T05 JUnit 在 `5ff4dd0` 已通过；本阶段新增和修改用例尚未执行。 |
-| `AnswerValidationTest` | 已读引用、全量拒绝无效引用、失败优先级、冲突例外、无依据门槛、UTF-16 定位和 Trace 快照。 | 机械校验不证明答案支持性；未执行。 |
-| `QaHttpTest` | 严格 JSON、历史、全部长度边界、五类任务状态、全部依赖错误码、空结果、协议头和异步超时分派。 | 使用实际 Controller、配置和异常处理器，服务为替身；未执行。超时由测试触发 Servlet 超时事件，不是实测等待 125 秒。 |
-| `RetrievalEvaluationTest` | 指标分母、排名、去重、冲突成对召回、空相关集、融合／排序与生产实现对齐、回退。 | 确定性回归，不是检索质量成绩；未执行。 |
-| `T05PostgresIntegrationTest` | 真实 schema／Mapper／分词／导入／召回／读取；补充发布失败、批次回滚、READY 不可写和替换快照。 | `postgres` 标签，真实 Docker pgvector，模型为替身；新增和修改部分未执行。 |
-| `RealRetrievalEvaluationTest` | 指定 READY 快照上的四方案实际比较与结果导出。 | `real` 标签，不运行问答或 DeepSeek；尚未执行。 |
-| `RequestStateTest`、`AgentQaServiceBoundaryTest` | 请求级状态、预算、同查询恢复、资料身份、订阅隔离及最终截止原因。 | 总截止状态使用明确置位验证，不冒充真实流式计时；未执行。 |
-| `QaOfflineMockTest` | 实际问答服务与 AgentScope 循环，含正常、冲突、资料外、路由恢复、同轮引用拒绝、工具／轮次上限及模型失败。 | 确定性模型和资料存储替身，不调用网络或数据源；未执行，不证明真实模型决策。 |
-| `FaultInjectionTest`、`RealQaEvaluationTest` | 故障固定一次后委托、真实问答输入／响应／Trace 采集。 | 故障包装器单元测试默认运行；真实问答为 `real` 标签，均未执行。 |
+| `contract/*ContractTest`、`SiliconFlowInterruptionTest` | 向量、配置、JSON、读取结果互斥、稳定排序、模型中断。 | 已包含在最终默认测试的 184 项中并重新通过。 |
+| `SiliconFlowProtocolTest` | 请求字段、批序、结果数量／下标、向量、重排分数、计量、HTTP 错误和脱敏。 | 最终默认测试通过；仍使用本机受控 HTTP，不证明服务商持续可用性。 |
+| `PgKnowledgeStoreBoundaryTest` | 不足预算不启动事务、空关键词和跨快照边界。 | 最终默认测试与 PostgreSQL 集成测试通过。 |
+| `CorpusIngestionTest` | 严格 JSON、资料与条款身份、UTF-16 偏移／哈希、分词资源、失败不发布、写入与发布顺序。 | 最终默认测试与 PostgreSQL 集成测试通过；数据库／模型替身边界不变。 |
+| `HybridSearchServiceTest`、`KnowledgeEvidenceReaderTest` | 融合、排序回退、主题截断、原文读取和证据登记。 | 最终默认测试通过。 |
+| `AnswerValidationTest` | 已读引用、全量拒绝无效引用、失败优先级、冲突例外、无依据门槛、UTF-16 定位和 Trace 快照。 | 最终默认测试通过；机械校验不证明语义支持性。 |
+| `QaHttpTest` | 严格 JSON、历史、全部长度边界、五类任务状态、全部依赖错误码、空结果、协议头和异步超时分派。 | 最终默认测试通过；另有真实 HTTP E01 证据。超时用例触发 Servlet 超时事件，不是实测等待 125 秒。 |
+| `RetrievalEvaluationTest` | 指标分母、排名、去重、冲突成对召回、空相关集、融合／排序与生产实现对齐、回退。 | 最终默认测试通过；确定性回归不替代真实检索成绩。 |
+| `T05PostgresIntegrationTest` | 真实 schema／Mapper／分词／导入／召回／读取；补充发布失败、批次回滚、READY 不可写和替换快照。 | `postgres` profile 通过，真实 Docker pgvector，模型为替身。 |
+| `RealRetrievalEvaluationTest` | 指定 READY 快照上的四方案实际比较与结果导出。 | 最终真实评估通过，16 题 0 失败，结果见 `examples/retrieval/real/`。 |
+| `RequestStateTest`、`AgentQaServiceBoundaryTest` | 请求级状态、预算、同查询恢复、资料身份、订阅隔离及最终截止原因。 | 最终默认测试通过；总截止状态使用明确置位验证。 |
+| `QaOfflineMockTest` | 实际问答服务与 AgentScope 循环，含正常、冲突、资料外、路由恢复、同轮引用拒绝、工具／轮次上限及模型失败。 | 最终默认测试与 PostgreSQL profile 均通过，证据见 `examples/mock/`。 |
+| `FaultInjectionTest`、`RealQaEvaluationTest` | 故障固定一次后委托、真实问答输入／响应／Trace 采集。 | `FaultInjectionTest` 随默认测试通过；`RealQaEvaluationTest` 带 `real` 标签，共 10 次独立运行、覆盖 8 个用例（E01 运行 3 次），不计入默认 184 项。 |
 
 获得测试指令后，在 Java 17 和 Maven 环境执行：
 
@@ -64,7 +107,7 @@ python3 scripts/run-tests.py postgres
 python3 scripts/run-tests.py mock
 ```
 
-脚本记录实际 commit、开始前是否存在未提交改动、命令、开始／结束时间、Maven 退出码与报告计数，日志和报告放在 `examples/tests/<mode>/<runId>/`。每次为 Surefire 指定全新报告目录，避免把旧报告混入本次结果。没有生成报告时计数为 `null`；中断和启动失败如实记录。脚本未运行，目录当前尚无实际产物。
+脚本记录实际 commit、开始前是否存在未提交改动、命令、开始／结束时间、Maven 退出码与报告计数，日志和报告放在 `examples/tests/<mode>/<runId>/`。每次为 Surefire 指定全新报告目录，避免把旧报告混入本次结果。最终 unit、postgres、qa 和 retrieval 运行记录已提交。
 
 完整离线流程也可单独执行 `mvn -Dtest=QaOfflineMockTest test`。实际服务生成的每次响应与 Trace 会保存到 `examples/mock/<caseId>/<runId>/`，标记 `MOCK`。模型输出预设动作仅用于验证框架接线和异常路径，不能用这些动作声称真实模型具备动态决策能力。
 
@@ -107,16 +150,16 @@ mvn -Preal-evaluation -Dtest=RealRetrievalEvaluationTest \
 
 | 需求 | 用例 | 当前交付与剩余证据 |
 | --- | --- | --- |
-| R01 明确答案 | E01 | 有请求、normal 参考条款和实际服务采集入口；实际答案支持性与读取后推理待运行。 |
-| R02 文档冲突 | E02 | 有双方标注及校验器回归；实际读取双方、补查和追问待真实 Trace。 |
-| R03 资料外问题 | E03 | 有空相关集和无依据状态门槛测试；完整查证后说明缺口待运行。 |
-| R04 相似改写 | E04 | 与 E01 同资料同依据，有检索比较入口；实际结果待运行。 |
-| R05 上下文追问 | E05 | 有历史请求、凭证条款与真实问答采集入口；真实历史消歧及重新查证待运行。 |
-| R06 工具失败 | E06、E09 | 协议失败、排序回退、同查询恢复和固定一次的故障包装器已有代码；真实模型调整动作仍待实际运行。 |
-| R07 动态调整 | E01、E02 | 必须有至少两条真实模型路径，读取完成后再次推理；不能用固定日志或自动重试替代。 |
-| R08 执行上限 | E07 | 已有实际 Mock 工具／轮次循环与预算优先级代码；流式总时限、取消与迟到结果仍需运行验证。 |
-| R09 资料替换 | E08 | 有 normal／mutation 标注、数据库新旧快照读取回归、请求状态隔离和两次真实采集入口；进行中请求及实际答案变化仍待验证。 |
-| R10 离线入口 | E10 | 已接入实际问答服务和框架的确定性替身；尚未编译或执行，不能标为已通过。 |
+| R01 明确答案 | E01 | 真实运行 `ANSWERED`，3 轮模型决策、2 次检索、1 次读取；人工语义复核仍待填写。 |
+| R02 文档冲突 | E02 | 真实运行 `CONFLICT`，读取双方并补查适用关系，引用 3 条已读原文。 |
+| R03 资料外问题 | E03 | 真实运行 `NO_EVIDENCE`，多次检索后说明资料范围与缺口。 |
+| R04 相似改写 | E04 | 真实运行 `ANSWERED`，与 E01 使用同一条期限依据。 |
+| R05 上下文追问 | E05 | 真实运行 `ANSWERED`，利用历史指向差旅凭证并重新读取当前快照。 |
+| R06 工具失败 | E06、E09 | E06 注入 Embedding 超时后返回 `ROUTE_FAILED`；E09 注入 Rerank 超时后回退 RRF、披露降级并正常回答。 |
+| R07 动态调整 | E01、E02 | E01 和 E02 的真实 Trace 均显示检索/读取后继续模型推理，不是固定调用脚本。 |
+| R08 执行上限 | E07 | 实际 Mock 覆盖工具与轮次上限并得到 `BUDGET_EXHAUSTED`／`MAX_ITERATIONS`；真实流式总时限和取消后迟到结果仍有测试缺口。 |
+| R09 资料替换 | E08 | normal 为 30 天，mutation 为 20 天；新请求重新读取并引用 D01 v2。同一进行中请求的并发实时验证仍由单元状态回归覆盖，未做真实并发压测。 |
+| R10 离线入口 | E10 | 默认测试和 PostgreSQL profile 均执行实际服务、AgentScope、工具与校验；证据标记为 `MOCK`。 |
 
 最终至少提交三组真实输入、实际输出及运行记录，覆盖正常、资料不足与工具失败，并覆盖全部验收点。答案支持性、冲突解释、缺口与限制逐项人工核对，记录核对者和时间。引用有效不等于答案受到支持，检索高分也不是回答置信度。
 
@@ -133,4 +176,4 @@ E02 要求最新 conflict 快照，E01/E03/E04/E05/E06/E09 使用 normal；E08 �
 
 第一阶段 T09 实现及修复见 `6e04317`、`27db0bb` 和 Git 历史。Bacon／McClintock 分别完成规范与需求静态审查及定向复核，无剩余阻断项；其后 48 个测试有历史通过记录。T04／T05 的临时受控验证见前述文档，临时环境和原始日志已清理；不能表述为仓库内仍保留可执行的原始产物。
 
-本阶段的实现、审查问题及合并记录追加到 [T09 设计记录](t09-testing-delivery-design.md)。静态审查和差异检查不代表编译或测试通过。
+本阶段的实现、审查问题及合并记录追加到 [T09 设计记录](t09-testing-delivery-design.md)。最终代码已在 `3cddda8` 完成自动化、真实数据库、真实模型、HTTP 和检索评估；人工语义复核及用户个人事实仍不能由静态审查或自动测试代替。
