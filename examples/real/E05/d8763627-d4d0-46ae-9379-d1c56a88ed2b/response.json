@@ -1,0 +1,78 @@
+{
+  "runId" : "d8763627-d4d0-46ae-9379-d1c56a88ed2b",
+  "snapshotId" : "fd95b17c-eec9-4662-9637-bd3c53b34c6e",
+  "status" : "ANSWERED",
+  "reason" : "EVIDENCE_SUFFICIENT",
+  "answer" : "按《差旅报销制度（合成资料）》第2条，提交差旅报销时应提供：\n1. 已审批的出差申请；\n2. 交通票据；\n3. 住宿发票；\n4. 上述费用的对应付款记录。\n未发生的费用无需提供该类凭证。\n\n补充要求：\n- 住宿报销按住宿发票列明的实际金额申请；私人消费不属于差旅报销范围，不得混入住宿费用（第3条）。\n- 交通票据遗失时，应补充行程记录与对应付款记录，并说明遗失原因，由财务核对后确认能否报销（第4条）。\n\n通用《费用报销制度（合成资料）》的一般要求：申请报销时应提交对应费用的有效凭证，并填写费用用途和实际金额（第2条）；缺少有效凭证或费用用途不清楚时，应先补充材料再提交报销申请（第3条）。该制度未就差旅单独规定凭证清单，差旅场景以差旅制度的清单为准，通用制度则要求凭证有效、用途与金额填写清楚。",
+  "citations" : [ {
+    "documentId" : "D03",
+    "version" : "v1",
+    "chunkId" : "clause-2",
+    "quote" : "第2条 提交差旅报销时，应提供已审批的出差申请、交通票据、住宿发票及对应付款记录；未发生的费用无需提供该类凭证。",
+    "startOffset" : 54,
+    "endOffset" : 110,
+    "contentHash" : "3aa27b98ed66044af01e031af9b13583d05ebde2d921bebb0d4cbba8adece396"
+  }, {
+    "documentId" : "D03",
+    "version" : "v1",
+    "chunkId" : "clause-3",
+    "quote" : "第3条 住宿报销按住宿发票列明的实际金额申请；私人消费不属于差旅报销范围，不得混入住宿费用。",
+    "startOffset" : 112,
+    "endOffset" : 158,
+    "contentHash" : "dd312dfae9bbaee0b7c776f8128e2ca0e93b1acf65c316c2cd1b1a50ee58ab8d"
+  }, {
+    "documentId" : "D03",
+    "version" : "v1",
+    "chunkId" : "clause-4",
+    "quote" : "第4条 交通票据遗失时，应补充行程记录与对应付款记录，并说明遗失原因，由财务核对后确认能否报销。",
+    "startOffset" : 160,
+    "endOffset" : 208,
+    "contentHash" : "c073cb4a98064ad1280f8b5746c9ec72d16a76bfdd120e1c6a30940a447fab81"
+  }, {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-2",
+    "quote" : "第2条 申请报销时，应提交对应费用的有效凭证，并填写费用用途和实际金额。",
+    "startOffset" : 45,
+    "endOffset" : 81,
+    "contentHash" : "bce690c23425c3c12ebd2557f3ee9b74d2b11a3a996554ae4608e32a558caf17"
+  }, {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-3",
+    "quote" : "第3条 缺少有效凭证或费用用途不清楚时，申请人应先补充材料，再提交报销申请。",
+    "startOffset" : 83,
+    "endOffset" : 121,
+    "contentHash" : "c0f8ef8c9f62470c595c09cdffcabc017ff2bb9f99822254a82fca4d54a16e65"
+  } ],
+  "evidenceGaps" : [ ],
+  "clarifyingQuestion" : null,
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 3,
+    "toolCalls" : 6,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 7252,
+    "remainingMillis" : 112747,
+    "readCharacters" : 232,
+    "toolTextCharacters" : 535,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

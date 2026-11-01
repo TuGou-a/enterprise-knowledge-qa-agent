@@ -1,0 +1,37 @@
+{
+  "materialType": "ACTUAL_AUTOMATED_TEST_RUN",
+  "mode": "REAL_QA",
+  "commit": "3cddda899ab6f7a11ae9409374c1a83317de28d3",
+  "workingTreeDirtyAtStart": true,
+  "startedAt": "2026-11-01T06:20:32.305241+00:00",
+  "command": [
+    "mvn",
+    "-Dstyle.color=never",
+    "-Dtest.reports-directory=/private/tmp/agent-t09-final-validation2/examples/tests/qa/20261101T062032Z-690486970b5e4452ae38fb66a4c7ebdf/reports",
+    "-Devaluation.executionMetadata=examples/tests/qa/20261101T062032Z-690486970b5e4452ae38fb66a4c7ebdf/run.json",
+    "-Preal-evaluation",
+    "-Dtest=RealQaEvaluationTest",
+    "-Devaluation.case=E05",
+    "-Devaluation.snapshot=fd95b17c-eec9-4662-9637-bd3c53b34c6e",
+    "test"
+  ],
+  "status": "FINISHED",
+  "finishedAt": "2026-11-01T06:20:42.712658+00:00",
+  "exitCode": 0,
+  "suites": [
+    {
+      "file": "TEST-com.mango.backend.qa.application.RealQaEvaluationTest.xml",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "reportCollectionErrors": [],
+  "testCounts": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

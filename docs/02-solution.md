@@ -1,6 +1,6 @@
 # 企业知识问答 Agent：架构方案
 
-本方案基于已确认的项目范围编写，配套[HTML 架构文档](./architecture.html)。用户已确定技术路线；工具契约、表结构、参数初值和模块拆分是本方案提出的实施设计，尚未完成完整业务代码与运行验证。T01 已将共享类型、方法签名、配置默认值和恢复规则写入 [T01 契约](08-t01-contracts.md)，后续实施以该交接文档及对应 Java 类型为准。
+本方案基于已确认的项目范围编写，配套[HTML 架构文档](./architecture.html)。用户已确定技术路线；工具契约、表结构、参数初值和模块拆分已落地为完整业务代码，并通过真实模型、HTTP、数据库与检索评估。T01 已将共享类型、方法签名、配置默认值和恢复规则写入 [T01 契约](08-t01-contracts.md)。最终运行结果见[测试与评估](03-evaluation.md#最终运行结果2026-11-01)。
 
 ## 总体结构
 
@@ -49,7 +49,7 @@ flowchart LR
 
 ## MyBatis 数据访问
 
-按用户选择，持久化统一使用 MyBatis，建议固定 `mybatis-spring-boot-starter:3.0.5`。官方兼容表中 3.0 系列支持 Spring Boot 3.2 至 3.5、Java 17 及以上；当前工程仍需实际编译与启动验证。依赖及来源见 [README](../README.md) 与[接入核查](./framework-verification.md)。
+按用户选择，持久化统一使用 MyBatis，固定 `mybatis-spring-boot-starter:3.0.5`。官方兼容表中 3.0 系列支持 Spring Boot 3.2 至 3.5、Java 17 及以上；当前工程已通过真实 PostgreSQL 集成测试和完整应用启动。依赖及来源见 [README](../README.md) 与[接入核查](./framework-verification.md)。
 
 `CorpusMapper` 管理快照状态，`DocumentMapper` 管理版本原文，`ChunkMapper` 管理片段入库、两路召回、同主题扩展与片段读取。建议 XML 存放于 `src/main/resources/mapper/knowledge/`，使用 `mybatis.mapper-locations=classpath*:mapper/**/*.xml` 和 `@MapperScan` 注册；业务服务协调查询与事务。
 
@@ -93,7 +93,7 @@ AgentScope `2.0.4` 的 `ToolExecutor` 已将同步工具调度到 `boundedElasti
 6. 使用同一查询与候选条款原文调用硅基流动 `BAAI/bge-reranker-v2-m3`，取得整个融合池的分数后，本地按相关性分数、RRF 名次与稳定片段键排序，再选取最多 6 条主候选。空候选池跳过云请求，记录 `SKIPPED_EMPTY`。
 7. 以重排序前候选池的 `topic_key` 扩展同主题的其他资料版本，按稳定片段键去重，最多额外返回 12 条；该集合独立于主候选，不受重排序 Top-K 或分数过滤。通过额外探测一条确认是否还有未返回条款，不能仅因结果刚好等于上限就标记截断。全局截断时，各种子主题组均保守标记完整性未确认，不宣称已穷尽所有规定。检索预览累计文本预算由 T07 在交付模型前独立检查，超限时返回预算错误，不把结果伪装成空检索。
 
-上述数量均是可配置建议初值，尚未验证。最终工具结果最多包含 6 条主候选与 12 条主题扩展；`topK` 只控制主候选数量。Trace 分别记录每路召回数、去重数、送入重排序数、主候选数与主题扩展数。
+上述数量均为可配置初值，最终实现为每路最多 20 条、融合池 20 条、主候选 6 条和主题扩展 12 条，并已用于真实检索评估。最终工具结果最多包含 6 条主候选与 12 条主题扩展；`topK` 只控制主候选数量。Trace 分别记录每路召回数、去重数、送入重排序数、主候选数与主题扩展数。
 
 RRF 的单个片段得分为各路 `1 / (k + rank)` 的和，未进入某一路候选的片段在该路贡献为 0。第一版使用等权；并列结果按稳定片段键排序，便于复现。得分是排序依据，不是回答置信度。
 
@@ -196,11 +196,11 @@ Embedding 失败时，可返回关键词候选，并明确标记 `vector=ERROR`�
 
 按用户确认，固定 AgentScope Java `2.0.4`，使用 DeepSeek Provider 与 `ModelCreationContext.builder().enableThinking(false)`；后者明确关闭该服务的思考模式，不改变 ReAct 的动作选择能力。通过 `call(..., AnswerDraft.class, RuntimeContext)` 获取结构化业务内容，再由应用添加执行信息组装 `AnswerEnvelope`，并用中间件采集内部事件。核查基线为本地 `v2.0.4` 标签，对应提交 `0b6743b263ba8e39eb417e35048026f1e0196548`；当前参考源码工作区的 `2.1.0-SNAPSHOT` 不作为实施依赖。
 
-最小集成需先验证 Reactor 与 Jackson 基线：AgentScope 2.0.4 的构建配置高于当前 Boot 3.5.10 的管理版本。保持现有后端，先检查实际依赖树、编译与启动，再验证真实工具调用；在此之前不宣称两者兼容，不预先覆盖全套 BOM。版本对照与来源见[接入核查](./framework-verification.md#需要优先验证的依赖基线差异)。
+AgentScope 2.0.4 的构建配置高于当前 Boot 3.5.10 的管理版本。保持现有后端后，实际解析采用 Reactor 3.7.15 与 Jackson 2.19.4，并已完成编译、启动、真实工具调用和 HTTP 问答，未预先覆盖全套 BOM。版本对照与来源见[接入核查](./framework-verification.md#需要优先验证的依赖基线差异)。
 
-应用读取 `DEEPSEEK_BASE_URL` 与 `DEEPSEEK_MODEL`，分别传入模型创建上下文和 `deepseek:<modelName>` 标识。固定版的窗口表不认识当前官方名称 `deepseek-flash`，通过 `ModelCreationContext.builder().option("contextWindowSize", configuredWindow)` 显式设置核查后的窗口；不能依靠参考工作区 main 的新映射。
+应用读取 `DEEPSEEK_BASE_URL` 与 `DEEPSEEK_MODEL`，分别传入模型创建上下文和 `deepseek:<modelName>` 标识。最终运行选择 `deepseek-chat`；固定版的窗口表不包含该项目选定名称，通过 `ModelCreationContext.builder().option("contextWindowSize", configuredWindow)` 显式设置核查后的窗口；不能依靠参考工作区 main 的新映射。
 
-该发行版 DeepSeek Provider 的结构化输出采用框架工具回退方式，需要验证 `generate_response` 等内部工具与业务工具交互。不能把 `streamEvents(...)` 当作具有同样结构化类型参数的重载，也不能复用当前 main 文档中发行版尚未包含的修复。细节见[接入核查](./framework-verification.md)。
+该发行版 DeepSeek Provider 的结构化输出采用框架工具回退方式；`generate_response` 与业务工具的实际交互已通过真实 Trace 验证。不能把 `streamEvents(...)` 当作具有同样结构化类型参数的重载，也不能复用当前 main 文档中发行版尚未包含的修复。细节见[接入核查](./framework-verification.md)。
 
 工具通过 `Toolkit.registerTool(...)` 注册 `@Tool` 方法；模型输入使用 `@ToolParam`，资料快照、预算和已读证据通过 `RuntimeContext.builder().put(RunContext.class, runContext)` 注入，工具使用未标注 `@ToolParam` 的 `RunContext` 参数接收。它们不进入模型可填参数，不使用 Agent 上的共享当前上下文或依赖 `ThreadLocal` 跨线程传递。
 
@@ -222,28 +222,28 @@ Embedding 失败时，可返回关键词候选，并明确标记 `vector=ERROR`�
 
 检索配置还包含重排序模型、候选池及返回上限、RRF 参数；每次记录重排序耗时、服务响应 ID、计量信息（若返回）、下标映射、最终模式和回退原因。重排序消耗属于一次检索工具调用的内部成本，仍受请求总超时限制，不另算一个模型业务工具。
 
-建议用例与交付文件如下。它们是计划文件名，尚未生成实际输出。
+建议用例与实际交付文件如下。目录中的 `runId` 为实际运行输出，不再使用早期计划路径。
 
-| 用例 | 预期检查 | 计划记录 |
+| 用例 | 检查 | 实际记录 |
 | --- | --- | --- |
-| 明确报销期限与相似改写 | 同一依据、原文可定位，改写仍可找到答案。 | `examples/real/normal/` |
-| 30 天与 15 天冲突 | 读取双方、继续查证、保留冲突，不凭日期选择。 | `examples/real/conflict/` |
-| 资料外问题 | 不以模型常识补答，明确资料范围与缺口。 | `examples/real/no-evidence/` |
-| 上下文追问 | 历史消歧后读取相关资料，历史回答不直接当依据。 | `examples/real/follow-up/` |
-| Embedding、读取与数据库失败 | 区分降级、空结果、错误，体现模型观察后的下一步。 | `examples/real/tool-failure/` |
-| 重排序超时或异常下标 | 回退 RRF、保留主题扩展并披露降级，不把排序错误记成召回无结果。 | `examples/real/rerank-fallback/` |
-| 执行上限 | 框架继续要求工具时，到达上限输出未完成。 | `examples/mock/budget/` |
-| 替换资料后重跑 | 新快照的回答、引用与动作随资料变化。 | `examples/real/mutation/` |
+| 明确报销期限与相似改写 | 同一依据、原文可定位，改写仍可找到答案。 | `examples/real/E01/`、`E04/` |
+| 30 天与 15 天冲突 | 读取双方、继续查证、保留冲突，不凭日期选择。 | `examples/real/E02/` |
+| 资料外问题 | 不以模型常识补答，明确资料范围与缺口。 | `examples/real/E03/` |
+| 上下文追问 | 历史消歧后读取相关资料，历史回答不直接当依据。 | `examples/real/E05/` |
+| Embedding 超时 | 保留未恢复路由，不把工具失败写成无资料。 | `examples/real/E06/` |
+| 重排序超时 | 回退 RRF、披露降级，不把排序错误记成召回无结果。 | `examples/real/E09/` |
+| 执行上限 | 框架继续要求工具时，到达上限输出未完成。 | `examples/mock/E07/` |
+| 替换资料后重跑 | 新快照的回答、引用与动作随资料变化。 | `examples/real/E08/` |
 
 Mock 模式以可控模型与工具替身验证接口、循环、校验和异常路径，不要求云 API 或真实数据库；它不能证明真实模型决策或 PostgreSQL 混合检索效果。真实模式至少保留两条不同决策路径，并在真实 PostgreSQL 上验证两路检索。
 
 两类真实路径采用部分顺序断言，而非要求模型每次输出完全相同的调用序列：正常路径须有「模型选检索 → 返回候选 → 模型选读取 → 读取原文 → 带引用结束」；冲突路径须有「发现两份资料 → 模型读取双方 → 至少一次针对适用关系的补充查证 → 带双方引用结束为冲突」。两条路径都由同一真实模型面对不同工具结果作出动作，不用脚本预写下一步。
 
-上述「读取原文 → 带引用结束」还需包含读取完成后的模型推理，不能把同轮预先生成的 `generate_response` 当作已观察原文的证明。执行边界另覆盖追加汇总失败、工具调用数耗尽及总超时；这些均为计划验收项，尚未运行。
+上述「读取原文 → 带引用结束」还需包含读取完成后的模型推理，不能把同轮预先生成的 `generate_response` 当作已观察原文的证明。真实 E01/E02 Trace 已验证读取后的模型推理；追加汇总失败和工具调用数耗尽由 Mock 验证，真实流式总时限仍未作为独立实验执行。
 
 工具失败采用仅在评估配置启用的包装器注入：例如第一次 `EmbeddingClient.embed` 抛出可恢复超时，或指定片段的 `EvidenceReader.read` 返回读取错误。固定注入点、次数与输入，记录故障发生和恢复后的动作；明确标为「真实模型与真实 PostgreSQL＋注入工具故障」，与完全离线 Mock 分开。禁止通过线上密钥或公网参数开启故障注入。
 
-对相同问题集比较关键词、向量、RRF 混合、混合＋重排序四种方案。固定检索候选池比较排序变化，记录 Recall@K、MRR@6 或 nDCG@6、冲突资料成对召回、引用有效性和答案支持性，以及延迟、计量信息与回退率；主候选与加入主题扩展后的指标分别报告，避免混淆召回范围。未运行的指标不填写数值；若结果不理想，记录失败、调整项及再次验证结果。
+对相同问题集比较关键词、向量、RRF 混合、混合＋重排序四种方案。固定检索候选池比较排序变化，记录 Recall@K、MRR@6、冲突资料成对召回、延迟、计量信息与回退率；主候选与加入主题扩展后的指标分别报告。最终 16 题结果保存在 `examples/retrieval/real/`，指标见[测试与评估](03-evaluation.md#最终运行结果2026-11-01)。引用有效性与答案支持性仍需人工语义复核，不能由检索指标代替。
 
 ## 建议实施顺序
 

@@ -1,8 +1,30 @@
 # 验收输入与运行证据
 
-当前目录包含计划请求和参考标注，没有完整问答的实际回答、真实 Trace 或检索成绩。历史基线 `5ff4dd0` 的 63 项测试与 T04／T05 记录见[评估文档](../docs/03-evaluation.md)，本阶段新增／修改测试和 T07 尚未执行。
+当前目录包含计划输入、参考标注、完整真实问答、真实 HTTP 调用、检索评估结果和自动化测试运行记录。历史基线 `5ff4dd0` 的 63 项测试与 T04／T05 记录继续保留；最终验证见[评估文档](../docs/03-evaluation.md)。
 
-## 已提供材料
+## 最终证据索引
+
+最终验证时间为 2026-11-01，源码基线为 `3cddda8`，运行使用最终证据工作树和 DeepSeek `deepseek-chat`。
+
+| 用例 | 实际结果 | 证据 |
+| --- | --- | --- |
+| E01 | `ANSWERED/EVIDENCE_SUFFICIENT`，连续 3 次 | `real/E01/c0e3035a-66b2-4b4e-9a4d-75c0dbfd4b1d/`、`real/E01/aafb2d25-e740-4453-9fc6-e33835950aee/`、`real/E01/f19441e2-7fce-4c7a-aaed-82043a30c303/` |
+| E02 | `CONFLICT/APPLICABILITY_UNKNOWN` | `real/E02/328e269f-5306-4ac0-96c7-17025ca28c4f/` |
+| E03 | `NO_EVIDENCE/OUT_OF_CORPUS` | `real/E03/57ed4ba0-7460-451f-b4e8-623e60e44471/` |
+| E04 | `ANSWERED/EVIDENCE_SUFFICIENT` | `real/E04/094b311b-38a0-46a3-beb2-8a2e97fff758/` |
+| E05 | `ANSWERED/EVIDENCE_SUFFICIENT` | `real/E05/d8763627-d4d0-46ae-9379-d1c56a88ed2b/` |
+| E06 | `INCOMPLETE/ROUTE_FAILED`，注入 1 次 Embedding 超时 | `real/E06/5c42965e-8e90-4ac4-b9c4-7fdbbe6b98ce/` |
+| E08 | `ANSWERED/EVIDENCE_SUFFICIENT`，引用 20 天的新版本 | `real/E08/25874ddd-8678-4497-97e1-b5cbcc613516/` |
+| E09 | `ANSWERED/EVIDENCE_SUFFICIENT`，注入 1 次 Rerank 超时并披露回退 | `real/E09/b862ca60-d868-467b-a3fc-321fa7ae2fd0/` |
+| 真实 HTTP E01 | HTTP `200`，带原始报文与服务端日志 | `http/E01_HTTP_REAL/f18bc320-5fbd-4080-8cea-75b7e9008d21/` |
+| 16 题检索评估 | `COMPLETED`，0 个失败问题 | `retrieval/real/20261101T062009Z-5222daac-179c-4a87-95e4-7b5249fa2a52/` |
+| 离线 Mock | 正常、冲突、资料外、恢复、未观察引用、工具/轮次上限、模型失败 | `mock/E02/`、`mock/E03/`、`mock/E06/`、`mock/E07/`、`mock/E10/` |
+
+自动化测试证据位于 `tests/unit/`、`tests/postgres/`、`tests/qa/` 和 `tests/retrieval/`。最终
+默认测试为 `184/184`，PostgreSQL 集成测试为 `189/189`。测试目录中的 `run.json` 记录 commit、
+命令、起止时间、退出码和报告计数。
+
+## 输入与标注
 
 - [cases.json](cases.json)：E01–E10 的需求映射、请求、资料前提和预期检查，不是运行结果。
 - `requests/E01.json` 至 `requests/E10.json`：可直接作为 `POST /api/qa` 请求体的计划输入，不含预期答案或测试开关。
@@ -15,10 +37,10 @@
 
 ## HTTP 调用
 
-T07 已合并，应用通过运行验证并收到测试指令后，在项目根目录调用：
+启动完整应用时设置 `SERVER_PORT=18080`（默认端口为 `8080`），然后在项目根目录调用：
 
 ```bash
-curl --fail-with-body -sS http://localhost:8080/api/qa \
+curl --fail-with-body -sS http://127.0.0.1:18080/api/qa \
   -H 'Content-Type: application/json' \
   --data-binary @examples/requests/E01.json
 ```
@@ -27,7 +49,7 @@ curl --fail-with-body -sS http://localhost:8080/api/qa \
 
 ## 自动化测试证据
 
-合并后获得测试指令，再执行：
+最终执行入口为：
 
 ```bash
 python3 scripts/run-tests.py unit
@@ -39,19 +61,19 @@ python3 scripts/run-tests.py retrieval --snapshots 'normal=<id>,conflict=<id>,mu
 
 需要 Python 3、Java 和 Maven；`postgres` 另需 Docker 与 pgvector 镜像，`qa`／`retrieval` 需要实际资料与模型环境。输出位于从项目根目录计算的 `examples/tests/<mode>/<runId>/`，包含 `run.json`、`console.log` 和本次独立的 `reports/`。unit 为隔离回归，postgres 为真实数据库加模型替身，mock 为实际问答服务加确定性替身，qa／retrieval 才会调用各自所需的真实模型。
 
-每次记录实际命令、commit、运行开始前的未提交状态、时间、Maven 退出码和报告计数。没有报告时数量为 `null`，启动失败、中断或报告解析失败需保留；不复制历史报告制造本次成绩。这些目录只由实际运行生成，当前没有预填。
+每次记录实际命令、commit、运行开始前的未提交状态、时间、Maven 退出码和报告计数。没有报告时数量为 `null`，启动失败、中断或报告解析失败需保留；不复制历史报告制造本次成绩。
 
 ## 真实检索评估
 
 评估入口与配置见[评估文档](../docs/03-evaluation.md)。显式指定三组实际 READY 快照后，入口只读取已有资料并调用硅基流动，不运行 DeepSeek 或问答 Agent。每道题共用一次原始召回生成四方案；单路不增加主题扩展，混合方案保持 T05 行为。
 
-运行后才生成 `retrieval/real/<runId>/results.json` 和 `run.md`。结果包括问题、标注、实际快照、索引配置、原始召回、融合池、排名、指标、耗时、计量和失败；不产生“项目通过”的结论。7／8 条款的小型合成资料容易让 Recall@6 饱和，必须报告持平、退化和局限。
+实际运行生成 `retrieval/real/<runId>/results.json` 和 `run.md`。结果包括问题、标注、实际快照、索引配置、原始召回、融合池、排名、指标、耗时、计量和失败；不产生“项目通过”的结论。7／8 条款的小型合成资料容易让 Recall@6 饱和，必须报告持平、退化和局限。
 
 ## 完整问答证据
 
-实际服务的离线入口为 `mvn -Dtest=QaOfflineMockTest test`，真实问答入口为 `mvn -Preal-evaluation -Dtest=RealQaEvaluationTest -Devaluation.case=E01 -Devaluation.snapshot='<实际最新normal快照ID>' test`。两者都已编写但尚未执行，均需等运行指令。
+实际服务的离线入口为 `mvn -Dtest=QaOfflineMockTest test`，真实问答入口为 `mvn -Preal-evaluation -Dtest=RealQaEvaluationTest -Devaluation.case=E01 -Devaluation.snapshot='<实际最新normal快照ID>' test`。
 
-离线用例将实际服务及框架生成的响应与 Trace 放在 `mock/<caseId>/<runId>/`，标明确定性模型／资料替身。真实问答在 `real/<caseId>/<runId>/` 保存 `request.json`、`response.json`、`trace.json`、`run.json` 和 `run.md`。当前不创建这些实际产物。
+离线用例将实际服务及框架生成的响应与 Trace 放在 `mock/<caseId>/<runId>/`，标明确定性模型／资料替身。真实问答在 `real/<caseId>/<runId>/` 保存 `request.json`、`response.json`、`trace.json`、`run.json` 和 `run.md`。
 
 真实入口支持 E01/E02/E03/E04/E05/E06/E08/E09，E02 使用最新 conflict，其他普通用例使用 normal。E08 分别在 normal、mutation 发布后运行，设置 `evaluation.corpus` 和实际快照。E06/E09 的测试配置只在对应客户端首次调用注入一次 TIMEOUT，并记录实际注入次数，后续调用委托真实客户端。此入口直接调用实际服务，不代替 HTTP 端到端验证。
 

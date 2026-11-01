@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.mango.backend.contract.ConfigurationContractTest
+-------------------------------------------------------------------------------
+Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.229 s -- in com.mango.backend.contract.ConfigurationContractTest

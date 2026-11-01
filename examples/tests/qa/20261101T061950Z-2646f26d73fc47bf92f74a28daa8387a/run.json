@@ -1,0 +1,38 @@
+{
+  "materialType": "ACTUAL_AUTOMATED_TEST_RUN",
+  "mode": "REAL_QA",
+  "commit": "3cddda899ab6f7a11ae9409374c1a83317de28d3",
+  "workingTreeDirtyAtStart": true,
+  "startedAt": "2026-11-01T06:19:50.698065+00:00",
+  "command": [
+    "mvn",
+    "-Dstyle.color=never",
+    "-Dtest.reports-directory=/private/tmp/agent-t09-final-validation2/examples/tests/qa/20261101T061950Z-2646f26d73fc47bf92f74a28daa8387a/reports",
+    "-Devaluation.executionMetadata=examples/tests/qa/20261101T061950Z-2646f26d73fc47bf92f74a28daa8387a/run.json",
+    "-Preal-evaluation",
+    "-Dtest=RealQaEvaluationTest",
+    "-Devaluation.case=E08",
+    "-Devaluation.snapshot=3b93e9a0-e1f3-45d8-ac2d-429e0342d52f",
+    "-Devaluation.corpus=mutation",
+    "test"
+  ],
+  "status": "FINISHED",
+  "finishedAt": "2026-11-01T06:19:59.769530+00:00",
+  "exitCode": 0,
+  "suites": [
+    {
+      "file": "TEST-com.mango.backend.qa.application.RealQaEvaluationTest.xml",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "reportCollectionErrors": [],
+  "testCounts": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

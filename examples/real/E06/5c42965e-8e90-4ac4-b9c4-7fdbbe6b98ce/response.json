@@ -1,0 +1,66 @@
+{
+  "runId" : "5c42965e-8e90-4ac4-b9c4-7fdbbe6b98ce",
+  "snapshotId" : "fee7a379-f551-4232-bcea-d50be84de4f1",
+  "status" : "INCOMPLETE",
+  "reason" : "ROUTE_FAILED",
+  "answer" : "必要检索尚未恢复，尚未完成查证。",
+  "citations" : [ {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 报销申请应在费用发生之日起 30 个自然日内提交。",
+    "startOffset" : 14,
+    "endOffset" : 43,
+    "contentHash" : "0fa4d47274108f3a7167aa5aa1cf96cf7ecaaed26108bd8e44e9e55dec74ff04"
+  }, {
+    "documentId" : "D03",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 员工因公出差，应在出发前提交出差申请，取得直属主管审批后再安排出行。",
+    "startOffset" : 14,
+    "endOffset" : 52,
+    "contentHash" : "c763f864e4d72e7c59766da03414806866b32bbe01dcca8a9f535f3b70862732"
+  } ],
+  "evidenceGaps" : [ "必要检索尚未恢复，尚未完成查证。", "必要召回路由 VECTOR 尚未恢复（TIMEOUT）。" ],
+  "clarifyingQuestion" : null,
+  "retrieval" : {
+    "degraded" : true,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "ERROR",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ {
+      "scope" : {
+        "snapshotId" : "fee7a379-f551-4232-bcea-d50be84de4f1",
+        "query" : "报销期限 报销时限 费用发生后多少天内报销",
+        "topK" : 6
+      },
+      "route" : "VECTOR",
+      "failure" : {
+        "code" : "TIMEOUT",
+        "message" : "评估注入一次 Embedding 超时",
+        "retryable" : true
+      }
+    } ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 3,
+    "toolCalls" : 4,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 5026,
+    "remainingMillis" : 114973,
+    "readCharacters" : 71,
+    "toolTextCharacters" : 677,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

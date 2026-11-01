@@ -1,0 +1,75 @@
+[ {
+  "runId" : "5d3033cd-2d78-42f1-820a-adb869514862",
+  "sequence" : 1,
+  "timestamp" : 1793513517.356427000,
+  "detail" : {
+    "type" : "RUN_STARTED",
+    "snapshotId" : "snapshot-1",
+    "frameworkVersion" : "2.0.4",
+    "model" : "deterministic-test",
+    "indexProfile" : {
+      "embeddingModel" : "BAAI/bge-m3",
+      "embeddingDimension" : 1024,
+      "preprocessingVersion" : "source-preserving-v1",
+      "tokenizerVersion" : "jieba-analysis-1.0.2",
+      "dictionaryVersion" : "builtin-v1",
+      "stopWordsVersion" : "none-v1"
+    },
+    "rerankModel" : "BAAI/bge-reranker-v2-m3",
+    "routeLimit" : 20,
+    "candidatePoolLimit" : 20,
+    "primaryLimit" : 6,
+    "relatedLimit" : 12,
+    "rrfK" : 60
+  }
+}, {
+  "runId" : "5d3033cd-2d78-42f1-820a-adb869514862",
+  "sequence" : 2,
+  "timestamp" : 1793513517.359302000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 1,
+    "phase" : "STARTED",
+    "publicSummary" : "模型根据本次对话及已交付的工具结果选择后续动作。",
+    "error" : null
+  }
+}, {
+  "runId" : "5d3033cd-2d78-42f1-820a-adb869514862",
+  "sequence" : 3,
+  "timestamp" : 1793513517.359636000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 1,
+    "phase" : "FAILED",
+    "publicSummary" : "模型调用未能完成。",
+    "error" : {
+      "code" : "UPSTREAM_UNAVAILABLE",
+      "message" : "模型请求失败，未取得可靠业务草稿。",
+      "retryable" : true
+    }
+  }
+}, {
+  "runId" : "5d3033cd-2d78-42f1-820a-adb869514862",
+  "sequence" : 4,
+  "timestamp" : 1793513517.359742000,
+  "detail" : {
+    "type" : "RUN_FINISHED",
+    "status" : "INCOMPLETE",
+    "reason" : "MODEL_FAILED",
+    "budget" : {
+      "reactIterations" : 1,
+      "toolCalls" : 0,
+      "maxReactIterations" : 6,
+      "maxToolCalls" : 12,
+      "elapsedMillis" : 3,
+      "remainingMillis" : 119996,
+      "readCharacters" : 0,
+      "toolTextCharacters" : 0,
+      "deadlineExceeded" : false,
+      "toolLimitExceeded" : false,
+      "iterationLimitExceeded" : false,
+      "textLimitExceeded" : false
+    },
+    "citations" : [ ]
+  }
+} ]

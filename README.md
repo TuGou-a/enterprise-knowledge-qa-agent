@@ -2,7 +2,7 @@
 
 面向报销与差旅制度的知识问答项目。通过检索和原文读取工具，帮助员工获得有文档依据的回答；资料冲突或不足时，明确说明限制并请求补充信息。
 
-T09 本阶段补齐已合并模块的测试、固定资料参考标注、四方案检索评估工具及交付说明。并行任务已在 `5ff4dd0` 完成 63 个测试，0 失败、0 错误、0 跳过；本阶段新增和修改代码尚未编译或执行。T07 已以 `7da2897` 合入，实际问答 Mock 与验收采集入口已接入；新增测试和参考标注不能视为验收通过。范围与交接见 [T09 设计记录](docs/t09-testing-delivery-design.md)。
+T07 Agent 与问答服务已合入 `dev`。2026-11-01 以源码基线 `3cddda8` 和最终证据工作树完成默认测试 `184/184`、PostgreSQL 集成测试 `189/189`、8 个真实问答用例、真实 HTTP 调用和 16 题四方案检索评估；结果与证据见[测试与评估](docs/03-evaluation.md)。运行使用 DeepSeek `deepseek-chat`、硅基流动 `BAAI/bge-m3`／`BAAI/bge-reranker-v2-m3` 和真实 PostgreSQL/pgvector。
 
 ## 文档入口
 
@@ -12,12 +12,12 @@ T09 本阶段补齐已合并模块的测试、固定资料参考标注、四方�
 - [框架接入核查](docs/framework-verification.md)：官方来源、发行版 API 与兼容性边界。
 - [开发计划](docs/06-parallel-development-plan.md)与[T01 契约](docs/08-t01-contracts.md)：任务边界、类型及待验证事项。
 - [测试与评估](docs/03-evaluation.md)、[AI 使用记录](docs/04-ai-usage.md)和[阶段复盘](docs/05-retrospective.md)。
-- [示例与证据说明](examples/README.md)：验收请求、16 个参考标注问题及实际运行证据的保存方式，当前没有完整问答的实际输出或 Trace。
+- [示例与证据说明](examples/README.md)：验收请求、16 个参考标注问题、完整真实问答 Trace、HTTP 证据和检索结果。
 - [业务术语表](GLOSSARY.md)与[数据库选型决策](docs/adr/0001-postgres-hybrid-retrieval.md)。
 
 ## 当前测试入口
 
-需要 Java 17 和 Maven，仓库没有 Maven Wrapper。默认入口不创建真实数据源、不调用云模型、不启动 Docker；模型协议测试只访问受控的本机 HTTP 服务。首次下载 Maven 依赖仍可能需要网络，依赖缓存完整后才能尝试 `-o`。收到合并后的测试指令，再在项目根目录执行：
+需要 Java 17 和 Maven，仓库没有 Maven Wrapper。默认入口不创建真实数据源、不调用云模型、不启动 Docker；模型协议测试只访问受控的本机 HTTP 服务。首次下载 Maven 依赖仍可能需要网络，依赖缓存完整后才能尝试 `-o`。在项目根目录执行：
 
 ```bash
 mvn test
@@ -46,9 +46,9 @@ mvn -Preal-evaluation -Dtest=RealRetrievalEvaluationTest \
   -Devaluation.snapshots='normal=<正常快照ID>,conflict=<冲突快照ID>,mutation=<替换快照ID>' test
 ```
 
-结果在实际运行时保存到 `examples/retrieval/real/<runId>/`。标注目前为 AI 辅助逐条核对形成的参考标注，待人工复核；7／8 条款的小语料无法证明普遍检索收益。命令及新增代码尚未执行，不能引用为通过结果。
+结果保存在 `examples/retrieval/real/<runId>/`。标注目前为 AI 辅助逐条核对形成的参考标注，待人工复核；7／8 条款的小语料无法证明普遍检索收益。2026-11-01 的 16 题实际结果见[测试与评估](docs/03-evaluation.md)。
 
-真实问答使用独立入口，先发布用例要求的资料并记录当前最新快照，再获得运行指令后执行：
+真实问答使用独立入口，先发布用例要求的资料并记录当前最新快照，再执行：
 
 ```bash
 mvn -Preal-evaluation -Dtest=RealQaEvaluationTest \
@@ -59,7 +59,7 @@ mvn -Preal-evaluation -Dtest=RealQaEvaluationTest \
 
 需要完整交付证据时，真实问答使用 `python3 scripts/run-tests.py qa --case E01 --snapshot '<实际快照ID>'`，检索对比使用 `python3 scripts/run-tests.py retrieval --snapshots 'normal=<id>,conflict=<id>,mutation=<id>'`。脚本将实际命令、起止时间、退出码与同次输出关联；直接 Maven 调用仍可用于开发，但缺少外层记录时会标为证据不完整。
 
-评审可先阅读 [需求映射和测试边界](docs/03-evaluation.md)，再检查 `src/test/` 和 `examples/`。T04／T05 的历史受控运行记录分别见 [T04 验证](docs/t04-ingestion-verification.md)与 [T05 验证](docs/t05-search-verification.md)，不能替代本次改动的运行结果。T07 已合并，获得运行指令后可使用 `examples/requests/E01.json` 等请求调用 `POST /api/qa`；当前不将完整应用启动列为已验证入口。
+评审可先阅读 [需求映射和测试边界](docs/03-evaluation.md)，再检查 `src/test/` 和 `examples/`。T04／T05 的历史受控运行记录分别见 [T04 验证](docs/t04-ingestion-verification.md)与 [T05 验证](docs/t05-search-verification.md)。完整应用已在 `18080` 端口启动并通过 `POST /api/qa` 真实 HTTP 调用，证据见 `examples/http/E01_HTTP_REAL/`。
 
 ## 已确认的项目范围
 
@@ -86,11 +86,11 @@ mvn -Preal-evaluation -Dtest=RealQaEvaluationTest \
 
 框架负责模型适配、工具注册与执行循环等通用能力；项目仍需负责制度资料、检索策略、工具返回、任务状态和验收结果。使用框架可以减少通用代码，也会引入版本和行为约束，因此需要固定发行版，并记录实际使用的功能。
 
-按用户确认，固定使用 `agentscope-core:2.0.4` 和 `agentscope-extensions-model-openai:2.0.4`。在现有 Spring 配置中创建 Agent；该版本官方 starter 使用的 Spring Boot 基线与当前工程不同，暂不采用 starter，目标组合仍需编译与运行验证。来源见[接入核查](docs/framework-verification.md)。
+按用户确认，固定使用 `agentscope-core:2.0.4` 和 `agentscope-extensions-model-openai:2.0.4`。在现有 Spring 配置中创建 Agent；该版本官方 starter 使用的 Spring Boot 基线与当前工程不同，暂不采用 starter。目标组合已完成编译、启动、真实工具循环和 HTTP 验证。来源见[接入核查](docs/framework-verification.md)。
 
 已对照本地源码的 `v2.0.4` 标签核查：ReAct 循环、Java 工具、结构化调用与中间件可承接本方案；旧 `core.rag` API 已标记弃用，检索与重排序由应用实现。`reference-code/agentscope-java` 当前工作区是 `2.1.0-SNAPSHOT`，仅作为源码参考；业务工程仍通过 Maven 获取 `2.0.4`，不依赖该目录构建。
 
-需优先验证依赖基线：AgentScope 2.0.4 使用 Reactor BOM `2025.0.2`、Jackson `2.21.1`，Boot 3.5.10 管理 Reactor BOM `2024.0.14`、Jackson `2.19.4`。实际依赖树已成功解析，当前采用 Boot 管理的 Jackson 2.19.4 和 Reactor 3.7.15；T04 的非 Web 导入上下文已运行，但 AgentScope 参与完整问答与模型调用后的兼容性仍需后续验证。暂不盲目覆盖版本或升级后端。具体来源见[依赖基线差异](docs/framework-verification.md#需要优先验证的依赖基线差异)。
+AgentScope 2.0.4 自身使用 Reactor BOM `2025.0.2`、Jackson `2.21.1`，Boot 3.5.10 管理 Reactor BOM `2024.0.14`、Jackson `2.19.4`。实际解析采用 Boot 管理的 Jackson 2.19.4 和 Reactor 3.7.15，并已通过完整问答和真实模型调用；未发现需要覆盖整套 BOM 的兼容性问题。具体来源见[依赖基线差异](docs/framework-verification.md#需要优先验证的依赖基线差异)。
 
 ### 使用 PostgreSQL＋pgvector：由一个数据库承载原文与两路检索
 
@@ -108,7 +108,7 @@ mvn -Preal-evaluation -Dtest=RealQaEvaluationTest \
 
 按本项目选择，数据访问层使用 MyBatis，通过 Mapper 接口和 XML 管理文档入库、版本原文读取、全文检索和向量检索。SQL 可以直接表达 `ts_rank_cd`、`<=>` 和快照过滤，便于审阅及调整检索逻辑。
 
-代价是需要维护 SQL、结果映射与 PostgreSQL 类型转换。建议使用 `org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5`；官方兼容表列明 3.0 系列支持 Spring Boot 3.2 至 3.5、Java 17 及以上，目标工程仍需实际编译和运行验证。查询值使用 `#{}` 绑定，向量先校验维度与有限数值，再序列化并通过 `CAST(#{queryVector} AS vector)` 传入。来源：[官方兼容表](https://mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/)、[3.0.5 发行说明](https://github.com/mybatis/spring-boot-starter/releases/tag/mybatis-spring-boot-3.0.5)。
+代价是需要维护 SQL、结果映射与 PostgreSQL 类型转换。使用 `org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5`；官方兼容表列明 3.0 系列支持 Spring Boot 3.2 至 3.5、Java 17 及以上，目标组合已通过真实 PostgreSQL 集成测试。查询值使用 `#{}` 绑定，向量先校验维度与有限数值，再序列化并通过 `CAST(#{queryVector} AS vector)` 传入。来源：[官方兼容表](https://mybatis.org/spring-boot-starter/mybatis-spring-boot-autoconfigure/)、[3.0.5 发行说明](https://github.com/mybatis/spring-boot-starter/releases/tag/mybatis-spring-boot-3.0.5)。
 
 ### 使用云端重排序：对召回候选做更细的相关性比较
 
@@ -142,21 +142,21 @@ AgentScope 默认并行执行同轮工具。首期显式采用 `ToolkitConfig.pa
 
 ## Maven 依赖声明
 
-根目录 [pom.xml](pom.xml) 已声明 AgentScope core/OpenAI 扩展 2.0.4、MyBatis starter 3.0.5、jieba 1.0.2、PostgreSQL 驱动、Reactor、Validation、Spring Boot Test 和 Testcontainers；沿用现有 Spring Boot parent。T09 复用已有依赖，仅调整 Surefire 标签选择、报告目录及显式测试 profile，不新增依赖或覆盖 BOM。历史基线 Java 17 目标编译与 JAR 打包已通过，见 T04／T05 记录；当时 JAR 启动因缺少 T07 Bean 失败，依赖树尚未单独记录。本次改动和 T07 仍未编译或启动。
+根目录 [pom.xml](pom.xml) 已声明 AgentScope core/OpenAI 扩展 2.0.4、MyBatis starter 3.0.5、jieba 1.0.2、PostgreSQL 驱动、Reactor、Validation、Spring Boot Test 和 Testcontainers；沿用现有 Spring Boot parent。T09 复用已有依赖，仅调整 Surefire 标签选择、报告目录及显式测试 profile，不新增依赖或覆盖 BOM。最终代码已在 Java 21 运行、Java 17 编译目标下完成测试与应用启动；AgentScope 2.0.4、Reactor 3.7.15、Jackson 2.19.4 组合通过真实模型和 HTTP 调用。
 
 PostgreSQL 驱动版本交由现有 Spring Boot 依赖管理。业务服务通过 MyBatis Mapper 完成持久化；Mapper XML 集中维护参数化 SQL，RRF 与重排序协调在 `HybridSearchService` 中完成。
 
 ## 配置与启动边界
 
-配置清单见 [.env.example](.env.example) 与 [T01 契约](docs/08-t01-contracts.md)。配置绑定和值约束已经实现；真实模式需要两家模型服务密钥和数据库凭据，缺失时启动校验失败，账号可用性仍待实际调用验证。真实密钥通过环境变量提供；示例文件不包含真实密钥。Spring Boot 默认不会自动加载项目根目录的 `.env` 文件，需要由启动终端、IDE 或容器显式注入环境变量。当前契约测试入口与真实启动配置隔离。
+配置清单见 [.env.example](.env.example) 与 [T01 契约](docs/08-t01-contracts.md)。配置绑定和值约束已经实现；真实模式需要两家模型服务密钥和数据库凭据，缺失时启动校验失败。最终运行已验证 DeepSeek、硅基流动 Embedding／Rerank 和 PostgreSQL 可用。真实密钥通过环境变量提供；示例文件不包含真实密钥。Spring Boot 默认不会自动加载项目根目录的 `.env` 文件，需要由启动终端、IDE 或容器显式注入环境变量。
 
-应用负责读取 `DEEPSEEK_BASE_URL`、`DEEPSEEK_MODEL` 并传给 Provider；它不会自动读取这两个变量。固定版的窗口表尚不认识 `deepseek-flash`，需要在 `ModelCreationContext` 中通过 `option("contextWindowSize", configuredWindow)` 显式设置核查后的窗口。该名称仍按当前 DeepSeek 官方建议保留，实际输入预算由应用另行限制。
+应用负责读取 `DEEPSEEK_BASE_URL`、`DEEPSEEK_MODEL` 并传给 Provider；它不会自动读取这两个变量。最终运行使用 `deepseek-chat`；固定版的窗口表不包含该项目选定名称，需要在 `ModelCreationContext` 中通过 `option("contextWindowSize", configuredWindow)` 显式设置核查后的窗口。实际输入预算仍由应用另行限制。
 
 | 变量 | 用途或计划默认值 |
 | --- | --- |
 | `DEEPSEEK_API_KEY` | DeepSeek 官方服务密钥。 |
 | `DEEPSEEK_BASE_URL` | `https://api.deepseek.com`。 |
-| `DEEPSEEK_MODEL` | 候选 `deepseek-flash`，实际可用性待运行验证。 |
+| `DEEPSEEK_MODEL` | `deepseek-chat`；已用真实 DeepSeek 官方 API 验证。 |
 | `SILICONFLOW_API_KEY` | 硅基流动服务密钥。 |
 | `SILICONFLOW_BASE_URL` | `https://api.siliconflow.cn/v1`。 |
 | `EMBEDDING_MODEL` | `BAAI/bge-m3`。 |
@@ -171,8 +171,8 @@ PostgreSQL 驱动版本交由现有 Spring Boot 依赖管理。业务服务通�
 
 ## 运行与验证状态
 
-历史基线 `5ff4dd0` 的 63 个测试已通过，包含原有 15 个 T05 JUnit；本阶段新增／修改测试仍等待指令。T03 的[手动数据库初始化脚本及说明](src/main/resources/db/README.md)已在历史受控环境执行；T04 资料导入与 T05 检索读取的历史事实见对应验证文档。本阶段未执行编译、打包、Docker、HTTP、模型调用或评估，尚无新增通过率、回答或 Trace。
+最终验证在 `3cddda8` 完成：默认测试 `184/184`、PostgreSQL 集成 `189/189`，均为 0 失败、0 错误、0 跳过。8 个真实问答用例覆盖明确答案、冲突、资料外、改写、追问、故障注入、资料替换与 Rerank 降级；真实 HTTP E01 返回 `200 / ANSWERED`。16 题检索评估无失败，四种方案均完成。T03 的[手动数据库初始化脚本及说明](src/main/resources/db/README.md)、T04 资料导入与 T05 检索读取的历史事实继续保留在对应验证文档。
 
 验收材料至少覆盖明确答案、文档冲突、资料外问题、相似改写、上下文追问和工具失败；另验证执行上限与文档替换。Mock 验证流程，真实模型 Trace 证明动作调整，二者分别标注，结果引用对应文件。
 
-当前 Git 根目录、`pom.xml`、`src/`、README 与 `docs/` 位于同一项目根目录。T07 问答业务及 T09 执行入口已编写；最终交付仍需实际运行、R01–R10 验收证据、真实模型与检索成绩及人工结论。实际投入时间、个人修改、题号、GitHub URL 与最终 commit SHA 等事实待补充，不预填。其他任务的历史通过记录不能替代最新代码的运行验证。
+当前 Git 根目录、`pom.xml`、`src/`、README 与 `docs/` 位于同一项目根目录。T07 问答业务及 T09 执行入口已运行并保存证据；人工语义复核、实际投入时间、个人修改、题号与 GitHub URL 等事实仍需补充，不预填。

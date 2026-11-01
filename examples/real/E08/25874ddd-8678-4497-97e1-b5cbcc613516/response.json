@@ -1,0 +1,46 @@
+{
+  "runId" : "25874ddd-8678-4497-97e1-b5cbcc613516",
+  "snapshotId" : "3b93e9a0-e1f3-45d8-ac2d-429e0342d52f",
+  "status" : "ANSWERED",
+  "reason" : "EVIDENCE_SUFFICIENT",
+  "answer" : "根据《费用报销制度（合成资料）》（D01，v2，2026-03-01）第1条：报销申请应在费用发生之日起 20 个自然日内提交。\n\n适用边界说明：该制度未标注特定适用范围的限制，属于报销期限的一般规定；《差旅报销制度（合成资料）》（D03，v1）适用于员工因公出差的差旅报销，其已读条款仅涉及出差审批与差旅凭证要求，未另行规定报销提交期限，也未声明取代费用报销制度，因此差旅报销的提交期限仍以上述 20 个自然日的一般规定为准（如你的情况属于差旅报销且另有专项口径，请补充说明）。",
+  "citations" : [ {
+    "documentId" : "D01",
+    "version" : "v2",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 报销申请应在费用发生之日起 20 个自然日内提交。",
+    "startOffset" : 14,
+    "endOffset" : 43,
+    "contentHash" : "e7f9cec47c251746a82d1de6ab2869740d3e672033c81e13f161eb76e193f0a4"
+  } ],
+  "evidenceGaps" : [ ],
+  "clarifyingQuestion" : null,
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 4,
+    "toolCalls" : 5,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 5865,
+    "remainingMillis" : 114134,
+    "readCharacters" : 167,
+    "toolTextCharacters" : 470,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

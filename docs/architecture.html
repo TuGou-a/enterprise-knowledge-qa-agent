@@ -321,12 +321,12 @@
 &lt;/select&gt;</code></pre><p class="compact">映射为说明草案，需注册结果别名。向量先校验 1024 维与有限数值，再序列化为绑定参数；tsvector 在 SQL 内构造。查询值均通过 <code>#{queryVector}</code> 等占位符绑定，每条 SQL 都限定快照；排序表达式固定。XML 使用 CDATA 或转义处理比较运算符。</p></details>
       </div>
       <div class="grid">
-        <div class="card"><h3>DeepSeek：明确绑定模型配置</h3><p>应用读取基础地址与模型名，通过 ModelCreationContext.builder().enableThinking(false) 创建模型。为 deepseek-flash 显式设置核查后的 contextWindowSize；省略思考开关不代表默认关闭。</p></div>
+        <div class="card"><h3>DeepSeek：明确绑定模型配置</h3><p>应用读取基础地址与模型名，通过 ModelCreationContext.builder().enableThinking(false) 创建模型。最终选择 deepseek-chat，并显式设置核查后的 contextWindowSize；省略思考开关不代表默认关闭。</p></div>
         <div class="card"><h3>硅基流动：两类检索能力分别校验</h3><p>Embedding 校验响应下标、数量与 1024 维度，不发送 dimensions；Rerank 校验输入下标映射、唯一性和有限分数，失败回退 RRF，独立记录超时与耗时。</p></div>
       </div>
       <pre><code>DEEPSEEK_API_KEY=&lt;由运行环境注入&gt;
 DEEPSEEK_BASE_URL=https://api.deepseek.com
-DEEPSEEK_MODEL=deepseek-flash
+DEEPSEEK_MODEL=deepseek-chat
 
 SILICONFLOW_API_KEY=&lt;由运行环境注入&gt;
 SILICONFLOW_BASE_URL=https://api.siliconflow.cn/v1
