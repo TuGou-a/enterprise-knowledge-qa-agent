@@ -90,6 +90,8 @@ class T05PostgresIntegrationTest {
 
     @DynamicPropertySource
     static void databaseProperties(DynamicPropertyRegistry registry) {
+        // Spring may resolve dynamic properties before Testcontainers starts @Container.
+        POSTGRES.start();
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
