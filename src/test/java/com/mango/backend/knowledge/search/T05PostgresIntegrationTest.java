@@ -19,6 +19,7 @@ import com.mango.backend.contract.runtime.RunContext;
 import com.mango.backend.infra.pg.KnowledgeMapper;
 import com.mango.backend.knowledge.evidence.KnowledgeEvidenceReader;
 import com.mango.backend.knowledge.ingest.CorpusImporter;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,6 +64,8 @@ class T05PostgresIntegrationTest {
                     .withDatabaseName("knowledge_agent")
                     .withUsername("test")
                     .withPassword("test");
+    private static final String ORIGINAL_SOCKS_PROXY_HOST = System.getProperty("socksProxyHost");
+    private static final String ORIGINAL_SOCKS_PROXY_PORT = System.getProperty("socksProxyPort");
 
     @Autowired
     private DataSource dataSource;
@@ -101,10 +104,23 @@ class T05PostgresIntegrationTest {
 
     @BeforeAll
     void createSchema() throws Exception {
+        // Maven may inject a SOCKS proxy that cannot route Testcontainers loopback ports.
+        System.clearProperty("socksProxyHost");
+        System.clearProperty("socksProxyPort");
         try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {
             statement.execute(Files.readString(
                     Path.of("src/main/resources/db/V001__knowledge.sql")));
+        }
+    }
+
+    @AfterAll
+    void restoreSocksProxyProperties() {
+        if (ORIGINAL_SOCKS_PROXY_HOST != null) {
+            System.setProperty("socksProxyHost", ORIGINAL_SOCKS_PROXY_HOST);
+        }
+        if (ORIGINAL_SOCKS_PROXY_PORT != null) {
+            System.setProperty("socksProxyPort", ORIGINAL_SOCKS_PROXY_PORT);
         }
     }
 
