@@ -118,12 +118,12 @@ class RealQaEvaluationTest {
                             && read.key().document().documentId().equals(document))
                     .mapToLong(TraceEvent::sequence).min().orElseThrow()).max().orElseThrow();
             var supplementIds = events.stream()
-                    .filter(event -> event.sequence() > bothSidesRead)
                     .map(TraceEvent::detail).filter(ToolStarted.class::isInstance).map(ToolStarted.class::cast)
                     .filter(started -> (started.publicPurpose() + " " + started.effective()).matches("(?s).*(适用|替代|优先|废止).*"))
                     .map(ToolStarted::callId).toList();
             var supplementResults = events.stream()
-                    .filter(event -> event.detail() instanceof ToolCompleted completed
+                    .filter(event -> event.sequence() > bothSidesRead
+                            && event.detail() instanceof ToolCompleted completed
                             && supplementIds.contains(completed.callId()) && completed.deliveryError() == null
                             && !(completed.outcome() instanceof ToolError)).toList();
             assertThat(supplementResults).isNotEmpty().anySatisfy(finished -> {
