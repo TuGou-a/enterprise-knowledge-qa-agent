@@ -141,11 +141,18 @@ public final class AgentQaService implements QaService {
             forced = AnswerReason.ROUTE_FAILED;
         }
         var budget = state.budget().snapshot();
+        // 校验期间也可能跨过截止点，最终状态以这份快照为准。
+        if (budget.deadlineExceeded()) {
+            forced = AnswerReason.DEADLINE_EXCEEDED;
+        } else if (budget.toolLimitExceeded()) {
+            forced = AnswerReason.BUDGET_EXHAUSTED;
+        } else if (budget.iterationLimitExceeded()) {
+            forced = AnswerReason.MAX_ITERATIONS;
+        } else if (budget.textLimitExceeded()) {
+            forced = AnswerReason.INPUT_LIMIT_EXCEEDED;
+        }
         if (forced != null) {
-            var reason = budget.deadlineExceeded() ? AnswerReason.DEADLINE_EXCEEDED
-                    : budget.toolLimitExceeded() ? AnswerReason.BUDGET_EXHAUSTED
-                    : budget.iterationLimitExceeded() ? AnswerReason.MAX_ITERATIONS
-                    : budget.textLimitExceeded() ? AnswerReason.INPUT_LIMIT_EXCEEDED : forced;
+            var reason = forced;
             String explanation = failureMessage(reason);
             var gaps = new LinkedHashSet<String>();
             if (draft != null) { gaps.addAll(checked.evidenceGaps()); }

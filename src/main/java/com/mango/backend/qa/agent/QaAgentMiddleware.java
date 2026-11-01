@@ -96,7 +96,14 @@ public final class QaAgentMiddleware implements MiddlewareBase {
                         }
                     })
                     .onErrorMap(error -> {
-                        state.modelFailed(new Failure(error instanceof java.util.concurrent.TimeoutException
+                        boolean timedOut = false;
+                        for (Throwable cause = error; cause != null; cause = cause.getCause()) {
+                            if (cause instanceof java.util.concurrent.TimeoutException) {
+                                timedOut = true;
+                                break;
+                            }
+                        }
+                        state.modelFailed(new Failure(timedOut
                                 ? Failure.Code.TIMEOUT : Failure.Code.UPSTREAM_UNAVAILABLE,
                                 "模型请求失败，未取得可靠业务草稿。", true));
                         return new AgentExecutionStopped(AnswerReason.MODEL_FAILED);
