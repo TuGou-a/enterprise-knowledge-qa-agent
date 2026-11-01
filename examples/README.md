@@ -34,7 +34,7 @@ python3 scripts/run-tests.py unit
 python3 scripts/run-tests.py postgres
 ```
 
-需要 Python 3、Java 和 Maven；`postgres` 另需 Docker 与 pgvector 镜像。输出位于 `tests/<mode>/<runId>/`，包含 `run.json`、`console.log` 和本次独立的 `reports/`。unit 是隔离单元测试，postgres 是真实数据库加模型替身；均不冒充完整问答 Mock 或真实模型验收。
+需要 Python 3、Java 和 Maven；`postgres` 另需 Docker 与 pgvector 镜像。输出位于从项目根目录计算的 `examples/tests/<mode>/<runId>/`，包含 `run.json`、`console.log` 和本次独立的 `reports/`。unit 是隔离单元测试，postgres 是真实数据库加模型替身；均不冒充完整问答 Mock 或真实模型验收。
 
 每次记录实际命令、commit、运行开始前的未提交状态、时间、Maven 退出码和报告计数。没有报告时数量为 `null`，启动失败、中断或报告解析失败需保留；不复制历史报告制造本次成绩。这些目录只由实际运行生成，当前没有预填。
 

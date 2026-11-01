@@ -94,7 +94,6 @@ class RealRetrievalEvaluationTest {
         String runId = DateTimeFormatter.ofPattern("uuuuMMdd'T'HHmmss'Z'").withZone(ZoneOffset.UTC)
                 .format(Instant.now()) + "-" + UUID.randomUUID();
         var output = Path.of("examples/retrieval/real", runId);
-        Files.createDirectories(output);
         var mapper = new ObjectMapper().findAndRegisterModules();
         var rows = new ArrayList<QueryResult>();
         var report = mapper.createObjectNode();
@@ -113,8 +112,13 @@ class RealRetrievalEvaluationTest {
         String commit = new String(git.getInputStream().readAllBytes(), StandardCharsets.UTF_8).strip();
         if (git.waitFor() != 0) throw new IllegalStateException("无法记录实际 Git commit");
         report.put("commit", commit);
+        var gitStatus = new ProcessBuilder("git", "status", "--porcelain").start();
+        boolean dirty = !new String(gitStatus.getInputStream().readAllBytes(), StandardCharsets.UTF_8).isBlank();
+        if (gitStatus.waitFor() != 0) throw new IllegalStateException("无法记录工作树状态");
+        report.put("workingTreeDirtyAtStart", dirty);
         report.set("queries", mapper.valueToTree(rows));
         report.put("status", "RUNNING");
+        Files.createDirectories(output);
         mapper.writerWithDefaultPrettyPrinter().writeValue(output.resolve("results.json").toFile(), report);
         for (var query : labels.queries()) {
             var snapshot = snapshots.get(query.corpusId());
@@ -143,10 +147,10 @@ class RealRetrievalEvaluationTest {
             report.set("queries", mapper.valueToTree(rows));
             mapper.writerWithDefaultPrettyPrinter().writeValue(output.resolve("results.json").toFile(), report);
         }
-        var aggregates = new LinkedHashMap<String, Map<String, Double>>();
-        for (String scheme : List.of("KEYWORD", "VECTOR", "HYBRID_RRF", "HYBRID_RERANK")) {
+        var aggregates = new LinkedHashMap<Scheme, SchemeAggregate>();
+        for (var scheme : Scheme.values()) {
             var measured = rows.stream().flatMap(row -> row.schemes().stream())
-                    .filter(result -> result.ranking().scheme().equals(scheme)).toList();
+                    .filter(result -> result.ranking().scheme() == scheme).toList();
             var values = new LinkedHashMap<String, Double>();
             values.put("recallAt6", average(measured.stream().map(result -> result.metrics().recallAt6()).toList()));
             values.put("mrrAt6", average(measured.stream().map(result -> result.metrics().mrrAt6()).toList()));
@@ -154,10 +158,19 @@ class RealRetrievalEvaluationTest {
             values.put("conflictPairRecall", average(measured.stream().map(result -> result.metrics().conflictPairRecall()).toList()));
             values.put("expandedConflictPairRecall", average(measured.stream()
                     .map(result -> result.metrics().expandedConflictPairRecall()).toList()));
-            aggregates.put(scheme, values);
+            var counts = Map.of(
+                    "recallAt6", measured.stream().filter(result -> result.metrics().recallAt6() != null).count(),
+                    "mrrAt6", measured.stream().filter(result -> result.metrics().mrrAt6() != null).count(),
+                    "expandedRecall", measured.stream().filter(result -> result.metrics().expandedRecall() != null).count(),
+                    "conflictPairRecall", measured.stream().filter(result -> result.metrics().conflictPairRecall() != null).count(),
+                    "expandedConflictPairRecall", measured.stream().filter(result -> result.metrics().expandedConflictPairRecall() != null).count());
+            long conflictPairs = rows.stream().filter(row -> row.failure() == null)
+                    .mapToLong(row -> row.conflictPairs().size()).sum();
+            long outside = rows.stream().filter(row -> row.failure() == null && row.relevantClauses().isEmpty()).count();
+            aggregates.put(scheme, new SchemeAggregate(values, counts, conflictPairs, outside));
         }
         var reranked = rows.stream().flatMap(row -> row.schemes().stream())
-                .map(SchemeResult::ranking).filter(rank -> rank.scheme().equals("HYBRID_RERANK")
+                .map(SchemeResult::ranking).filter(rank -> rank.scheme() == Scheme.HYBRID_RERANK
                         && !rank.fusionPool().isEmpty()).toList();
         report.set("aggregates", mapper.valueToTree(aggregates));
         report.put("failedQueries", rows.stream().filter(row -> row.failure() != null).count());
@@ -183,6 +196,8 @@ class RealRetrievalEvaluationTest {
     }
 
     record SchemeResult(Ranking ranking, Metrics metrics) {}
+    record SchemeAggregate(Map<String, Double> metrics, Map<String, Long> sampleCounts,
+                           long conflictPairs, long outOfCorpusExcluded) {}
     record QueryResult(String queryId, String corpusId, String query, String snapshotId,
                        List<ClauseRef> relevantClauses, List<ConflictPair> conflictPairs,
                        List<RecallHit> keywordHits, List<RecallHit> vectorHits,

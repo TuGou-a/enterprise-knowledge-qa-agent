@@ -38,8 +38,8 @@ class RetrievalEvaluationTest {
         var other = new ClauseRef("D03", "v1", "clause-1");
         var query = new Query("conflict", "conflict", "期限", List.of(left, right),
                 List.of(new ConflictPair(left, right)), "两项冲突");
-        var ranking = new Ranking("HYBRID_RRF", List.of(other.bind("s"), left.bind("s"), left.bind("s")),
-                List.of(other.bind("s"), left.bind("s"), right.bind("s")), false, "RRF", null, null, null, List.of());
+        var ranking = new Ranking(Scheme.HYBRID_RRF, List.of(other.bind("s"), left.bind("s"), left.bind("s")),
+                List.of(other.bind("s"), left.bind("s"), right.bind("s")), false, Mode.RRF, null, null, null, null, List.of());
         var result = metrics(query, "s", ranking);
         assertThat(result.recallAt6()).isEqualTo(0.5);
         assertThat(result.mrrAt6()).isEqualTo(0.5);
@@ -52,8 +52,8 @@ class RetrievalEvaluationTest {
     @Test
     void outOfCorpusAndAbsentConflictSetsAreNotZeroScoringPositiveExamples() {
         var query = new Query("outside", "normal", "期权", List.of(), List.of(), "资料缺口");
-        var result = metrics(query, "s", new Ranking("VECTOR", List.of(), null,
-                false, "VECTOR", null, null, null, List.of()));
+        var result = metrics(query, "s", new Ranking(Scheme.VECTOR, List.of(), null,
+                false, Mode.VECTOR, null, null, null, null, List.of()));
         assertThat(result.recallAt6()).isNull();
         assertThat(result.mrrAt6()).isNull();
         assertThat(result.expandedRecall()).isNull();
@@ -66,7 +66,7 @@ class RetrievalEvaluationTest {
         var ranked = java.util.stream.IntStream.rangeClosed(1, 7)
                 .mapToObj(number -> new ClauseRef("D" + number, "v1", "clause-1").bind("s")).toList();
         var result = metrics(new Query("q", "normal", "问题", List.of(reference), List.of(), "答案"), "s",
-                new Ranking("VECTOR", ranked, null, false, "VECTOR", null, null, null, List.of()));
+                new Ranking(Scheme.VECTOR, ranked, null, false, Mode.VECTOR, null, null, null, null, List.of()));
         assertThat(result.recallAt6()).isZero();
         assertThat(result.mrrAt6()).isZero();
     }
@@ -81,6 +81,18 @@ class RetrievalEvaluationTest {
         Files.writeString(path, mapper.writeValueAsString(root));
         assertThrows(IllegalArgumentException.class, () -> load(path));
         assertThat(load(Path.of("examples/retrieval-labels.json")).annotationStatus()).isEqualTo("REFERENCE_REVIEW_PENDING");
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"", "directory"})
+    void annotationLoaderRejectsBlankAndDirectoryPaths(String sourcePath) throws Exception {
+        var mapper = new ObjectMapper();
+        var root = mapper.readTree(Path.of("examples/retrieval-labels.json").toFile());
+        ((com.fasterxml.jackson.databind.node.ObjectNode) root.path("corpora").get(0))
+                .put("path", sourcePath.isEmpty() ? "" : temporary.toString());
+        var labels = temporary.resolve("invalid-path.json");
+        Files.writeString(labels, mapper.writeValueAsString(root));
+        assertThrows(IllegalArgumentException.class, () -> load(labels));
     }
 
     @Test
@@ -119,13 +131,15 @@ class RetrievalEvaluationTest {
             assertThat(compared.get(3).primary()).containsExactlyElementsOf(actual.primaryCandidates().stream()
                     .map(candidate -> candidate.source().key()).toList());
             assertThat(compared.get(2).fusionPool()).containsExactlyElementsOf(actual.metrics().rerankInputKeys());
+            assertThat(compared.get(3).rerankResponseId()).isEqualTo("rank");
             assertThat(compared.get(2).primary()).containsExactly(first.key(), third.key(), second.key());
             when(rerank.rerank(anyString(), anyList(), anyInt(), any())).thenThrow(new DependencyException(
                     new Failure(Failure.Code.TIMEOUT, "受控超时", true)));
             var fallback = compare("期限", snapshot, vector, keyword, store, rerank, properties).get(3);
             assertThat(fallback.primary()).isEqualTo(compared.get(2).primary());
-            assertThat(fallback.rankingMode()).isEqualTo("RRF_FALLBACK");
+            assertThat(fallback.rankingMode()).isEqualTo(Mode.RRF_FALLBACK);
             assertThat(fallback.rankingWarning().code()).isEqualTo(Failure.Code.TIMEOUT);
+            assertThat(fallback.rerankResponseId()).isNull();
         } finally {
             service.dispose();
         }

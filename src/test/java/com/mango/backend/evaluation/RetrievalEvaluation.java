@@ -22,6 +22,9 @@ import static com.mango.backend.contract.knowledge.KnowledgeTypes.*;
 public final class RetrievalEvaluation {
     private RetrievalEvaluation() {}
 
+    public enum Scheme { KEYWORD, VECTOR, HYBRID_RRF, HYBRID_RERANK }
+    public enum Mode { KEYWORD, VECTOR, RRF, RERANK, RRF_FALLBACK, NONE }
+
     public record ClauseRef(String documentId, String version, String chunkId) {
         public ChunkKey bind(String snapshotId) {
             return new ChunkKey(new DocumentKey(snapshotId, documentId, version), chunkId);
@@ -35,9 +38,10 @@ public final class RetrievalEvaluation {
                          String relevanceScale, List<Corpus> corpora, List<Query> queries) {}
     public record Metrics(Double recallAt6, Double mrrAt6, Double expandedRecall, int returnedCount,
                           Double conflictPairRecall, Double expandedConflictPairRecall) {}
-    public record Ranking(String scheme, List<ChunkKey> primary, List<ChunkKey> expanded,
-                          boolean truncated, String rankingMode, Failure rankingWarning,
-                          Long rerankMillis, Usage rerankUsage, List<ChunkKey> fusionPool) {}
+    public record Ranking(Scheme scheme, List<ChunkKey> primary, List<ChunkKey> expanded,
+                          boolean truncated, Mode rankingMode, Failure rankingWarning,
+                          Long rerankMillis, String rerankResponseId, Usage rerankUsage,
+                          List<ChunkKey> fusionPool) {}
 
     public static Labels load(Path path) throws Exception {
         var mapper = new ObjectMapper().enable(JsonParser.Feature.STRICT_DUPLICATE_DETECTION)
@@ -55,7 +59,8 @@ public final class RetrievalEvaluation {
         var corpora = new HashSet<String>();
         for (var corpus : labels.corpora()) {
             if (corpus == null || corpus.corpusId() == null || corpus.corpusId().isBlank()
-                    || !corpora.add(corpus.corpusId()) || corpus.path() == null
+                    || !corpora.add(corpus.corpusId()) || corpus.path() == null || corpus.path().isBlank()
+                    || !Files.isRegularFile(Path.of(corpus.path()))
                     || corpus.sourceSha256() == null || !corpus.sourceSha256().matches("[0-9a-f]{64}")
                     || corpus.contentHash() == null || !corpus.contentHash().matches("[0-9a-f]{64}")) {
                 throw new IllegalArgumentException("资料清单无效或重复");
@@ -145,16 +150,17 @@ public final class RetrievalEvaluation {
                 .<ChunkKey>comparingDouble(scores::get).reversed().thenComparing(CHUNK_ORDER))
                 .limit(config.candidatePoolLimit()).toList();
         var rankings = new ArrayList<Ranking>();
-        rankings.add(new Ranking("KEYWORD", keyword.stream().map(hit -> hit.candidate().key())
-                .limit(config.primaryLimit()).toList(), null, false, "KEYWORD", null, null, null, List.of()));
-        rankings.add(new Ranking("VECTOR", vector.stream().map(hit -> hit.candidate().key())
-                .limit(config.primaryLimit()).toList(), null, false, "VECTOR", null, null, null, List.of()));
+        rankings.add(new Ranking(Scheme.KEYWORD, keyword.stream().map(hit -> hit.candidate().key())
+                .limit(config.primaryLimit()).toList(), null, false, Mode.KEYWORD, null, null, null, null, List.of()));
+        rankings.add(new Ranking(Scheme.VECTOR, vector.stream().map(hit -> hit.candidate().key())
+                .limit(config.primaryLimit()).toList(), null, false, Mode.VECTOR, null, null, null, null, List.of()));
         var rrf = pool.stream().limit(config.primaryLimit()).toList();
         var ranked = rrf;
         Failure warning = null;
         Long elapsed = null;
         Usage usage = null;
-        String mode = pool.isEmpty() ? "NONE" : "RERANK";
+        String responseId = null;
+        var mode = pool.isEmpty() ? Mode.NONE : Mode.RERANK;
         if (!pool.isEmpty()) {
             long started = System.nanoTime();
             try {
@@ -162,13 +168,14 @@ public final class RetrievalEvaluation {
                 var result = rerank.rerank(query, chunks.stream().map(KnowledgeChunk::content).toList(),
                         pool.size(), Duration.ofMillis(properties.timeouts().rerankMs()));
                 usage = result.usage();
+                responseId = result.responseId();
                 ranked = result.scores().stream().sorted(Comparator
                         .comparingDouble(com.mango.backend.contract.model.ModelTypes.RerankScore::relevanceScore)
                         .reversed().thenComparingInt(score -> score.inputIndex()))
                         .map(score -> pool.get(score.inputIndex())).limit(config.primaryLimit()).toList();
             } catch (DependencyException exception) {
                 warning = exception.failure();
-                mode = "RRF_FALLBACK";
+                mode = Mode.RRF_FALLBACK;
             } finally {
                 elapsed = Duration.ofNanos(System.nanoTime() - started).toMillis();
             }
@@ -181,9 +188,10 @@ public final class RetrievalEvaluation {
                     : store.expandTopics(snapshot.snapshotId(), topics, primary, config.relatedLimit(), timeout);
             var expanded = new LinkedHashSet<>(primary);
             expansion.candidates().forEach(candidate -> expanded.add(candidate.key()));
-            rankings.add(new Ranking(useRerank ? "HYBRID_RERANK" : "HYBRID_RRF", primary,
-                    List.copyOf(expanded), expansion.truncated(), useRerank ? mode : pool.isEmpty() ? "NONE" : "RRF",
-                    useRerank ? warning : null, useRerank ? elapsed : null, useRerank ? usage : null, pool));
+            rankings.add(new Ranking(useRerank ? Scheme.HYBRID_RERANK : Scheme.HYBRID_RRF, primary,
+                    List.copyOf(expanded), expansion.truncated(), useRerank ? mode : pool.isEmpty() ? Mode.NONE : Mode.RRF,
+                    useRerank ? warning : null, useRerank ? elapsed : null, useRerank ? responseId : null,
+                    useRerank ? usage : null, pool));
         }
         return List.copyOf(rankings);
     }
