@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 import java.util.Optional;
@@ -120,11 +121,42 @@ class AnswerValidationTest {
         var result = validator.validate(draft, context);
         assertThat(result.status()).isEqualTo(TaskStatus.CONFLICT);
         assertThat(result.citations()).hasSize(2);
-        assertThat(result.clarifyingQuestion()).isEqualTo("应适用哪份制度？");
-        assertThat(result.evidenceGaps()).contains("适用范围未知");
+        assertThat(result.answer()).contains("30 天", "15 天", "不能选取");
+        assertThat(result.clarifyingQuestion()).contains("适用", "制度归口部门");
+        assertThat(String.join("", result.evidenceGaps())).contains("适用范围", "同主题资料尚未完整查证");
         var oneSide = new AnswerDraft(draft.status(), draft.reason(), draft.answer(),
                 List.of(citation("D01", "30 天")), draft.evidenceGaps(), draft.clarifyingQuestion());
         assertThat(validator.validate(oneSide, context).reason()).isEqualTo(AnswerReason.CITATION_INVALID);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "冲突未消解，建议按较严格的 15 个自然日时限把握，这只是风险提示，不构成制度结论。",
+            "D02 日期较新，暂按 15 天办理。",
+            "为避免超期，可先遵守较短期限。",
+            "建议按 30 天执行。",
+            "差旅制度没有规定报销期限。"
+    })
+    void conflictDisplaysVerifiedQuotesWithoutModelAdviceOrUnsupportedClaims(String modelAnswer) {
+        String first = "第1条 报销申请应在费用发生之日起 30 个自然日内提交。";
+        String second = "第1条 报销申请应在费用发生之日起 15 个自然日内提交。";
+        register("D01", first);
+        register("D02", second);
+        var draft = new AnswerDraft(TaskStatus.CONFLICT, AnswerReason.APPLICABILITY_UNKNOWN,
+                modelAnswer, List.of(citation("D01", first), citation("D02", second)),
+                List.of("为稳妥起见按 15 天办理", "未读差旅制度没有期限"), "是否先按 15 天提交？");
+
+        var result = validator.validate(draft, context);
+
+        assertThat(result.status()).isEqualTo(TaskStatus.CONFLICT);
+        assertThat(result.reason()).isEqualTo(AnswerReason.APPLICABILITY_UNKNOWN);
+        assertThat(result.citations()).extracting(quote -> quote.quote()).containsExactly(first, second);
+        assertThat(result.answer()).contains(first, second, "D01", "D02", "不能选取")
+                .doesNotContain(modelAnswer, "建议", "暂按", "差旅");
+        assertThat(String.join("", result.evidenceGaps())).contains("适用范围", "优先级", "替代关系")
+                .doesNotContain("15 天办理", "差旅");
+        assertThat(result.clarifyingQuestion()).contains("制度归口部门", "适用")
+                .doesNotContain("15 天", "30 天");
     }
 
     @Test

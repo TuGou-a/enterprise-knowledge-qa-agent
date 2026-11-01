@@ -4,7 +4,7 @@ import com.mango.backend.contract.runtime.RunContext;
 
 import java.util.List;
 
-/** T06 实现；校验结构、已读引用与状态最低前提，不能证明语义支持。 */
+/** T06 实现；校验结构、已读引用与状态最低前提，合法冲突仅展示核验引用；不能证明语义支持。 */
 public interface AnswerValidator {
     ValidatedAnswer validate(AnswerDraft draft, RunContext context);
 

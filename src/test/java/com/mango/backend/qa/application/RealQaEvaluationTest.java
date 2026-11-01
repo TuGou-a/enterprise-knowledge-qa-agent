@@ -8,8 +8,11 @@ import com.mango.backend.contract.error.Failure;
 import com.mango.backend.contract.knowledge.KnowledgeStore;
 import com.mango.backend.contract.model.EmbeddingClient;
 import com.mango.backend.contract.model.RerankClient;
+import com.mango.backend.contract.qa.AnswerReason;
 import com.mango.backend.contract.qa.QaRequest;
 import com.mango.backend.contract.qa.QaService;
+import com.mango.backend.contract.qa.TaskStatus;
+import com.mango.backend.contract.runtime.TraceEvent;
 import com.mango.backend.evaluation.QaEvidence;
 import com.mango.backend.evaluation.RecordingTraceFactory;
 import com.mango.backend.evaluation.RetrievalEvaluation;
@@ -32,7 +35,9 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
+import static com.mango.backend.contract.runtime.TraceEvent.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /** 显式真实问答评估；故障开关只存在于测试配置，不注册 HTTP 参数或生产开关。 */
@@ -82,8 +87,9 @@ class RealQaEvaluationTest {
         faults.injected.set(0);
         var response = service.answer(request).block(Duration.ofMillis(properties.timeouts().requestMs() + 5000));
         assertThat(response).isNotNull();
+        var events = traces.events(response.runId());
         var mode = faults.mode == FaultMode.NONE ? QaEvidence.Mode.REAL : QaEvidence.Mode.REAL_WITH_INJECTED_FAULT;
-        QaEvidence.write(Path.of("examples/real"), caseId, request, response, traces.events(response.runId()), mode,
+        QaEvidence.write(Path.of("examples/real"), caseId, request, response, events, mode,
                 Map.of("caseId", caseId, "corpusId", corpusId, "annotationStatus", labels.annotationStatus(),
                         "model", properties.deepseek().model(), "embeddingModel", properties.siliconflow().embeddingModel(),
                         "rerankModel", properties.siliconflow().rerankModel(), "faultMode", faults.mode.name(),
@@ -92,7 +98,43 @@ class RealQaEvaluationTest {
                         "rerankCalls", Integer.toString(faults.rerankCalls.get())));
         assertThat(response.snapshotId()).isEqualTo(expectedSnapshot);
         if (faults.mode != FaultMode.NONE) assertThat(faults.injected.get()).isEqualTo(1);
-        // 实际状态及语义质量保留给人工核对，不把模型执行完成等同于验收通过。
+        if (caseId.equals("E02")) {
+            assertThat(response.status()).isEqualTo(TaskStatus.CONFLICT);
+            assertThat(response.reason()).isEqualTo(AnswerReason.APPLICABILITY_UNKNOWN);
+            assertThat(response.citations()).anySatisfy(citation -> {
+                assertThat(citation.documentId()).isEqualTo("D01");
+                assertThat(citation.quote()).contains("费用发生之日起 30 个自然日内提交");
+            }).anySatisfy(citation -> {
+                assertThat(citation.documentId()).isEqualTo("D02");
+                assertThat(citation.quote()).contains("费用发生之日起 15 个自然日内提交");
+            });
+            assertThat(response.answer()).contains("不能选取").doesNotContain("建议按", "暂按", "较严格", "较短期限");
+            assertThat(response.citations()).allSatisfy(citation -> assertThat(response.answer()).contains(citation.quote()));
+            assertThat(response.evidenceGaps()).isNotEmpty();
+            assertThat(response.clarifyingQuestion()).contains("制度归口部门", "适用");
+            long bothSidesRead = Stream.of("D01", "D02").mapToLong(document -> events.stream()
+                    .filter(event -> event.detail() instanceof ToolCompleted completed
+                            && completed.deliveryError() == null && completed.outcome() instanceof ReadOutcome read
+                            && read.key().document().documentId().equals(document))
+                    .mapToLong(TraceEvent::sequence).min().orElseThrow()).max().orElseThrow();
+            var supplementIds = events.stream()
+                    .filter(event -> event.sequence() > bothSidesRead)
+                    .map(TraceEvent::detail).filter(ToolStarted.class::isInstance).map(ToolStarted.class::cast)
+                    .filter(started -> (started.publicPurpose() + " " + started.effective()).matches("(?s).*(适用|替代|优先|废止).*"))
+                    .map(ToolStarted::callId).toList();
+            var supplementResults = events.stream()
+                    .filter(event -> event.detail() instanceof ToolCompleted completed
+                            && supplementIds.contains(completed.callId()) && completed.deliveryError() == null
+                            && !(completed.outcome() instanceof ToolError)).toList();
+            assertThat(supplementResults).isNotEmpty().anySatisfy(finished -> {
+                assertThat(events).anySatisfy(observation -> {
+                    assertThat(observation.sequence()).isGreaterThan(finished.sequence());
+                    assertThat(observation.detail()).isInstanceOfSatisfying(ModelRound.class,
+                            round -> assertThat(round.phase()).isEqualTo(ModelPhase.STARTED));
+                });
+            });
+        }
+        // E02 的状态、双方引用及补查路径设为硬断言；完整语义质量仍需人工核对。
     }
 
     enum FaultMode { NONE, EMBEDDING_ONCE, RERANK_ONCE }

@@ -16,7 +16,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-/** 只核对结构、已读引用及完成前提，不判断原文是否在语义上支持回答。 */
+/** 核对结构、已读引用及完成前提；冲突结果仅展示核验引用，不判断原文是否在语义上冲突。 */
 @Component
 public final class DefaultAnswerValidator implements AnswerValidator {
     @Override
@@ -127,6 +127,9 @@ public final class DefaultAnswerValidator implements AnswerValidator {
             failures.add(AnswerReason.TOPIC_TRUNCATED);
         }
         if (failures.isEmpty()) {
+            if (draft.status() == TaskStatus.CONFLICT) {
+                return conflictAnswer(citations, List.of());
+            }
             return new ValidatedAnswer(draft.status(), draft.reason(), draft.answer(), citations,
                     draft.evidenceGaps(), draft.clarifyingQuestion());
         }
@@ -134,7 +137,7 @@ public final class DefaultAnswerValidator implements AnswerValidator {
         boolean draftValid = structureValid && citationsValid;
         var gaps = new LinkedHashSet<String>();
         if (draftValid) {
-            gaps.addAll(draft.evidenceGaps());
+            if (draft.status() != TaskStatus.CONFLICT) { gaps.addAll(draft.evidenceGaps()); }
         } else {
             citations.clear();
         }
@@ -156,11 +159,26 @@ public final class DefaultAnswerValidator implements AnswerValidator {
         if (draftValid && draft.status() == TaskStatus.CONFLICT
                 && (reason == AnswerReason.ROUTE_FAILED || reason == AnswerReason.READ_FAILED
                 || reason == AnswerReason.TOPIC_TRUNCATED)) {
-            return new ValidatedAnswer(draft.status(), draft.reason(), draft.answer(), citations,
-                    List.copyOf(gaps), draft.clarifyingQuestion());
+            return conflictAnswer(citations, List.copyOf(gaps));
         }
         return new ValidatedAnswer(TaskStatus.INCOMPLETE, reason, failureMessage(reason), citations,
                 List.copyOf(gaps), null);
+    }
+
+    private static ValidatedAnswer conflictAnswer(List<Citation> citations, List<String> limitations) {
+        // 合法冲突只呈现核验原文；自由文本中的“风险提示”也可能变相选边。
+        var answer = new StringBuilder("当前已读资料存在未消解的规定冲突，尚不能确定适用哪项规定：\n");
+        for (var citation : citations) {
+            answer.append("\n- ").append(citation.documentId()).append(" / ").append(citation.version())
+                    .append(" / ").append(citation.chunkId()).append("：「").append(citation.quote()).append("」\n");
+        }
+        answer.append("\n确认适用关系前，不能选取其中任何一项作为执行依据。");
+        var gaps = new ArrayList<String>();
+        gaps.add("缺少足以消解上述规定分歧的适用范围、优先级或替代关系依据。");
+        gaps.addAll(limitations);
+        return new ValidatedAnswer(TaskStatus.CONFLICT, AnswerReason.APPLICABILITY_UNKNOWN,
+                answer.toString(), citations, gaps,
+                "请提供本次事项适用的制度范围、优先级或替代关系说明，或请制度归口部门确认应适用哪份规定。");
     }
 
     private static boolean hasText(String value) {
