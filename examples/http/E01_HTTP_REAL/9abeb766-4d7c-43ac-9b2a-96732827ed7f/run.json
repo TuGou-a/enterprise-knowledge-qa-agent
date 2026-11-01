@@ -1,0 +1,36 @@
+{
+  "materialType": "ACTUAL_HTTP_RUN",
+  "mode": "REAL_HTTP",
+  "recordedAt": "2026-11-01T14:55:56+08:00",
+  "sourceBaselineCommit": "9aaeaea71615664e512fecfbf1f4e169e8264ae0",
+  "workingTreeDirtyAtRun": true,
+  "workingTreeNote": "本次运行在 dev 的证据工作树上执行；产品源码未修改，未跟踪文件为自动化运行产物。",
+  "endpoint": "http://127.0.0.1:18080/api/qa",
+  "serverStartCommand": "SERVER_PORT=18080 mvn -q spring-boot:run",
+  "serverEnvironment": {
+    "SERVER_PORT": "18080",
+    "DEEPSEEK_MODEL": "deepseek-chat",
+    "EMBEDDING_MODEL": "BAAI/bge-m3",
+    "RERANK_MODEL": "BAAI/bge-reranker-v2-m3",
+    "JAVA_TOOL_OPTIONS": "-Djava.net.useSystemProxies=false -Dhttp.proxyHost= -Dhttps.proxyHost= -DsocksProxyHost="
+  },
+  "curlCommand": "curl -sS -i --max-time 130 -H 'Content-Type: application/json' --data-binary @examples/requests/E01.json http://127.0.0.1:18080/api/qa",
+  "httpStatusLine": "HTTP/1.1 200",
+  "httpStatus": 200,
+  "runId": "9abeb766-4d7c-43ac-9b2a-96732827ed7f",
+  "snapshotId": "3e4a6305-22c4-4dee-b8b2-d78e40e00125",
+  "corpusId": "normal",
+  "status": "ANSWERED",
+  "reason": "EVIDENCE_SUFFICIENT",
+  "citations": 1,
+  "evidenceGaps": 2,
+  "elapsedMillis": 4839,
+  "evidenceFiles": [
+    "request.json",
+    "response.json",
+    "http-transcript.txt",
+    "server.log"
+  ],
+  "traceAvailable": false,
+  "traceNote": "当前 HTTP 契约不暴露 Trace 查询接口。"
+}

@@ -1,0 +1,58 @@
+{
+  "runId" : "0fb3acaa-0cde-4f54-823b-a40f46d3e125",
+  "snapshotId" : "3ddd118c-8c15-4b70-a2d2-ae500900f962",
+  "status" : "INCOMPLETE",
+  "reason" : "ROUTE_FAILED",
+  "answer" : "必要检索尚未恢复，尚未完成查证。",
+  "citations" : [ {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 报销申请应在费用发生之日起 30 个自然日内提交。",
+    "startOffset" : 14,
+    "endOffset" : 43,
+    "contentHash" : "0fa4d47274108f3a7167aa5aa1cf96cf7ecaaed26108bd8e44e9e55dec74ff04"
+  } ],
+  "evidenceGaps" : [ "必要检索尚未恢复，尚未完成查证。", "必要召回路由 VECTOR 尚未恢复（TIMEOUT）。" ],
+  "clarifyingQuestion" : null,
+  "retrieval" : {
+    "degraded" : true,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "ERROR",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ {
+      "scope" : {
+        "snapshotId" : "3ddd118c-8c15-4b70-a2d2-ae500900f962",
+        "query" : "报销期限 费用报销 时限 提交 天数",
+        "topK" : 6
+      },
+      "route" : "VECTOR",
+      "failure" : {
+        "code" : "TIMEOUT",
+        "message" : "评估注入一次 Embedding 超时",
+        "retryable" : true
+      }
+    } ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 3,
+    "toolCalls" : 3,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 6374,
+    "remainingMillis" : 113625,
+    "readCharacters" : 31,
+    "toolTextCharacters" : 637,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

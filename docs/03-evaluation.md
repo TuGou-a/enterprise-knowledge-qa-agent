@@ -2,6 +2,58 @@
 
 T09 按用户于 2026-11-01 确认的范围分阶段交付。本阶段补齐已合并模块的测试、固定资料参考标注、四方案检索评估工具和交付说明；T07 已以 `7da2897` 合入，实际问答 Mock 与后续验收采集入口已接入。具体决定与交接见 [T09 设计记录](t09-testing-delivery-design.md)。
 
+## T09 合并后当前提交复验（2026-11-01）
+
+用户明确授权使用项目 `.env` 中的现有凭据，将三组合成资料、固定评估问题及问答上下文发送给
+SiliconFlow 和 DeepSeek，并接受可能产生的 API 费用。本轮以 `dev` 的
+`9aaeaea71615664e512fecfbf1f4e169e8264ae0` 为源码基线，在临时 PostgreSQL 17／pgvector
+容器中重新导入资料并完成以下复验；容器和测试应用已在运行结束后清理。
+
+| 检查 | 实际结果 | 本次证据 |
+| --- | --- | --- |
+| `scripts/run-tests.py unit` | 184 个测试通过，0 失败／错误／跳过 | `examples/tests/unit/20261101T064650Z-e3c4042a938f4acfa382b324fb02321a/` |
+| `scripts/run-tests.py postgres` | 189 个测试通过；Testcontainers 启动真实 pgvector | `examples/tests/postgres/20261101T064704Z-215b890de4c649acbb41f6e89c842965/` |
+| `scripts/run-tests.py mock` | 8 个完整离线问答场景通过 | `examples/tests/mock/20261101T064716Z-405d95494d7849d9925e7addef4d1f24/` |
+| 真实问答 | E01–E06、E08、E09 共 9 次资料阶段运行通过；E08 覆盖 normal 与 mutation | `examples/real/`、`examples/tests/qa/20261101T065134Z-968ea55c7ae1478782a5883da742dbbe/` 等 9 个运行目录 |
+| 真实 HTTP E01 | HTTP `200`、`ANSWERED/EVIDENCE_SUFFICIENT`、1 条已读引用、2 条适用范围缺口 | `examples/http/E01_HTTP_REAL/9abeb766-4d7c-43ac-9b2a-96732827ed7f/` |
+| 真实检索评估 | `COMPLETED`，16 题、0 失败，Rerank 回退率 0 | `examples/retrieval/real/20261101T065427Z-cf89a171-7f65-4b70-a2e1-346dc07e3a15/` |
+| `mvn -DskipTests package` | 构建成功，生成可执行 JAR | `target/backend-0.0.1-SNAPSHOT.jar` |
+
+受限沙箱中的首次 unit 和 E01 尝试分别被 Mockito JVM agent 附加及本机套接字权限拦截；E01
+在测试方法开始前失败，没有连接数据库或调用模型。两次原始失败记录继续保留在
+`examples/tests/unit/20261101T064555Z-27b0b515b6d4426f935f91e203c8ec52/` 和
+`examples/tests/qa/20261101T064816Z-2885bfa7bf7a4a9aa5aa1ccbc2c6da80/`，成功结果来自
+获得运行权限后的独立重跑。
+
+本轮检索评估使用 normal `3ddd118c-8c15-4b70-a2d2-ae500900f962`、conflict
+`dd95ed52-0804-4027-b83a-1d212aa6b597`、mutation
+`6660ee85-5943-481f-b84e-1631e2a7039f`。三组快照均为 `READY`，文档／条款数量分别为
+2／7、3／8、2／7，集合哈希与标注基准一致。E08 normal 和 HTTP E01 另行发布了 normal 快照
+`2815792f-4dbd-47dc-98bd-c54c972d2a6e` 和
+`3e4a6305-22c4-4dee-b8b2-d78e40e00125`。
+
+| 真实问答用例 | 实际终态 | 主代理语义核对 |
+| --- | --- | --- |
+| E01 | `ANSWERED/EVIDENCE_SUFFICIENT` | 回答 30 个自然日，并说明差旅制度未另设期限 |
+| E02 | `CONFLICT/APPLICABILITY_UNKNOWN` | 同时呈现 30／15 天规定，不因版本日期较新擅选 |
+| E03 | `NO_EVIDENCE/OUT_OF_CORPUS` | 明确股票期权资料缺口，不生成引用 |
+| E04 | `ANSWERED/EVIDENCE_SUFFICIENT` | 相似改写仍落到 D01 v1 的同一期限条款 |
+| E05 | `ANSWERED/EVIDENCE_SUFFICIENT` | 依据历史正确回答差旅凭证；期限预览未读取原文的部分列入缺口 |
+| E06 | `INCOMPLETE/ROUTE_FAILED` | 注入一次 Embedding 超时，保留 VECTOR 未恢复状态，未写成无资料 |
+| E08 normal | `ANSWERED/EVIDENCE_SUFFICIENT` | 引用 D01 v1 的 30 天规定 |
+| E08 mutation | `ANSWERED/EVIDENCE_SUFFICIENT` | 引用 D01 v2 的 20 天规定 |
+| E09 | `ANSWERED/EVIDENCE_SUFFICIENT` | 注入一次 Rerank 超时，回退 RRF 并披露降级 |
+
+四方案指标与上一轮相同：关键词 Recall@6／MRR@6 为 1.0000／0.8214，向量为
+1.0000／0.9643，RRF 为 1.0000／0.9643，混合＋Rerank 为 1.0000／1.0000；混合方案的扩展后
+Recall 与冲突成对召回均为 1.0000。正常组仅 7 条款、冲突组仅 8 条款，Recall@6 已饱和，
+这些结果只能说明当前小样本上的表现，不能证明重排序的普遍收益。参考标注状态仍为
+`REFERENCE_REVIEW_PENDING`。
+
+本次主代理已逐条核对回答与资料、状态、引用和故障披露；这不等同于用户人工复核。R08 的真实
+流式总时限／取消后迟到结果、R09 的真实并发实验仍只由确定性测试覆盖。运行记录中的
+`workingTreeDirtyAtStart=true` 来自保留的自动化证据和 Mock 产物，产品源码未修改。
+
 ## 最终运行结果（2026-11-01）
 
 最终验证以源码基线 `3cddda8` 和最终证据工作树完成，运行环境为 macOS、Java 21.0.12、Maven 3.9.9、

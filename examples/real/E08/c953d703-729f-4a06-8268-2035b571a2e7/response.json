@@ -1,0 +1,46 @@
+{
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+  "status" : "ANSWERED",
+  "reason" : "EVIDENCE_SUFFICIENT",
+  "answer" : "根据《费用报销制度（合成资料）》第1条，报销申请应在费用发生之日起 30 个自然日内提交。\n\n需注意的适用边界：差旅报销制度中未对报销提交期限另作规定，其只规定了出差前审批、凭证要求等内容，因此就报销期限而言，应按上述一般规定执行。资料中也没有关于超期后能否补报、是否有延长或例外情形的规定。",
+  "citations" : [ {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 报销申请应在费用发生之日起 30 个自然日内提交。",
+    "startOffset" : 14,
+    "endOffset" : 43,
+    "contentHash" : "0fa4d47274108f3a7167aa5aa1cf96cf7ecaaed26108bd8e44e9e55dec74ff04"
+  } ],
+  "evidenceGaps" : [ "资料中未见超期报销的处理方式及可延长期限的例外规定" ],
+  "clarifyingQuestion" : null,
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 3,
+    "toolCalls" : 4,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 5797,
+    "remainingMillis" : 114202,
+    "readCharacters" : 71,
+    "toolTextCharacters" : 677,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

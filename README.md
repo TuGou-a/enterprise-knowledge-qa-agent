@@ -2,7 +2,7 @@
 
 面向报销与差旅制度的知识问答项目。通过检索和原文读取工具，帮助员工获得有文档依据的回答；资料冲突或不足时，明确说明限制并请求补充信息。
 
-T07 Agent 与问答服务已合入 `dev`。2026-11-01 以源码基线 `3cddda8` 和最终证据工作树完成默认测试 `184/184`、PostgreSQL 集成测试 `189/189`、8 个真实问答用例、真实 HTTP 调用和 16 题四方案检索评估；结果与证据见[测试与评估](docs/03-evaluation.md)。运行使用 DeepSeek `deepseek-chat`、硅基流动 `BAAI/bge-m3`／`BAAI/bge-reranker-v2-m3` 和真实 PostgreSQL/pgvector。
+T09 测试与交付材料已合入 `dev`。2026-11-01 又在当前源码基线 `9aaeaea` 上复验默认测试 `184/184`、PostgreSQL 集成测试 `189/189`、8 个真实问答用例、真实 HTTP 调用和 16 题四方案检索评估；结果与证据见[测试与评估](docs/03-evaluation.md)。运行使用 DeepSeek `deepseek-chat`、硅基流动 `BAAI/bge-m3`／`BAAI/bge-reranker-v2-m3` 和真实 PostgreSQL/pgvector。
 
 ## 文档入口
 

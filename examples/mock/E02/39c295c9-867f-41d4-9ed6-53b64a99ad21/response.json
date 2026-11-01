@@ -1,0 +1,54 @@
+{
+  "runId" : "39c295c9-867f-41d4-9ed6-53b64a99ad21",
+  "snapshotId" : "snapshot-1",
+  "status" : "CONFLICT",
+  "reason" : "APPLICABILITY_UNKNOWN",
+  "answer" : "30 天与 15 天冲突",
+  "citations" : [ {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "30 天",
+    "startOffset" : 6,
+    "endOffset" : 10,
+    "contentHash" : "chunk-hash"
+  }, {
+    "documentId" : "D02",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "15 天",
+    "startOffset" : 6,
+    "endOffset" : 10,
+    "contentHash" : "chunk-hash"
+  } ],
+  "evidenceGaps" : [ "适用范围未知" ],
+  "clarifyingQuestion" : "应适用哪份制度？",
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 5,
+    "toolCalls" : 4,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 18,
+    "remainingMillis" : 119981,
+    "readCharacters" : 22,
+    "toolTextCharacters" : 66,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

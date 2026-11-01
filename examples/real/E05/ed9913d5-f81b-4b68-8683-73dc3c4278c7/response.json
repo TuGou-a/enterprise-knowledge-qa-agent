@@ -1,0 +1,86 @@
+{
+  "runId" : "ed9913d5-f81b-4b68-8683-73dc3c4278c7",
+  "snapshotId" : "3ddd118c-8c15-4b70-a2d2-ae500900f962",
+  "status" : "ANSWERED",
+  "reason" : "EVIDENCE_SUFFICIENT",
+  "answer" : "按《差旅报销制度（合成资料）》（D03 v1，§1–§4），员工因公出差办理差旅报销需准备以下凭证与材料：\n\n1. 已审批的出差申请。制度要求因公出差应在出发前提交出差申请，取得直属主管审批后再安排出行，报销时需提供该已审批的出差申请。\n2. 交通票据。\n3. 住宿发票，以及上述费用对应的付款记录。住宿报销按住宿发票列明的实际金额申请。\n4. 费用用途和实际金额的填写（《费用报销制度》D01 v1 §2 的通用要求）。\n\n适用边界与例外：\n- 未发生的费用无需提供该类凭证（D03 §2）。\n- 交通票据遗失时，应补充行程记录与对应付款记录，并说明遗失原因，由财务核对后确认能否报销（D03 §4）。\n- 缺少有效凭证或费用用途不清楚时，申请人应先补充材料，再提交报销申请（D01 §3）。\n- 私人消费不属于差旅报销范围，不得混入住宿费用（D03 §3）。\n\n另需注意期限：报销申请应在费用发生之日起 30 个自然日内提交（D01 §1），但该条不在本次已读片段内，具体以原文为准。\n\n以上为一般规定；若你的情形涉及票据遗失、部分费用未发生或含私人消费，请按上述例外条款处理。",
+  "citations" : [ {
+    "documentId" : "D03",
+    "version" : "v1",
+    "chunkId" : "clause-2",
+    "quote" : "第2条 提交差旅报销时，应提供已审批的出差申请、交通票据、住宿发票及对应付款记录；未发生的费用无需提供该类凭证。",
+    "startOffset" : 54,
+    "endOffset" : 110,
+    "contentHash" : "3aa27b98ed66044af01e031af9b13583d05ebde2d921bebb0d4cbba8adece396"
+  }, {
+    "documentId" : "D03",
+    "version" : "v1",
+    "chunkId" : "clause-4",
+    "quote" : "第4条 交通票据遗失时，应补充行程记录与对应付款记录，并说明遗失原因，由财务核对后确认能否报销。",
+    "startOffset" : 160,
+    "endOffset" : 208,
+    "contentHash" : "c073cb4a98064ad1280f8b5746c9ec72d16a76bfdd120e1c6a30940a447fab81"
+  }, {
+    "documentId" : "D03",
+    "version" : "v1",
+    "chunkId" : "clause-3",
+    "quote" : "第3条 住宿报销按住宿发票列明的实际金额申请；私人消费不属于差旅报销范围，不得混入住宿费用。",
+    "startOffset" : 112,
+    "endOffset" : 158,
+    "contentHash" : "dd312dfae9bbaee0b7c776f8128e2ca0e93b1acf65c316c2cd1b1a50ee58ab8d"
+  }, {
+    "documentId" : "D03",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 员工因公出差，应在出发前提交出差申请，取得直属主管审批后再安排出行。",
+    "startOffset" : 14,
+    "endOffset" : 52,
+    "contentHash" : "c763f864e4d72e7c59766da03414806866b32bbe01dcca8a9f535f3b70862732"
+  }, {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-2",
+    "quote" : "第2条 申请报销时，应提交对应费用的有效凭证，并填写费用用途和实际金额。",
+    "startOffset" : 45,
+    "endOffset" : 81,
+    "contentHash" : "bce690c23425c3c12ebd2557f3ee9b74d2b11a3a996554ae4608e32a558caf17"
+  }, {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-3",
+    "quote" : "第3条 缺少有效凭证或费用用途不清楚时，申请人应先补充材料，再提交报销申请。",
+    "startOffset" : 83,
+    "endOffset" : 121,
+    "contentHash" : "c0f8ef8c9f62470c595c09cdffcabc017ff2bb9f99822254a82fca4d54a16e65"
+  } ],
+  "evidenceGaps" : [ "报销期限（30 个自然日）仅见于检索预览，未读取该片段原文，故未作为确定依据或引用。" ],
+  "clarifyingQuestion" : null,
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 3,
+    "toolCalls" : 7,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 7662,
+    "remainingMillis" : 112337,
+    "readCharacters" : 272,
+    "toolTextCharacters" : 575,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

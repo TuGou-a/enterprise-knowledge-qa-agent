@@ -1,0 +1,38 @@
+{
+  "materialType": "ACTUAL_AUTOMATED_TEST_RUN",
+  "mode": "REAL_QA",
+  "commit": "9aaeaea71615664e512fecfbf1f4e169e8264ae0",
+  "workingTreeDirtyAtStart": true,
+  "startedAt": "2026-11-01T06:54:08.618266+00:00",
+  "command": [
+    "mvn",
+    "-Dstyle.color=never",
+    "-Dtest.reports-directory=/Users/mango/Desktop/xykj/Agent/examples/tests/qa/20261101T065408Z-370f8e507ea946fab927a9f4491a37d8/reports",
+    "-Devaluation.executionMetadata=examples/tests/qa/20261101T065408Z-370f8e507ea946fab927a9f4491a37d8/run.json",
+    "-Preal-evaluation",
+    "-Dtest=RealQaEvaluationTest",
+    "-Devaluation.case=E08",
+    "-Devaluation.snapshot=6660ee85-5943-481f-b84e-1631e2a7039f",
+    "-Devaluation.corpus=mutation",
+    "test"
+  ],
+  "status": "FINISHED",
+  "finishedAt": "2026-11-01T06:54:17.926387+00:00",
+  "exitCode": 0,
+  "suites": [
+    {
+      "file": "TEST-com.mango.backend.qa.application.RealQaEvaluationTest.xml",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "reportCollectionErrors": [],
+  "testCounts": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

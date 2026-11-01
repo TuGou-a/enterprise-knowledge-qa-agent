@@ -1,0 +1,54 @@
+{
+  "runId" : "ea61d620-9563-4a43-b3e7-e481eca8f6f1",
+  "snapshotId" : "dd95ed52-0804-4027-b83a-1d212aa6b597",
+  "status" : "CONFLICT",
+  "reason" : "APPLICABILITY_UNKNOWN",
+  "answer" : "关于报销期限，当前资料中存在两份规定不一致的文件，无法确定哪一份优先适用：\n\n1. 《费用报销制度（合成资料）》（D01，版本 v1，版本日期 2026-01-01）第1条规定：报销申请应在费用发生之日起 **30 个自然日**内提交。\n2. 《费用报销办理规定（合成资料）》（D02，版本 v1，版本日期 2026-02-01）第1条规定：报销申请应在费用发生之日起 **15 个自然日**内提交。\n\n两份文件均未载明适用范围（applicableScope 为空），也均未声明废止、替代另一份文件；D02 的版本日期较新，但资料本身没有说明版本日期新即优先适用，因此不能据此自行认定以 15 个自然日为准。\n\n在冲突未消解前，为避免超期，建议按较严格的 15 个自然日时限把握，但这只是风险提示，不构成制度结论。如需明确适用口径，请向财务部门确认本单位的现行有效版本，或提供您所属主体/费用类型等信息，以便进一步判断。\n\n另需说明：差旅报销制度（D03）中本次检索到的条款涉及出差审批、差旅凭证和住宿报销，未对差旅报销的提交期限作出规定。",
+  "citations" : [ {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 报销申请应在费用发生之日起 30 个自然日内提交。",
+    "startOffset" : 14,
+    "endOffset" : 43,
+    "contentHash" : "0fa4d47274108f3a7167aa5aa1cf96cf7ecaaed26108bd8e44e9e55dec74ff04"
+  }, {
+    "documentId" : "D02",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 报销申请应在费用发生之日起 15 个自然日内提交。",
+    "startOffset" : 16,
+    "endOffset" : 45,
+    "contentHash" : "2b2e58a2d4a24dee16942f033d7fd341afd22f1ed44243ceeb87726e61da8c9b"
+  } ],
+  "evidenceGaps" : [ "D01（2026-01-01）规定 30 个自然日，D02（2026-02-01）规定 15 个自然日，两者就同一事项（费用发生之日起的报销提交期限）作出相反规定", "两份文件均未载明适用范围（applicableScope 为空），也未声明废止或替代另一份文件", "资料中未见关于版本日期先后与适用优先级的通用规则，无法消解上述分歧" ],
+  "clarifyingQuestion" : "请问您要报销的费用属于哪个主体/哪类费用，以及财务是否已通知以《费用报销制度》还是《费用报销办理规定》为准？如无法确认，建议直接向财务部门核实现行有效的报销期限。",
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 4,
+    "toolCalls" : 4,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 8566,
+    "remainingMillis" : 111433,
+    "readCharacters" : 61,
+    "toolTextCharacters" : 727,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

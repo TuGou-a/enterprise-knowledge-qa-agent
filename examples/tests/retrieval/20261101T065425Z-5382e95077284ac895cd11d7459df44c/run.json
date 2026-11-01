@@ -1,0 +1,36 @@
+{
+  "materialType": "ACTUAL_AUTOMATED_TEST_RUN",
+  "mode": "REAL_RETRIEVAL",
+  "commit": "9aaeaea71615664e512fecfbf1f4e169e8264ae0",
+  "workingTreeDirtyAtStart": true,
+  "startedAt": "2026-11-01T06:54:25.106744+00:00",
+  "command": [
+    "mvn",
+    "-Dstyle.color=never",
+    "-Dtest.reports-directory=/Users/mango/Desktop/xykj/Agent/examples/tests/retrieval/20261101T065425Z-5382e95077284ac895cd11d7459df44c/reports",
+    "-Devaluation.executionMetadata=examples/tests/retrieval/20261101T065425Z-5382e95077284ac895cd11d7459df44c/run.json",
+    "-Preal-evaluation",
+    "-Dtest=RealRetrievalEvaluationTest",
+    "-Devaluation.snapshots=normal=3ddd118c-8c15-4b70-a2d2-ae500900f962,conflict=dd95ed52-0804-4027-b83a-1d212aa6b597,mutation=6660ee85-5943-481f-b84e-1631e2a7039f",
+    "test"
+  ],
+  "status": "FINISHED",
+  "finishedAt": "2026-11-01T06:54:33.433678+00:00",
+  "exitCode": 0,
+  "suites": [
+    {
+      "file": "TEST-com.mango.backend.knowledge.ingest.RealRetrievalEvaluationTest.xml",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "reportCollectionErrors": [],
+  "testCounts": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

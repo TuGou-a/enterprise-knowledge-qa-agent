@@ -1,0 +1,24 @@
+{
+  "mode" : "MOCK",
+  "recordedAt" : 1793515627.482555000,
+  "commit" : "9aaeaea71615664e512fecfbf1f4e169e8264ae0",
+  "workingTreeDirty" : true,
+  "javaVersion" : "21.0.12",
+  "frameworkVersion" : "2.0.4",
+  "indexProfile" : {
+    "embeddingModel" : "BAAI/bge-m3",
+    "embeddingDimension" : 1024,
+    "preprocessingVersion" : "source-preserving-v1",
+    "tokenizerVersion" : "jieba-analysis-1.0.2",
+    "dictionaryVersion" : "builtin-v1",
+    "stopWordsVersion" : "none-v1"
+  },
+  "model" : "deterministic-test",
+  "rerankModel" : "BAAI/bge-reranker-v2-m3",
+  "executionMetadataFile" : "examples/tests/postgres/20261101T064704Z-215b890de4c649acbb41f6e89c842965/run.json",
+  "configuration" : {
+    "scenario" : "RECOVERY",
+    "model" : "deterministic-test",
+    "reproduce" : "mvn -Dtest=QaOfflineMockTest test"
+  }
+}

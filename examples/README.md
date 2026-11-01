@@ -2,7 +2,37 @@
 
 当前目录包含计划输入、参考标注、完整真实问答、真实 HTTP 调用、检索评估结果和自动化测试运行记录。历史基线 `5ff4dd0` 的 63 项测试与 T04／T05 记录继续保留；最终验证见[评估文档](../docs/03-evaluation.md)。
 
-## 最终证据索引
+## 当前提交复验索引
+
+2026-11-01 的 T09 合并后复验以源码基线 `9aaeaea` 执行。运行使用真实 PostgreSQL/pgvector、
+DeepSeek `deepseek-chat` 和硅基流动两个模型，临时数据库与测试应用已清理。
+
+| 检查或用例 | 本次证据 |
+| --- | --- |
+| 默认单元测试 `184/184` | `tests/unit/20261101T064650Z-e3c4042a938f4acfa382b324fb02321a/` |
+| PostgreSQL 集成测试 `189/189` | `tests/postgres/20261101T064704Z-215b890de4c649acbb41f6e89c842965/` |
+| 离线问答 Mock `8/8` | `tests/mock/20261101T064716Z-405d95494d7849d9925e7addef4d1f24/` |
+| E01 | `real/E01/1736e41f-c8e1-4699-84b5-c5f2ee06b5af/` |
+| E02 | `real/E02/ea61d620-9563-4a43-b3e7-e481eca8f6f1/` |
+| E03 | `real/E03/da8ccae4-667f-46ca-820e-c87a9513ffc6/` |
+| E04 | `real/E04/89e1be8f-7920-49b7-9e82-5305866476d1/` |
+| E05 | `real/E05/ed9913d5-f81b-4b68-8683-73dc3c4278c7/` |
+| E06 | `real/E06/0fb3acaa-0cde-4f54-823b-a40f46d3e125/` |
+| E08 normal | `real/E08/c953d703-729f-4a06-8268-2035b571a2e7/` |
+| E08 mutation | `real/E08/04dcfff9-657e-4d9d-9d61-93408db47f60/` |
+| E09 | `real/E09/53bac830-a31a-409a-ab12-12448876b907/` |
+| 真实 HTTP E01 | `http/E01_HTTP_REAL/9abeb766-4d7c-43ac-9b2a-96732827ed7f/` |
+| 16 题检索评估 | `retrieval/real/20261101T065427Z-cf89a171-7f65-4b70-a2e1-346dc07e3a15/` |
+
+参考标注仍为 `REFERENCE_REVIEW_PENDING`。主代理已核对本轮回答与资料、状态、引用和故障披露，
+但不能替代用户人工复核；7／8 条款小样本也无法证明重排序的普遍收益。
+
+`tests/unit/20261101T064555Z-27b0b515b6d4426f935f91e203c8ec52/` 和
+`tests/qa/20261101T064816Z-2885bfa7bf7a4a9aa5aa1ccbc2c6da80/` 是受限沙箱造成的失败保留：
+错误分别发生在 Mockito JVM agent 和本机套接字权限层。上表成功记录均由独立重跑生成；E01
+沙箱失败没有启动数据库连接或模型请求。
+
+## 历史最终证据索引
 
 最终验证时间为 2026-11-01，源码基线为 `3cddda8`，运行使用最终证据工作树和 DeepSeek `deepseek-chat`。
 

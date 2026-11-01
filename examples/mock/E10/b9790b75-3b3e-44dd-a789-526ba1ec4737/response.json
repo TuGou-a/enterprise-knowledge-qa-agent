@@ -1,0 +1,38 @@
+{
+  "runId" : "b9790b75-3b3e-44dd-a789-526ba1ec4737",
+  "snapshotId" : "snapshot-1",
+  "status" : "INCOMPLETE",
+  "reason" : "MODEL_FAILED",
+  "answer" : "模型请求失败，未取得可靠回答。",
+  "citations" : [ ],
+  "evidenceGaps" : [ "模型请求失败，未取得可靠回答。" ],
+  "clarifyingQuestion" : null,
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "NOT_RUN",
+      "keyword" : "NOT_RUN",
+      "rerank" : "NOT_RUN"
+    },
+    "rankingMode" : "NONE",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 1,
+    "toolCalls" : 0,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 4,
+    "remainingMillis" : 119995,
+    "readCharacters" : 0,
+    "toolTextCharacters" : 0,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

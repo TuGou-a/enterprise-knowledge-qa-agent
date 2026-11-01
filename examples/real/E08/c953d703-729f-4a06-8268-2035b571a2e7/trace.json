@@ -1,0 +1,544 @@
+[ {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 1,
+  "timestamp" : 1793516029.387511000,
+  "detail" : {
+    "type" : "RUN_STARTED",
+    "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+    "frameworkVersion" : "2.0.4",
+    "model" : "deepseek-chat",
+    "indexProfile" : {
+      "embeddingModel" : "BAAI/bge-m3",
+      "embeddingDimension" : 1024,
+      "preprocessingVersion" : "source-preserving-v1",
+      "tokenizerVersion" : "jieba-analysis-1.0.2",
+      "dictionaryVersion" : "builtin-v1",
+      "stopWordsVersion" : "none-v1"
+    },
+    "rerankModel" : "BAAI/bge-reranker-v2-m3",
+    "routeLimit" : 20,
+    "candidatePoolLimit" : 20,
+    "primaryLimit" : 6,
+    "relatedLimit" : 12,
+    "rrfK" : 60
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 2,
+  "timestamp" : 1793516029.466210000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 1,
+    "phase" : "STARTED",
+    "publicSummary" : "模型根据本次对话及已交付的工具结果选择后续动作。",
+    "error" : null
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 3,
+  "timestamp" : 1793516030.978476000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 1,
+    "phase" : "COMPLETED",
+    "publicSummary" : "模型调用完成；具体动作由后续工具事件或最终任务结果记录。",
+    "error" : null
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 4,
+  "timestamp" : 1793516031.035200000,
+  "detail" : {
+    "type" : "TOOL_STARTED",
+    "callId" : "call_00_lM1wrqc5FGvVdczMXzf82220",
+    "iteration" : 1,
+    "tool" : "SEARCH_KNOWLEDGE",
+    "requested" : {
+      "type" : "SEARCH_INPUT",
+      "query" : "报销期限 报销时效 费用发生后多久提交报销",
+      "topK" : null
+    },
+    "effective" : {
+      "type" : "SEARCH_INPUT",
+      "query" : "报销期限 报销时效 费用发生后多久提交报销",
+      "topK" : 6
+    },
+    "publicPurpose" : "查找关于报销提交期限的制度规定"
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 5,
+  "timestamp" : 1793516031.462908000,
+  "detail" : {
+    "type" : "TOOL_STARTED",
+    "callId" : "call_01_nUK1L1aXjDYB5EQ3X21L8390",
+    "iteration" : 1,
+    "tool" : "SEARCH_KNOWLEDGE",
+    "requested" : {
+      "type" : "SEARCH_INPUT",
+      "query" : "费用报销申请时间限制 跨年度报销",
+      "topK" : null
+    },
+    "effective" : {
+      "type" : "SEARCH_INPUT",
+      "query" : "费用报销申请时间限制 跨年度报销",
+      "topK" : 6
+    },
+    "publicPurpose" : "补充查找报销时限及相关例外规定"
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 6,
+  "timestamp" : 1793516031.771480000,
+  "detail" : {
+    "type" : "TOOL_COMPLETED",
+    "callId" : "call_00_lM1wrqc5FGvVdczMXzf82220",
+    "iteration" : 1,
+    "tool" : "SEARCH_KNOWLEDGE",
+    "outcome" : {
+      "type" : "SEARCH_RESULT",
+      "scope" : {
+        "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+        "query" : "报销期限 报销时效 费用发生后多久提交报销",
+        "topK" : 6
+      },
+      "primary" : [ {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D01",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-1"
+      }, {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D01",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-2"
+      }, {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D01",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-3"
+      }, {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D03",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-2"
+      }, {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D03",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-3"
+      }, {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D03",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-4"
+      } ],
+      "related" : [ {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D03",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-1"
+      } ],
+      "routes" : {
+        "vector" : "OK",
+        "keyword" : "OK",
+        "rerank" : "OK"
+      },
+      "rankingMode" : "RERANK",
+      "rankingWarnings" : [ ],
+      "unresolvedErrors" : [ ],
+      "truncated" : false,
+      "metrics" : {
+        "vectorCount" : 7,
+        "keywordCount" : 7,
+        "uniqueCount" : 7,
+        "rerankInputCount" : 7,
+        "primaryCount" : 6,
+        "relatedCount" : 1,
+        "rerankMillis" : 138,
+        "rerankResponseId" : "01a195e2cd5d755cb3dd9cde925a5b1d",
+        "rerankUsage" : {
+          "inputTokens" : 360,
+          "totalTokens" : null
+        },
+        "rerankInputKeys" : [ {
+          "document" : {
+            "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+            "documentId" : "D01",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-1"
+        }, {
+          "document" : {
+            "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+            "documentId" : "D01",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-2"
+        }, {
+          "document" : {
+            "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+            "documentId" : "D01",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-3"
+        }, {
+          "document" : {
+            "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+            "documentId" : "D03",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-2"
+        }, {
+          "document" : {
+            "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+            "documentId" : "D03",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-1"
+        }, {
+          "document" : {
+            "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+            "documentId" : "D03",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-4"
+        }, {
+          "document" : {
+            "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+            "documentId" : "D03",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-3"
+        } ]
+      }
+    },
+    "deliveryError" : null
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 7,
+  "timestamp" : 1793516031.771677000,
+  "detail" : {
+    "type" : "TOOL_COMPLETED",
+    "callId" : "call_01_nUK1L1aXjDYB5EQ3X21L8390",
+    "iteration" : 1,
+    "tool" : "SEARCH_KNOWLEDGE",
+    "outcome" : {
+      "type" : "SEARCH_RESULT",
+      "scope" : {
+        "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+        "query" : "费用报销申请时间限制 跨年度报销",
+        "topK" : 6
+      },
+      "primary" : [ {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D01",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-1"
+      }, {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D01",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-2"
+      }, {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D01",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-3"
+      }, {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D03",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-3"
+      }, {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D03",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-2"
+      }, {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D03",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-1"
+      } ],
+      "related" : [ {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D03",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-4"
+      } ],
+      "routes" : {
+        "vector" : "OK",
+        "keyword" : "OK",
+        "rerank" : "OK"
+      },
+      "rankingMode" : "RERANK",
+      "rankingWarnings" : [ ],
+      "unresolvedErrors" : [ ],
+      "truncated" : false,
+      "metrics" : {
+        "vectorCount" : 7,
+        "keywordCount" : 7,
+        "uniqueCount" : 7,
+        "rerankInputCount" : 7,
+        "primaryCount" : 6,
+        "relatedCount" : 1,
+        "rerankMillis" : 161,
+        "rerankResponseId" : "01a195e2cea47f35b0dd76cf8cdde30b",
+        "rerankUsage" : {
+          "inputTokens" : 325,
+          "totalTokens" : null
+        },
+        "rerankInputKeys" : [ {
+          "document" : {
+            "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+            "documentId" : "D01",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-1"
+        }, {
+          "document" : {
+            "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+            "documentId" : "D01",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-2"
+        }, {
+          "document" : {
+            "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+            "documentId" : "D01",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-3"
+        }, {
+          "document" : {
+            "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+            "documentId" : "D03",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-2"
+        }, {
+          "document" : {
+            "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+            "documentId" : "D03",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-3"
+        }, {
+          "document" : {
+            "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+            "documentId" : "D03",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-1"
+        }, {
+          "document" : {
+            "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+            "documentId" : "D03",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-4"
+        } ]
+      }
+    },
+    "deliveryError" : null
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 8,
+  "timestamp" : 1793516031.787698000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 2,
+    "phase" : "STARTED",
+    "publicSummary" : "模型根据本次对话及已交付的工具结果选择后续动作。",
+    "error" : null
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 9,
+  "timestamp" : 1793516033.257523000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 2,
+    "phase" : "COMPLETED",
+    "publicSummary" : "模型调用完成；具体动作由后续工具事件或最终任务结果记录。",
+    "error" : null
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 10,
+  "timestamp" : 1793516033.259173000,
+  "detail" : {
+    "type" : "TOOL_STARTED",
+    "callId" : "call_00_f24QazhcM3Y4khEDvHsq0189",
+    "iteration" : 2,
+    "tool" : "READ_KNOWLEDGE",
+    "requested" : {
+      "type" : "READ_INPUT",
+      "documentId" : "D01",
+      "version" : "v1",
+      "chunkId" : "clause-1"
+    },
+    "effective" : {
+      "type" : "READ_INPUT",
+      "documentId" : "D01",
+      "version" : "v1",
+      "chunkId" : "clause-1"
+    },
+    "publicPurpose" : "核实费用报销制度中报销期限的原文表述"
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 11,
+  "timestamp" : 1793516033.266333000,
+  "detail" : {
+    "type" : "TOOL_STARTED",
+    "callId" : "call_01_XlhQJCz6Pwfoe4cOnhxn2895",
+    "iteration" : 2,
+    "tool" : "READ_KNOWLEDGE",
+    "requested" : {
+      "type" : "READ_INPUT",
+      "documentId" : "D03",
+      "version" : "v1",
+      "chunkId" : "clause-1"
+    },
+    "effective" : {
+      "type" : "READ_INPUT",
+      "documentId" : "D03",
+      "version" : "v1",
+      "chunkId" : "clause-1"
+    },
+    "publicPurpose" : "核验差旅报销制度是否另有报销期限规定"
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 12,
+  "timestamp" : 1793516033.268332000,
+  "detail" : {
+    "type" : "TOOL_COMPLETED",
+    "callId" : "call_00_f24QazhcM3Y4khEDvHsq0189",
+    "iteration" : 2,
+    "tool" : "READ_KNOWLEDGE",
+    "outcome" : {
+      "type" : "READ_RESULT",
+      "key" : {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D01",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-1"
+      },
+      "characters" : 31,
+      "contentHash" : "0fa4d47274108f3a7167aa5aa1cf96cf7ecaaed26108bd8e44e9e55dec74ff04"
+    },
+    "deliveryError" : null
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 13,
+  "timestamp" : 1793516033.268354000,
+  "detail" : {
+    "type" : "TOOL_COMPLETED",
+    "callId" : "call_01_XlhQJCz6Pwfoe4cOnhxn2895",
+    "iteration" : 2,
+    "tool" : "READ_KNOWLEDGE",
+    "outcome" : {
+      "type" : "READ_RESULT",
+      "key" : {
+        "document" : {
+          "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+          "documentId" : "D03",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-1"
+      },
+      "characters" : 40,
+      "contentHash" : "c763f864e4d72e7c59766da03414806866b32bbe01dcca8a9f535f3b70862732"
+    },
+    "deliveryError" : null
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 14,
+  "timestamp" : 1793516033.269481000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 3,
+    "phase" : "STARTED",
+    "publicSummary" : "模型根据本次对话及已交付的工具结果选择后续动作。",
+    "error" : null
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 15,
+  "timestamp" : 1793516035.153711000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 3,
+    "phase" : "COMPLETED",
+    "publicSummary" : "模型调用完成；具体动作由后续工具事件或最终任务结果记录。",
+    "error" : null
+  }
+}, {
+  "runId" : "c953d703-729f-4a06-8268-2035b571a2e7",
+  "sequence" : 16,
+  "timestamp" : 1793516035.178804000,
+  "detail" : {
+    "type" : "RUN_FINISHED",
+    "status" : "ANSWERED",
+    "reason" : "EVIDENCE_SUFFICIENT",
+    "budget" : {
+      "reactIterations" : 3,
+      "toolCalls" : 4,
+      "maxReactIterations" : 6,
+      "maxToolCalls" : 12,
+      "elapsedMillis" : 5797,
+      "remainingMillis" : 114202,
+      "readCharacters" : 71,
+      "toolTextCharacters" : 677,
+      "deadlineExceeded" : false,
+      "toolLimitExceeded" : false,
+      "iterationLimitExceeded" : false,
+      "textLimitExceeded" : false
+    },
+    "citations" : [ {
+      "document" : {
+        "snapshotId" : "2815792f-4dbd-47dc-98bd-c54c972d2a6e",
+        "documentId" : "D01",
+        "version" : "v1"
+      },
+      "chunkId" : "clause-1"
+    } ]
+  }
+} ]

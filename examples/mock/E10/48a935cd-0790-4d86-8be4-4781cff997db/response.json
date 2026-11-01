@@ -1,0 +1,38 @@
+{
+  "runId" : "48a935cd-0790-4d86-8be4-4781cff997db",
+  "snapshotId" : "snapshot-1",
+  "status" : "INCOMPLETE",
+  "reason" : "OUTPUT_INVALID",
+  "answer" : "模型草稿无效或引用了生成前尚未观察的原文，无法提供可靠回答。",
+  "citations" : [ ],
+  "evidenceGaps" : [ "模型草稿无效或引用了生成前尚未观察的原文，无法提供可靠回答。" ],
+  "clarifyingQuestion" : null,
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 2,
+    "toolCalls" : 2,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 8,
+    "remainingMillis" : 119991,
+    "readCharacters" : 11,
+    "toolTextCharacters" : 22,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

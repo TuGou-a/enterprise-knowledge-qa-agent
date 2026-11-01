@@ -1,0 +1,54 @@
+{
+  "runId" : "1736e41f-c8e1-4699-84b5-c5f2ee06b5af",
+  "snapshotId" : "3ddd118c-8c15-4b70-a2d2-ae500900f962",
+  "status" : "ANSWERED",
+  "reason" : "EVIDENCE_SUFFICIENT",
+  "answer" : "根据《费用报销制度（合成资料）》第1条，报销申请应在费用发生之日起 30 个自然日内提交。该条为该制度中的一般规定，未区分费用类型；资料中未发现其他相反或例外的期限规定。\n\n需要说明的是：《差旅报销制度（合成资料）》适用于员工因公出差的差旅报销，但该制度中未见关于报销提交期限的专门条款（其第1条仅规定出差前须提交出差申请并经直属主管审批），因此差旅报销的提交期限同样适用上述 30 个自然日的一般规定。若后续另有差旅专项期限规定，应以该专项规定为准。",
+  "citations" : [ {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 报销申请应在费用发生之日起 30 个自然日内提交。",
+    "startOffset" : 14,
+    "endOffset" : 43,
+    "contentHash" : "0fa4d47274108f3a7167aa5aa1cf96cf7ecaaed26108bd8e44e9e55dec74ff04"
+  }, {
+    "documentId" : "D03",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "第1条 员工因公出差，应在出发前提交出差申请，取得直属主管审批后再安排出行。",
+    "startOffset" : 14,
+    "endOffset" : 52,
+    "contentHash" : "c763f864e4d72e7c59766da03414806866b32bbe01dcca8a9f535f3b70862732"
+  } ],
+  "evidenceGaps" : [ ],
+  "clarifyingQuestion" : null,
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 5,
+    "toolCalls" : 4,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 6106,
+    "remainingMillis" : 113893,
+    "readCharacters" : 71,
+    "toolTextCharacters" : 677,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

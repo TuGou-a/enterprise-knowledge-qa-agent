@@ -1,0 +1,34 @@
+{
+  "materialType": "ACTUAL_AUTOMATED_TEST_RUN",
+  "mode": "OFFLINE_QA_MOCK",
+  "commit": "9aaeaea71615664e512fecfbf1f4e169e8264ae0",
+  "workingTreeDirtyAtStart": true,
+  "startedAt": "2026-11-01T06:47:16.231259+00:00",
+  "command": [
+    "mvn",
+    "-Dstyle.color=never",
+    "-Dtest.reports-directory=/Users/mango/Desktop/xykj/Agent/examples/tests/mock/20261101T064716Z-405d95494d7849d9925e7addef4d1f24/reports",
+    "-Devaluation.executionMetadata=examples/tests/mock/20261101T064716Z-405d95494d7849d9925e7addef4d1f24/run.json",
+    "-Dtest=QaOfflineMockTest",
+    "test"
+  ],
+  "status": "FINISHED",
+  "finishedAt": "2026-11-01T06:47:18.342685+00:00",
+  "exitCode": 0,
+  "suites": [
+    {
+      "file": "TEST-com.mango.backend.qa.application.QaOfflineMockTest.xml",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "reportCollectionErrors": [],
+  "testCounts": {
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

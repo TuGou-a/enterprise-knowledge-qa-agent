@@ -1,0 +1,38 @@
+{
+  "runId" : "da8ccae4-667f-46ca-820e-c87a9513ffc6",
+  "snapshotId" : "3ddd118c-8c15-4b70-a2d2-ae500900f962",
+  "status" : "NO_EVIDENCE",
+  "reason" : "OUT_OF_CORPUS",
+  "answer" : "本次资料快照中没有关于股票期权（含兑现价格、行权价格）的任何规定。检索命中的两份制度均为报销类文件：D01《费用报销制度（合成资料）》v1 仅涉及报销期限、凭证与材料补充；D03《差旅报销制度（合成资料）》v1 的适用范围内为“员工因公出差的差旅报销”，仅涉及出差审批、差旅凭证、住宿报销与票据遗失补充。二者均未涉及股权激励、股票期权或行权定价事项，因此无法据本次资料回答该问题。",
+  "citations" : [ ],
+  "evidenceGaps" : [ "本次快照仅包含费用报销制度（D01 v1）与差旅报销制度（D03 v1），无股权激励/股票期权相关制度文件", "缺乏股票期权兑现（行权）价格的定价规则、适用人员范围及时间条件等依据" ],
+  "clarifyingQuestion" : "如需进一步查证，请确认公司是否有独立的股权激励或期权管理办法可供纳入本次资料；并说明您所指的是哪一期期权计划下的行权价格。",
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 3,
+    "toolCalls" : 4,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 6180,
+    "remainingMillis" : 113819,
+    "readCharacters" : 89,
+    "toolTextCharacters" : 695,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}
