@@ -6,13 +6,15 @@
 
 模型服务使用本地确定性 HTTP 桩，不能证明真实硅基流动模型的相关性排序质量、网络延迟、限流或账号可用性。T07 尚未合并，本次没有完整 Agent 工具循环、HTTP 问答或真实 DeepSeek 调用。
 
+后续已把关键行为沉淀为永久 JUnit：`HybridSearchServiceTest`、`KnowledgeEvidenceReaderTest` 和 `T05PostgresIntegrationTest`。集成测试使用 Testcontainers 启动 Docker 中的 `pgvector/pgvector:pg17`，执行正式 schema 并导入 `normal.json`、`conflict.json`；测试尚未运行。
+
 ## 环境
 
 - macOS，Asia/Shanghai
 - Java 21.0.12，Maven 按 `release 17` 编译
 - Maven 3.9.9
 - PostgreSQL 17.11，pgvector 0.8.6
-- 临时数据库监听 `127.0.0.1:55432`
+- 以下历史受控验证使用临时数据库监听 `127.0.0.1:55432`；新增 JUnit 集成测试改用 Docker Testcontainers
 - 受控 Embedding／Rerank HTTP 桩监听 `127.0.0.1:55433`
 
 ## 测试与打包
@@ -58,7 +60,7 @@
 ## 未覆盖与限制
 
 - 没有调用真实硅基流动 Embedding／Rerank 或 DeepSeek，未验证真实语义相关性、限流、网络延迟与账号。
-- 逻辑级和集成级验证程序是本次运行的临时夹具，未加入 `src/test/`；当前 Maven 48 个测试仍不能作为 T05 的永久回归覆盖。
+- 新增 `HybridSearchServiceTest`、`KnowledgeEvidenceReaderTest`、`T05PostgresIntegrationTest` 已写入 `src/test/`；由于项目开发流程要求合并后等待测试指令，本次编码阶段尚未执行这些 JUnit。
 - 未验证多并发请求下的独立召回调度器容量、阻塞 HTTP／JDBC 取消是否立即生效或吞吐上限。
 - 未运行 T07 Agent 工具循环、T08 HTTP 接口、实际回答、引用支持性和 R01–R10 验收。
 - 未完成二元相关条款的人工标注、四种检索方案指标比较或真实模型收益评估。
