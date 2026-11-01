@@ -29,6 +29,8 @@
     <properties>
         <java.version>17</java.version>
         <agentscope.version>2.0.4</agentscope.version>
+        <test.excluded-groups>postgres | real</test.excluded-groups>
+        <test.reports-directory>${project.build.directory}/surefire-reports</test.reports-directory>
     </properties>
     <dependencies>
         <dependency>
@@ -96,6 +98,14 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludedGroups>${test.excluded-groups}</excludedGroups>
+                    <reportsDirectory>${test.reports-directory}</reportsDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <annotationProcessorPaths>
@@ -120,5 +130,20 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>postgres-it</id>
+            <properties>
+                <test.excluded-groups>real</test.excluded-groups>
+            </properties>
+        </profile>
+        <profile>
+            <id>real-evaluation</id>
+            <properties>
+                <test.excluded-groups>postgres</test.excluded-groups>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>

@@ -1,28 +1,33 @@
 {
   "materialType": "UNFILLED_ANNOTATION_TEMPLATE",
-  "annotationStatus": "PENDING_T04_CORPUS",
+  "annotationStatus": "UNFILLED",
+  "annotationSource": "TO_BE_RECORDED",
   "relevanceScale": "BINARY",
+  "corpora": [
+    {
+      "corpusId": "normal",
+      "path": "data/corpus/normal.json",
+      "sourceSha256": "24086f70043ed1b3ebc116c738f5b64405bab332e84deb6ed202d7849501249b",
+      "contentHash": "f6dd50e861105ab38b1bed3d18c62e71322f73b53611e064419361c74c866de7"
+    },
+    {
+      "corpusId": "conflict",
+      "path": "data/corpus/conflict.json",
+      "sourceSha256": "64d03765076add8af893f79ac8a8ef04a92a02ca228759d558d08d6f200f6ac1",
+      "contentHash": "f7f42a3d39c26838b26ac74c241de71631309355cb1a7e37b3705bc447f70d36"
+    },
+    {
+      "corpusId": "mutation",
+      "path": "data/corpus/mutation.json",
+      "sourceSha256": "248c95cb749c86ffaff763e555e38698c0044257c6f7bb70cd072aab43a69595",
+      "contentHash": "437c3055fbad7ed61f2bcb5bf654165df5402a1442b7b22aae115fc14db9b15f"
+    }
+  ],
   "queries": [
     {
-      "queryId": "E01",
-      "snapshotId": null,
-      "query": "报销期限是多久？",
-      "relevantClauses": null,
-      "conflictPairs": null,
-      "expectedAnswer": null
-    },
-    {
-      "queryId": "E02",
-      "snapshotId": null,
-      "query": "报销期限是多久？",
-      "relevantClauses": null,
-      "conflictPairs": null,
-      "expectedAnswer": null
-    },
-    {
-      "queryId": "E04",
-      "snapshotId": null,
-      "query": "费用发生后，最迟多长时间内要提交报销？",
+      "queryId": "NEW_QUERY",
+      "corpusId": "normal",
+      "query": "填写新问题",
       "relevantClauses": null,
       "conflictPairs": null,
       "expectedAnswer": null
