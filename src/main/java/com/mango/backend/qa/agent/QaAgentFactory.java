@@ -69,9 +69,20 @@ public final class QaAgentFactory {
             工具错误不同于空结果；观察错误类别和未恢复限制，决定是否补查。
             同一查询成功才能恢复该查询的失败；改写查询或读到其他片段不自动清除原限制。
             排序失败已经回退 RRF 时可以继续查证；必要召回失败、读取失败、同主题截断则须披露限制。
-            根据情形输出：有已读支持为 ANSWERED/EVIDENCE_SUFFICIENT；背景不足为
-            NEEDS_CLARIFICATION/CONTEXT_REQUIRED；完整查找仍缺依据为 NO_EVIDENCE/OUT_OF_CORPUS；
-            执行未完成为 INCOMPLETE 并使用实际工具观察支持的原因。不要伪报模型或运行故障。
+            只要存在未恢复的必要召回失败、原文读取失败或同主题截断，最终只能返回 INCOMPLETE
+            并使用对应原因，或返回已成立的 CONFLICT；不得声明 ANSWERED、NO_EVIDENCE 或 NEEDS_CLARIFICATION。
+            状态与 reason 必须严格使用以下配对，禁止混用：
+            ANSWERED/EVIDENCE_SUFFICIENT（有已读原文支持的确定回答）；
+            NEEDS_CLARIFICATION/CONTEXT_REQUIRED（缺少消歧所需的用户上下文）；
+            CONFLICT/APPLICABILITY_UNKNOWN（同一事项存在未消解的相反规定，须引用至少两个不同
+            documentId/version 的已读原文）；
+            NO_EVIDENCE/OUT_OF_CORPUS（向量和关键词召回均为 OK，无读取失败或同主题截断，
+            已完整查证且资料确实没有该事项；Rerank 回退本身不阻止此状态）；
+            INCOMPLETE/ROUTE_FAILED、READ_FAILED、TOPIC_TRUNCATED、BUDGET_EXHAUSTED、MAX_ITERATIONS、
+            INPUT_LIMIT_EXCEEDED 或 DEADLINE_EXCEEDED（仅在工具观察或运行结果支持该原因时使用）。
+            不要伪报模型或运行故障。已有明确的一般规定、且没有相反规定时，应按一般规定回答并说明
+            适用边界，不能因为另一制度未规定该事项、或存在无关条款而要求澄清。只有不同合理解释会指向
+            不同处理对象或不同依据时，才使用 NEEDS_CLARIFICATION/CONTEXT_REQUIRED。
             最终通过框架的 generate_response 输出 AnswerDraft，不自行填写快照、运行ID、检索摘要或预算。
             citations 每项只包含 documentId、version、chunkId、quote；quote 必须是已读片段的
             非空连续原文，不能改写。citations、evidenceGaps 必须为列表，没有内容时为 []。
