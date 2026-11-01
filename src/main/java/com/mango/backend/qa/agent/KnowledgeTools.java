@@ -18,6 +18,8 @@ import io.agentscope.core.util.JsonUtils;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
@@ -119,7 +121,7 @@ public final class KnowledgeTools {
                 return ToolResultBlock.error(JsonUtils.getJsonCodec().toJson(failure));
             }
             state.outcome(id, outcome, null);
-            return ToolResultBlock.text(JsonUtils.getJsonCodec().toJson(result));
+            return ToolResultBlock.text(JsonUtils.getJsonCodec().toJson(SearchToolResult.from(result)));
         } catch (DependencyException error) {
             state.failSearch();
             return reject(id, error.failure());
@@ -151,7 +153,7 @@ public final class KnowledgeTools {
             if (result.status() == ReadStatus.ERROR) { return reject(id, result.error()); }
             var chunk = result.evidence().chunk();
             state.outcome(id, new ReadOutcome(chunk.key(), chunk.content().length(), chunk.contentHash()), null);
-            return ToolResultBlock.text(JsonUtils.getJsonCodec().toJson(result));
+            return ToolResultBlock.text(JsonUtils.getJsonCodec().toJson(ReadToolResult.from(result.evidence())));
         } catch (DependencyException error) {
             var key = new ChunkKey(new DocumentKey(context.snapshot().snapshotId(), documentId, version), chunkId);
             context.retrieval().recordRead(new ReadProblem(key, error.failure()));
@@ -169,5 +171,50 @@ public final class KnowledgeTools {
     private ToolResultBlock reject(String id, Failure failure) {
         state.outcome(id, new ToolError(failure), null);
         return ToolResultBlock.error(JsonUtils.getJsonCodec().toJson(failure));
+    }
+
+    record SearchToolResult(String query, int topK, List<SearchToolCandidate> primary,
+                            List<SearchToolCandidate> related, Routes routes, RankingMode rankingMode,
+                            List<Failure> rankingWarnings, List<SearchToolProblem> unresolvedErrors,
+                            boolean degraded, boolean truncated) {
+        static SearchToolResult from(SearchResult result) {
+            return new SearchToolResult(result.scope().query(), result.scope().topK(),
+                    result.primaryCandidates().stream()
+                            .map(candidate -> SearchToolCandidate.from(candidate.source())).toList(),
+                    result.relatedCandidates().stream()
+                            .map(candidate -> SearchToolCandidate.from(candidate.source())).toList(),
+                    result.routes(), result.rankingMode(), result.rankingWarnings(),
+                    result.unresolvedErrors().stream().map(SearchToolProblem::from).toList(),
+                    result.degraded(), result.truncated());
+        }
+    }
+
+    record SearchToolProblem(RecallRoute route, Failure failure) {
+        static SearchToolProblem from(RecallProblem problem) {
+            return new SearchToolProblem(problem.route(), problem.failure());
+        }
+    }
+
+    record SearchToolCandidate(String documentId, String version, String chunkId, String title,
+                               LocalDate versionDate, String applicableScope, String topicKey,
+                               String preview) {
+        static SearchToolCandidate from(ChunkPreview candidate) {
+            return new SearchToolCandidate(candidate.key().document().documentId(),
+                    candidate.key().document().version(), candidate.key().chunkId(), candidate.title(),
+                    candidate.versionDate(), candidate.applicableScope(), candidate.topicKey(),
+                    candidate.preview());
+        }
+    }
+
+    record ReadToolResult(String documentId, String version, String chunkId, String title,
+                          LocalDate versionDate, String applicableScope, List<DocumentRef> supersedes,
+                          String content) {
+        static ReadToolResult from(ReadEvidence evidence) {
+            var document = evidence.document();
+            var chunk = evidence.chunk();
+            return new ReadToolResult(document.key().documentId(), document.key().version(),
+                    chunk.key().chunkId(), document.title(), document.versionDate(),
+                    document.applicableScope(), document.supersedes(), chunk.content());
+        }
     }
 }

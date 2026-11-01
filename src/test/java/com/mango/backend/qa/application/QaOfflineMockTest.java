@@ -97,6 +97,13 @@ class QaOfflineMockTest {
                         assertThat(citation.quote()).isEqualTo("30 天"));
                 assertThat(model.inputs.get(2).stream().flatMap(message -> message.getContent().stream()))
                         .anyMatch(block -> block instanceof ToolResultBlock result && result.getId().equals("read-1"));
+                var toolPayloads = collectToolPayloads(model.inputs);
+                assertThat(toolPayloads).anySatisfy(payload -> assertThat(payload)
+                        .contains("\"primary\"", "\"documentId\"", "\"preview\"")
+                        .doesNotContain("rrfScore", "rerankInputKeys", "snapshotId", "topicGroups"));
+                assertThat(toolPayloads).anySatisfy(payload -> assertThat(payload)
+                        .contains("\"content\"", "\"supersedes\"")
+                        .doesNotContain("contentHash", "startOffset", "endOffset"));
             }
             case CONFLICT -> {
                 assertThat(answer.status()).isEqualTo(TaskStatus.CONFLICT);
@@ -110,6 +117,9 @@ class QaOfflineMockTest {
                 assertThat(answer.retrieval().unresolvedErrors()).isEmpty();
                 assertThat(answer.retrieval().degraded()).isTrue();
                 assertThat(searches.get()).isEqualTo(2);
+                assertThat(collectToolPayloads(model.inputs)).anySatisfy(payload -> assertThat(payload)
+                        .contains("\"unresolvedErrors\"", "\"VECTOR\"", "\"TIMEOUT\"")
+                        .doesNotContain("snapshotId", "\"scope\""));
             }
             case UNOBSERVED -> {
                 assertThat(answer.reason()).isEqualTo(AnswerReason.OUTPUT_INVALID);
@@ -133,6 +143,25 @@ class QaOfflineMockTest {
         assertThat(events.get(0).detail()).isInstanceOf(TraceEvent.Started.class);
         assertThat(events.get(events.size() - 1).detail()).isInstanceOf(TraceEvent.Finished.class);
         assertThat(events).allSatisfy(event -> assertThat(event.runId()).isEqualTo(answer.runId()));
+        if (scenario != Scenario.MODEL_FAILURE) {
+            assertThat(collectToolPayloads(model.inputs)).isNotEmpty().allSatisfy(payload -> assertThat(payload)
+                    .doesNotContain("vectorRank", "keywordRank", "rrfScore", "rerankScore", "origin",
+                            "\"scope\"", "topicGroups", "metrics", "rerankMillis", "rerankInputKeys",
+                            "rerankResponseId", "rerankUsage",
+                            "snapshotId", "contentHash", "startOffset", "endOffset"));
+        }
+    }
+
+    private static List<String> collectToolPayloads(List<List<Msg>> inputs) {
+        return inputs.stream().flatMap(List::stream)
+                .flatMap(message -> message.getContent().stream())
+                .filter(ToolResultBlock.class::isInstance)
+                .map(ToolResultBlock.class::cast)
+                .flatMap(result -> result.getOutput().stream())
+                .filter(TextBlock.class::isInstance)
+                .map(TextBlock.class::cast)
+                .map(TextBlock::getText)
+                .toList();
     }
 
     private static AgentProperties properties(Scenario scenario) {
