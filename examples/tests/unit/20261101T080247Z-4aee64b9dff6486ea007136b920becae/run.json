@@ -1,0 +1,152 @@
+{
+  "materialType": "ACTUAL_AUTOMATED_TEST_RUN",
+  "mode": "ISOLATED_UNIT",
+  "commit": "8d83e6be7802a5e35e0487ff48b8e79270796edb",
+  "workingTreeDirtyAtStart": false,
+  "startedAt": "2026-11-01T08:02:47.670067+00:00",
+  "command": [
+    "mvn",
+    "-Dstyle.color=never",
+    "-Dtest.reports-directory=/Users/mango/Desktop/xykj/Agent/examples/tests/unit/20261101T080247Z-4aee64b9dff6486ea007136b920becae/reports",
+    "-Devaluation.executionMetadata=examples/tests/unit/20261101T080247Z-4aee64b9dff6486ea007136b920becae/run.json",
+    "test"
+  ],
+  "status": "FAILED",
+  "finishedAt": "2026-11-01T08:03:13.883645+00:00",
+  "exitCode": 1,
+  "suites": [
+    {
+      "file": "TEST-com.mango.backend.contract.ConfigurationContractTest.xml",
+      "tests": 20,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.contract.DenseVectorContractTest.xml",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.contract.KnowledgeOrderingContractTest.xml",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.contract.ReadResultContractTest.xml",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.contract.WireContractTest.xml",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.evaluation.AnswerValidationTest.xml",
+      "tests": 16,
+      "failures": 0,
+      "errors": 16,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.evaluation.RetrievalEvaluationTest.xml",
+      "tests": 7,
+      "failures": 0,
+      "errors": 1,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.infra.model.SiliconFlowInterruptionTest.xml",
+      "tests": 4,
+      "failures": 0,
+      "errors": 4,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.infra.model.SiliconFlowProtocolTest.xml",
+      "tests": 30,
+      "failures": 0,
+      "errors": 30,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.infra.pg.PgKnowledgeStoreBoundaryTest.xml",
+      "tests": 2,
+      "failures": 0,
+      "errors": 2,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.knowledge.evidence.KnowledgeEvidenceReaderTest.xml",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.knowledge.ingest.CorpusIngestionTest.xml",
+      "tests": 20,
+      "failures": 0,
+      "errors": 16,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.knowledge.search.HybridSearchServiceTest.xml",
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.qa.api.QaHttpTest.xml",
+      "tests": 38,
+      "failures": 0,
+      "errors": 38,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.qa.application.AgentQaServiceBoundaryTest.xml",
+      "tests": 2,
+      "failures": 0,
+      "errors": 2,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.qa.application.FaultInjectionTest.xml",
+      "tests": 2,
+      "failures": 0,
+      "errors": 2,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.qa.application.QaOfflineMockTest.xml",
+      "tests": 9,
+      "failures": 0,
+      "errors": 9,
+      "skipped": 0
+    },
+    {
+      "file": "TEST-com.mango.backend.qa.application.RequestStateTest.xml",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "reportCollectionErrors": [],
+  "testCounts": {
+    "tests": 190,
+    "failures": 0,
+    "errors": 120,
+    "skipped": 0
+  }
+}

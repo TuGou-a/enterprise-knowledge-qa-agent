@@ -1,0 +1,309 @@
+[ {
+  "runId" : "0eb2c3c2-0b7f-4a1d-8c1d-386d2c5881cb",
+  "sequence" : 1,
+  "timestamp" : 1793520209.332572000,
+  "detail" : {
+    "type" : "RUN_STARTED",
+    "snapshotId" : "snapshot-1",
+    "frameworkVersion" : "2.0.4",
+    "model" : "deterministic-test",
+    "indexProfile" : {
+      "embeddingModel" : "BAAI/bge-m3",
+      "embeddingDimension" : 1024,
+      "preprocessingVersion" : "source-preserving-v1",
+      "tokenizerVersion" : "jieba-analysis-1.0.2",
+      "dictionaryVersion" : "builtin-v1",
+      "stopWordsVersion" : "none-v1"
+    },
+    "rerankModel" : "BAAI/bge-reranker-v2-m3",
+    "routeLimit" : 20,
+    "candidatePoolLimit" : 20,
+    "primaryLimit" : 6,
+    "relatedLimit" : 12,
+    "rrfK" : 60
+  }
+}, {
+  "runId" : "0eb2c3c2-0b7f-4a1d-8c1d-386d2c5881cb",
+  "sequence" : 2,
+  "timestamp" : 1793520209.335652000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 1,
+    "phase" : "STARTED",
+    "publicSummary" : "模型根据本次对话及已交付的工具结果选择后续动作。",
+    "error" : null
+  }
+}, {
+  "runId" : "0eb2c3c2-0b7f-4a1d-8c1d-386d2c5881cb",
+  "sequence" : 3,
+  "timestamp" : 1793520209.335828000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 1,
+    "phase" : "COMPLETED",
+    "publicSummary" : "模型调用完成；具体动作由后续工具事件或最终任务结果记录。",
+    "error" : null
+  }
+}, {
+  "runId" : "0eb2c3c2-0b7f-4a1d-8c1d-386d2c5881cb",
+  "sequence" : 4,
+  "timestamp" : 1793520209.336254000,
+  "detail" : {
+    "type" : "TOOL_STARTED",
+    "callId" : "search-0",
+    "iteration" : 1,
+    "tool" : "SEARCH_KNOWLEDGE",
+    "requested" : {
+      "type" : "SEARCH_INPUT",
+      "query" : "报销期限",
+      "topK" : 6
+    },
+    "effective" : {
+      "type" : "SEARCH_INPUT",
+      "query" : "报销期限",
+      "topK" : 6
+    },
+    "publicPurpose" : "查找期限原文"
+  }
+}, {
+  "runId" : "0eb2c3c2-0b7f-4a1d-8c1d-386d2c5881cb",
+  "sequence" : 5,
+  "timestamp" : 1793520209.336429000,
+  "detail" : {
+    "type" : "TOOL_COMPLETED",
+    "callId" : "search-0",
+    "iteration" : 1,
+    "tool" : "SEARCH_KNOWLEDGE",
+    "outcome" : {
+      "type" : "SEARCH_RESULT",
+      "scope" : {
+        "snapshotId" : "snapshot-1",
+        "query" : "报销期限",
+        "topK" : 6
+      },
+      "primary" : [ {
+        "document" : {
+          "snapshotId" : "snapshot-1",
+          "documentId" : "D01",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-1"
+      } ],
+      "related" : [ ],
+      "routes" : {
+        "vector" : "OK",
+        "keyword" : "OK",
+        "rerank" : "OK"
+      },
+      "rankingMode" : "RERANK",
+      "rankingWarnings" : [ ],
+      "unresolvedErrors" : [ ],
+      "truncated" : false,
+      "metrics" : {
+        "vectorCount" : 1,
+        "keywordCount" : 1,
+        "uniqueCount" : 1,
+        "rerankInputCount" : 1,
+        "primaryCount" : 1,
+        "relatedCount" : 0,
+        "rerankMillis" : 0,
+        "rerankResponseId" : "mock",
+        "rerankUsage" : null,
+        "rerankInputKeys" : [ {
+          "document" : {
+            "snapshotId" : "snapshot-1",
+            "documentId" : "D01",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-1"
+        } ]
+      }
+    },
+    "deliveryError" : null
+  }
+}, {
+  "runId" : "0eb2c3c2-0b7f-4a1d-8c1d-386d2c5881cb",
+  "sequence" : 6,
+  "timestamp" : 1793520209.336701000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 2,
+    "phase" : "STARTED",
+    "publicSummary" : "模型根据本次对话及已交付的工具结果选择后续动作。",
+    "error" : null
+  }
+}, {
+  "runId" : "0eb2c3c2-0b7f-4a1d-8c1d-386d2c5881cb",
+  "sequence" : 7,
+  "timestamp" : 1793520209.336831000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 2,
+    "phase" : "COMPLETED",
+    "publicSummary" : "模型调用完成；具体动作由后续工具事件或最终任务结果记录。",
+    "error" : null
+  }
+}, {
+  "runId" : "0eb2c3c2-0b7f-4a1d-8c1d-386d2c5881cb",
+  "sequence" : 8,
+  "timestamp" : 1793520209.337181000,
+  "detail" : {
+    "type" : "TOOL_STARTED",
+    "callId" : "search-1",
+    "iteration" : 2,
+    "tool" : "SEARCH_KNOWLEDGE",
+    "requested" : {
+      "type" : "SEARCH_INPUT",
+      "query" : "报销期限",
+      "topK" : 6
+    },
+    "effective" : {
+      "type" : "SEARCH_INPUT",
+      "query" : "报销期限",
+      "topK" : 6
+    },
+    "publicPurpose" : "查找期限原文"
+  }
+}, {
+  "runId" : "0eb2c3c2-0b7f-4a1d-8c1d-386d2c5881cb",
+  "sequence" : 9,
+  "timestamp" : 1793520209.337329000,
+  "detail" : {
+    "type" : "TOOL_COMPLETED",
+    "callId" : "search-1",
+    "iteration" : 2,
+    "tool" : "SEARCH_KNOWLEDGE",
+    "outcome" : {
+      "type" : "SEARCH_RESULT",
+      "scope" : {
+        "snapshotId" : "snapshot-1",
+        "query" : "报销期限",
+        "topK" : 6
+      },
+      "primary" : [ {
+        "document" : {
+          "snapshotId" : "snapshot-1",
+          "documentId" : "D01",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-1"
+      } ],
+      "related" : [ ],
+      "routes" : {
+        "vector" : "OK",
+        "keyword" : "OK",
+        "rerank" : "OK"
+      },
+      "rankingMode" : "RERANK",
+      "rankingWarnings" : [ ],
+      "unresolvedErrors" : [ ],
+      "truncated" : false,
+      "metrics" : {
+        "vectorCount" : 1,
+        "keywordCount" : 1,
+        "uniqueCount" : 1,
+        "rerankInputCount" : 1,
+        "primaryCount" : 1,
+        "relatedCount" : 0,
+        "rerankMillis" : 0,
+        "rerankResponseId" : "mock",
+        "rerankUsage" : null,
+        "rerankInputKeys" : [ {
+          "document" : {
+            "snapshotId" : "snapshot-1",
+            "documentId" : "D01",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-1"
+        } ]
+      }
+    },
+    "deliveryError" : null
+  }
+}, {
+  "runId" : "0eb2c3c2-0b7f-4a1d-8c1d-386d2c5881cb",
+  "sequence" : 10,
+  "timestamp" : 1793520209.337588000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 3,
+    "phase" : "STARTED",
+    "publicSummary" : "模型根据本次对话及已交付的工具结果选择后续动作。",
+    "error" : null
+  }
+}, {
+  "runId" : "0eb2c3c2-0b7f-4a1d-8c1d-386d2c5881cb",
+  "sequence" : 11,
+  "timestamp" : 1793520209.337705000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 3,
+    "phase" : "COMPLETED",
+    "publicSummary" : "模型调用完成；具体动作由后续工具事件或最终任务结果记录。",
+    "error" : null
+  }
+}, {
+  "runId" : "0eb2c3c2-0b7f-4a1d-8c1d-386d2c5881cb",
+  "sequence" : 12,
+  "timestamp" : 1793520209.338004000,
+  "detail" : {
+    "type" : "TOOL_STARTED",
+    "callId" : "search-2",
+    "iteration" : 3,
+    "tool" : "SEARCH_KNOWLEDGE",
+    "requested" : {
+      "type" : "SEARCH_INPUT",
+      "query" : "报销期限",
+      "topK" : 6
+    },
+    "effective" : {
+      "type" : "SEARCH_INPUT",
+      "query" : "报销期限",
+      "topK" : 6
+    },
+    "publicPurpose" : "查找期限原文"
+  }
+}, {
+  "runId" : "0eb2c3c2-0b7f-4a1d-8c1d-386d2c5881cb",
+  "sequence" : 13,
+  "timestamp" : 1793520209.338145000,
+  "detail" : {
+    "type" : "TOOL_COMPLETED",
+    "callId" : "search-2",
+    "iteration" : 3,
+    "tool" : "SEARCH_KNOWLEDGE",
+    "outcome" : {
+      "type" : "TOOL_ERROR",
+      "failure" : {
+        "code" : "BUDGET_EXHAUSTED",
+        "message" : "业务工具调用预算不足。",
+        "retryable" : false
+      }
+    },
+    "deliveryError" : null
+  }
+}, {
+  "runId" : "0eb2c3c2-0b7f-4a1d-8c1d-386d2c5881cb",
+  "sequence" : 14,
+  "timestamp" : 1793520209.339129000,
+  "detail" : {
+    "type" : "RUN_FINISHED",
+    "status" : "INCOMPLETE",
+    "reason" : "BUDGET_EXHAUSTED",
+    "budget" : {
+      "reactIterations" : 3,
+      "toolCalls" : 2,
+      "maxReactIterations" : 6,
+      "maxToolCalls" : 2,
+      "elapsedMillis" : 6,
+      "remainingMillis" : 119993,
+      "readCharacters" : 0,
+      "toolTextCharacters" : 22,
+      "deadlineExceeded" : false,
+      "toolLimitExceeded" : true,
+      "iterationLimitExceeded" : false,
+      "textLimitExceeded" : false
+    },
+    "citations" : [ ]
+  }
+} ]

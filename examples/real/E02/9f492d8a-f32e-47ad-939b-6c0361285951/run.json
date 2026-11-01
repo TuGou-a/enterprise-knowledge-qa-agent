@@ -1,0 +1,31 @@
+{
+  "mode" : "REAL",
+  "recordedAt" : 1793521286.224031000,
+  "commit" : "87c48bba281c2eff043236b180dc36cbf84ed795",
+  "workingTreeDirty" : true,
+  "javaVersion" : "17.0.19",
+  "frameworkVersion" : "2.0.4",
+  "indexProfile" : {
+    "embeddingModel" : "BAAI/bge-m3",
+    "embeddingDimension" : 1024,
+    "preprocessingVersion" : "source-preserving-v1",
+    "tokenizerVersion" : "jieba-analysis-1.0.2",
+    "dictionaryVersion" : "builtin-v1",
+    "stopWordsVersion" : "none-v1"
+  },
+  "model" : "deepseek-chat",
+  "rerankModel" : "BAAI/bge-reranker-v2-m3",
+  "executionMetadataFile" : "examples/tests/qa/20261101T082111Z-203d5e43c1124c83b786741dca087427/run.json",
+  "configuration" : {
+    "embeddingCalls" : "3",
+    "corpusId" : "conflict",
+    "rerankCalls" : "3",
+    "injectedCount" : "0",
+    "model" : "deepseek-chat",
+    "faultMode" : "NONE",
+    "embeddingModel" : "BAAI/bge-m3",
+    "rerankModel" : "BAAI/bge-reranker-v2-m3",
+    "caseId" : "E02",
+    "annotationStatus" : "REFERENCE_REVIEW_PENDING"
+  }
+}

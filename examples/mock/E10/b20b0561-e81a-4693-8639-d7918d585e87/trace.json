@@ -1,0 +1,246 @@
+[ {
+  "runId" : "b20b0561-e81a-4693-8639-d7918d585e87",
+  "sequence" : 1,
+  "timestamp" : 1793520479.626609000,
+  "detail" : {
+    "type" : "RUN_STARTED",
+    "snapshotId" : "snapshot-1",
+    "frameworkVersion" : "2.0.4",
+    "model" : "deterministic-test",
+    "indexProfile" : {
+      "embeddingModel" : "BAAI/bge-m3",
+      "embeddingDimension" : 1024,
+      "preprocessingVersion" : "source-preserving-v1",
+      "tokenizerVersion" : "jieba-analysis-1.0.2",
+      "dictionaryVersion" : "builtin-v1",
+      "stopWordsVersion" : "none-v1"
+    },
+    "rerankModel" : "BAAI/bge-reranker-v2-m3",
+    "routeLimit" : 20,
+    "candidatePoolLimit" : 20,
+    "primaryLimit" : 6,
+    "relatedLimit" : 12,
+    "rrfK" : 60
+  }
+}, {
+  "runId" : "b20b0561-e81a-4693-8639-d7918d585e87",
+  "sequence" : 2,
+  "timestamp" : 1793520479.696032000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 1,
+    "phase" : "STARTED",
+    "publicSummary" : "模型根据本次对话及已交付的工具结果选择后续动作。",
+    "error" : null
+  }
+}, {
+  "runId" : "b20b0561-e81a-4693-8639-d7918d585e87",
+  "sequence" : 3,
+  "timestamp" : 1793520479.698966000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 1,
+    "phase" : "COMPLETED",
+    "publicSummary" : "模型调用完成；具体动作由后续工具事件或最终任务结果记录。",
+    "error" : null
+  }
+}, {
+  "runId" : "b20b0561-e81a-4693-8639-d7918d585e87",
+  "sequence" : 4,
+  "timestamp" : 1793520479.723438000,
+  "detail" : {
+    "type" : "TOOL_STARTED",
+    "callId" : "search-0",
+    "iteration" : 1,
+    "tool" : "SEARCH_KNOWLEDGE",
+    "requested" : {
+      "type" : "SEARCH_INPUT",
+      "query" : "报销期限",
+      "topK" : 6
+    },
+    "effective" : {
+      "type" : "SEARCH_INPUT",
+      "query" : "报销期限",
+      "topK" : 6
+    },
+    "publicPurpose" : "查找期限原文"
+  }
+}, {
+  "runId" : "b20b0561-e81a-4693-8639-d7918d585e87",
+  "sequence" : 5,
+  "timestamp" : 1793520479.727512000,
+  "detail" : {
+    "type" : "TOOL_COMPLETED",
+    "callId" : "search-0",
+    "iteration" : 1,
+    "tool" : "SEARCH_KNOWLEDGE",
+    "outcome" : {
+      "type" : "SEARCH_RESULT",
+      "scope" : {
+        "snapshotId" : "snapshot-1",
+        "query" : "报销期限",
+        "topK" : 6
+      },
+      "primary" : [ {
+        "document" : {
+          "snapshotId" : "snapshot-1",
+          "documentId" : "D01",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-1"
+      } ],
+      "related" : [ ],
+      "routes" : {
+        "vector" : "OK",
+        "keyword" : "OK",
+        "rerank" : "OK"
+      },
+      "rankingMode" : "RERANK",
+      "rankingWarnings" : [ ],
+      "unresolvedErrors" : [ ],
+      "truncated" : false,
+      "metrics" : {
+        "vectorCount" : 1,
+        "keywordCount" : 1,
+        "uniqueCount" : 1,
+        "rerankInputCount" : 1,
+        "primaryCount" : 1,
+        "relatedCount" : 0,
+        "rerankMillis" : 0,
+        "rerankResponseId" : "mock",
+        "rerankUsage" : null,
+        "rerankInputKeys" : [ {
+          "document" : {
+            "snapshotId" : "snapshot-1",
+            "documentId" : "D01",
+            "version" : "v1"
+          },
+          "chunkId" : "clause-1"
+        } ]
+      }
+    },
+    "deliveryError" : null
+  }
+}, {
+  "runId" : "b20b0561-e81a-4693-8639-d7918d585e87",
+  "sequence" : 6,
+  "timestamp" : 1793520479.731243000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 2,
+    "phase" : "STARTED",
+    "publicSummary" : "模型根据本次对话及已交付的工具结果选择后续动作。",
+    "error" : null
+  }
+}, {
+  "runId" : "b20b0561-e81a-4693-8639-d7918d585e87",
+  "sequence" : 7,
+  "timestamp" : 1793520479.731571000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 2,
+    "phase" : "COMPLETED",
+    "publicSummary" : "模型调用完成；具体动作由后续工具事件或最终任务结果记录。",
+    "error" : null
+  }
+}, {
+  "runId" : "b20b0561-e81a-4693-8639-d7918d585e87",
+  "sequence" : 8,
+  "timestamp" : 1793520479.732456000,
+  "detail" : {
+    "type" : "TOOL_STARTED",
+    "callId" : "read-1",
+    "iteration" : 2,
+    "tool" : "READ_KNOWLEDGE",
+    "requested" : {
+      "type" : "READ_INPUT",
+      "documentId" : "D01",
+      "version" : "v1",
+      "chunkId" : "clause-1"
+    },
+    "effective" : {
+      "type" : "READ_INPUT",
+      "documentId" : "D01",
+      "version" : "v1",
+      "chunkId" : "clause-1"
+    },
+    "publicPurpose" : "核对期限原文"
+  }
+}, {
+  "runId" : "b20b0561-e81a-4693-8639-d7918d585e87",
+  "sequence" : 9,
+  "timestamp" : 1793520479.734220000,
+  "detail" : {
+    "type" : "TOOL_COMPLETED",
+    "callId" : "read-1",
+    "iteration" : 2,
+    "tool" : "READ_KNOWLEDGE",
+    "outcome" : {
+      "type" : "READ_RESULT",
+      "key" : {
+        "document" : {
+          "snapshotId" : "snapshot-1",
+          "documentId" : "D01",
+          "version" : "v1"
+        },
+        "chunkId" : "clause-1"
+      },
+      "characters" : 11,
+      "contentHash" : "chunk-hash"
+    },
+    "deliveryError" : null
+  }
+}, {
+  "runId" : "b20b0561-e81a-4693-8639-d7918d585e87",
+  "sequence" : 10,
+  "timestamp" : 1793520479.735834000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 3,
+    "phase" : "STARTED",
+    "publicSummary" : "模型根据本次对话及已交付的工具结果选择后续动作。",
+    "error" : null
+  }
+}, {
+  "runId" : "b20b0561-e81a-4693-8639-d7918d585e87",
+  "sequence" : 11,
+  "timestamp" : 1793520479.736157000,
+  "detail" : {
+    "type" : "MODEL_ROUND",
+    "iteration" : 3,
+    "phase" : "COMPLETED",
+    "publicSummary" : "模型调用完成；具体动作由后续工具事件或最终任务结果记录。",
+    "error" : null
+  }
+}, {
+  "runId" : "b20b0561-e81a-4693-8639-d7918d585e87",
+  "sequence" : 12,
+  "timestamp" : 1793520479.740255000,
+  "detail" : {
+    "type" : "RUN_FINISHED",
+    "status" : "ANSWERED",
+    "reason" : "EVIDENCE_SUFFICIENT",
+    "budget" : {
+      "reactIterations" : 3,
+      "toolCalls" : 2,
+      "maxReactIterations" : 6,
+      "maxToolCalls" : 12,
+      "elapsedMillis" : 121,
+      "remainingMillis" : 119878,
+      "readCharacters" : 11,
+      "toolTextCharacters" : 22,
+      "deadlineExceeded" : false,
+      "toolLimitExceeded" : false,
+      "iterationLimitExceeded" : false,
+      "textLimitExceeded" : false
+    },
+    "citations" : [ {
+      "document" : {
+        "snapshotId" : "snapshot-1",
+        "documentId" : "D01",
+        "version" : "v1"
+      },
+      "chunkId" : "clause-1"
+    } ]
+  }
+} ]

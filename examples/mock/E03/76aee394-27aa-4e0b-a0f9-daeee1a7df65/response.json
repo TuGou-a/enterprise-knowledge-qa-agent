@@ -1,0 +1,38 @@
+{
+  "runId" : "76aee394-27aa-4e0b-a0f9-daeee1a7df65",
+  "snapshotId" : "snapshot-1",
+  "status" : "NO_EVIDENCE",
+  "reason" : "OUT_OF_CORPUS",
+  "answer" : "资料没有相关规定",
+  "citations" : [ ],
+  "evidenceGaps" : [ "缺少相关制度" ],
+  "clarifyingQuestion" : null,
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "SKIPPED_EMPTY"
+    },
+    "rankingMode" : "NONE",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 2,
+    "toolCalls" : 1,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 8,
+    "remainingMillis" : 119991,
+    "readCharacters" : 0,
+    "toolTextCharacters" : 0,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "runId" : "9d3b1711-6ecd-48e1-bc8b-738e9a160392",
+  "snapshotId" : "snapshot-1",
+  "status" : "INCOMPLETE",
+  "reason" : "MAX_ITERATIONS",
+  "answer" : "已达到模型推理轮次上限，尚未完成查证。",
+  "citations" : [ ],
+  "evidenceGaps" : [ "已达到模型推理轮次上限，尚未完成查证。" ],
+  "clarifyingQuestion" : null,
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 3,
+    "toolCalls" : 2,
+    "maxReactIterations" : 2,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 7,
+    "remainingMillis" : 119992,
+    "readCharacters" : 0,
+    "toolTextCharacters" : 22,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : true,
+    "textLimitExceeded" : false
+  }
+}

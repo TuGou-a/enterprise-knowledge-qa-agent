@@ -1,0 +1,54 @@
+{
+  "runId" : "4ebbd777-ab20-4f75-817d-845aa96b08ee",
+  "snapshotId" : "snapshot-1",
+  "status" : "CONFLICT",
+  "reason" : "APPLICABILITY_UNKNOWN",
+  "answer" : "当前已读资料存在未消解的规定冲突，尚不能确定适用哪项规定：\n\n- D01 / v1 / clause-1：「30 天」\n\n- D02 / v1 / clause-1：「15 天」\n\n确认适用关系前，不能选取其中任何一项作为执行依据。",
+  "citations" : [ {
+    "documentId" : "D01",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "30 天",
+    "startOffset" : 6,
+    "endOffset" : 10,
+    "contentHash" : "chunk-hash"
+  }, {
+    "documentId" : "D02",
+    "version" : "v1",
+    "chunkId" : "clause-1",
+    "quote" : "15 天",
+    "startOffset" : 6,
+    "endOffset" : 10,
+    "contentHash" : "chunk-hash"
+  } ],
+  "evidenceGaps" : [ "缺少足以消解上述规定分歧的适用范围、优先级或替代关系依据。" ],
+  "clarifyingQuestion" : "请提供本次事项适用的制度范围、优先级或替代关系说明，或请制度归口部门确认应适用哪份规定。",
+  "retrieval" : {
+    "degraded" : false,
+    "truncated" : false,
+    "routes" : {
+      "vector" : "OK",
+      "keyword" : "OK",
+      "rerank" : "OK"
+    },
+    "rankingMode" : "RERANK",
+    "rankingWarnings" : [ ],
+    "unresolvedErrors" : [ ],
+    "unresolvedReadErrors" : [ ],
+    "truncatedSearches" : [ ]
+  },
+  "budget" : {
+    "reactIterations" : 5,
+    "toolCalls" : 4,
+    "maxReactIterations" : 6,
+    "maxToolCalls" : 12,
+    "elapsedMillis" : 14,
+    "remainingMillis" : 119985,
+    "readCharacters" : 22,
+    "toolTextCharacters" : 66,
+    "deadlineExceeded" : false,
+    "toolLimitExceeded" : false,
+    "iterationLimitExceeded" : false,
+    "textLimitExceeded" : false
+  }
+}
