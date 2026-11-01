@@ -6,8 +6,8 @@ Java 17 真实 E02 运行 `d9e73d43-1121-462a-99ad-f0f5560cb2cf` 返回正确的
 `CONFLICT/APPLICABILITY_UNKNOWN`，并完整引用 D01、D02，但新增验收断言在
 `RealQaEvaluationTest` 第 129 行失败，报告“Expecting actual not to be empty”。
 
-Trace 显示模型读取 D01、D02 后继续读取 D03 `clause-1`，公开目的为“确认差旅报销制度的适用范围”。
-这是读取原文形式的合法补充查证，但断言没有识别。
+Trace 显示模型在同一模型轮次连续发起 D01、D02 和 D03 `clause-1` 的读取，其中 D03 的公开目的为
+“确认差旅报销制度的适用范围”。D03 是读取原文形式的合法补充查证，但断言没有识别。
 
 ## 环境
 
