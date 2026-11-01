@@ -19,6 +19,7 @@ import com.mango.backend.contract.runtime.RunContext;
 import com.mango.backend.infra.pg.KnowledgeMapper;
 import com.mango.backend.knowledge.evidence.KnowledgeEvidenceReader;
 import com.mango.backend.knowledge.ingest.CorpusImporter;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -67,6 +68,8 @@ class T05PostgresIntegrationTest {
                     .withDatabaseName("knowledge_agent")
                     .withUsername("test")
                     .withPassword("test");
+    private static final String ORIGINAL_SOCKS_PROXY_HOST = System.getProperty("socksProxyHost");
+    private static final String ORIGINAL_SOCKS_PROXY_PORT = System.getProperty("socksProxyPort");
 
     @Autowired
     private DataSource dataSource;
@@ -94,6 +97,8 @@ class T05PostgresIntegrationTest {
 
     @DynamicPropertySource
     static void databaseProperties(DynamicPropertyRegistry registry) {
+        // Spring may resolve dynamic properties before Testcontainers starts @Container.
+        POSTGRES.start();
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
@@ -103,10 +108,23 @@ class T05PostgresIntegrationTest {
 
     @BeforeAll
     void createSchema() throws Exception {
+        // Maven may inject a SOCKS proxy that cannot route Testcontainers loopback ports.
+        System.clearProperty("socksProxyHost");
+        System.clearProperty("socksProxyPort");
         try (var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {
             statement.execute(Files.readString(
                     Path.of("src/main/resources/db/V001__knowledge.sql")));
+        }
+    }
+
+    @AfterAll
+    void restoreSocksProxyProperties() {
+        if (ORIGINAL_SOCKS_PROXY_HOST != null) {
+            System.setProperty("socksProxyHost", ORIGINAL_SOCKS_PROXY_HOST);
+        }
+        if (ORIGINAL_SOCKS_PROXY_PORT != null) {
+            System.setProperty("socksProxyPort", ORIGINAL_SOCKS_PROXY_PORT);
         }
     }
 
@@ -222,9 +240,9 @@ class T05PostgresIntegrationTest {
         var normalResult = search.search(new SearchRequest("报销期限", 6),
                 context("normal-run", normal, new RecordingEvidence(), new RecordingLedger()));
         assertThat(java.util.stream.Stream.concat(
-                        normalResult.primaryCandidates().stream(),
-                        normalResult.relatedCandidates().stream())
-                .extracting(candidate -> candidate.source().key().document().documentId()))
+                normalResult.primaryCandidates().stream(),
+                normalResult.relatedCandidates().stream()))
+                .extracting(candidate -> candidate.source().key().document().documentId())
                 .doesNotContain("D02");
 
         var missing = reader.read(new ReadRequest("D02", "v1", "clause-1"),
