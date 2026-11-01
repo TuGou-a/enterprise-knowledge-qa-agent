@@ -84,7 +84,8 @@ public final class QaAgentMiddleware implements MiddlewareBase {
             var execution = ExecutionConfig.builder().timeout(timeout).maxAttempts(1).build();
             var boundedOptions = GenerateOptions.mergeOptions(
                     GenerateOptions.builder().executionConfig(execution).build(), options);
-            return next.apply(new ModelCallInput(input.messages(), input.tools(), boundedOptions, input.model()))
+            return Flux.defer(() -> next.apply(new ModelCallInput(
+                            input.messages(), input.tools(), boundedOptions, input.model())))
                     .takeUntilOther(Mono.delay(timeout).then(Mono.error(
                             new java.util.concurrent.TimeoutException("模型单次总时限已到。"))))
                     .doOnNext(event -> {
