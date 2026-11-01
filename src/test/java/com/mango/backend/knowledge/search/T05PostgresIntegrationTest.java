@@ -162,9 +162,9 @@ class T05PostgresIntegrationTest {
         var normalResult = search.search(new SearchRequest("报销期限", 6),
                 context("normal-run", normal, new RecordingEvidence(), new RecordingLedger()));
         assertThat(java.util.stream.Stream.concat(
-                        normalResult.primaryCandidates().stream(),
-                        normalResult.relatedCandidates().stream())
-                .extracting(candidate -> candidate.source().key().document().documentId()))
+                normalResult.primaryCandidates().stream(),
+                normalResult.relatedCandidates().stream()))
+                .extracting(candidate -> candidate.source().key().document().documentId())
                 .doesNotContain("D02");
 
         var missing = reader.read(new ReadRequest("D02", "v1", "clause-1"),
