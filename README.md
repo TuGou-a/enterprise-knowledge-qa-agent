@@ -2,7 +2,7 @@
 
 面向报销与差旅制度的知识问答项目。通过检索和原文读取工具，帮助员工获得有文档依据的回答；资料冲突或不足时，明确说明限制并请求补充信息。
 
-本轮 T09 以 T01 的配置与共享契约为测试基线，补充契约测试和交付材料。集成时已同步 `dev` 上的 T02 模型客户端、T03 持久化、T04 资料导入、T05 检索读取与 T06 校验/Trace 实现；48 个既有测试已通过，T04／T05 已完成先前受控验证，T05 JUnit 与 Docker PostgreSQL 集成测试已补充。完整问答、离线 Mock、真实模型输出及评估结论仍待完成。其他并行模块的最新状态见开发计划及 Git 历史。
+本轮 T09 以 T01 的配置与共享契约为测试基线，补充契约测试和交付材料。集成时已同步 `dev` 上的 T02 模型客户端、T03 持久化、T04 资料导入、T05 检索读取与 T06 校验/Trace 实现；当前 63 个测试已通过，包含 T05 JUnit 和 Docker PostgreSQL 集成测试。完整问答、离线 Mock、真实模型输出及评估结论仍待完成。其他并行模块的最新状态见开发计划及 Git 历史。
 
 ## 文档入口
 
@@ -23,7 +23,7 @@
 mvn test
 ```
 
-测试覆盖向量合法性、配置约束、读取结果互斥、资料排序、JSON 契约、模型调用中断，以及 T05 的融合、回退、主题扩展和证据读取。`T05PostgresIntegrationTest` 通过 Docker 中的 pgvector 容器验证真实 Mapper、分词、快照隔离和读取。新增 15 个测试尚未运行，不能引用为通过结果。依赖和镜像全部缓存后才可尝试 `-o` 断网执行。当前入口不能证明完整 Mock 问答、真实模型决策或线上检索质量。
+测试覆盖向量合法性、配置约束、读取结果互斥、资料排序、JSON 契约、模型调用中断，以及 T05 的融合、回退、主题扩展和证据读取。`T05PostgresIntegrationTest` 通过 Docker 中的 pgvector 容器验证真实 Mapper、分词、快照隔离和读取。2026 年 11 月 1 日已运行完整测试，63 个用例全部通过，0 失败、0 错误、0 跳过；依赖和镜像缓存后仍可尝试 `-o` 断网执行。当前入口不能证明完整 Mock 问答、真实模型决策或线上检索质量。
 
 评审可先阅读 [需求映射和测试边界](docs/03-evaluation.md)，再检查 `src/test/` 和 `examples/`。T03 数据库初始化、T04 资料导入和 T05 检索读取已有受控运行记录，详见 [T04 运行验证](docs/t04-ingestion-verification.md)与 [T05 运行验证](docs/t05-search-verification.md)。完整问答运行步骤仍待 T07 完成。
 
@@ -108,7 +108,7 @@ AgentScope 默认并行执行同轮工具。首期显式采用 `ToolkitConfig.pa
 
 ## Maven 依赖声明
 
-根目录 [pom.xml](pom.xml) 已声明 AgentScope core/OpenAI 扩展 2.0.4、MyBatis starter 3.0.5、jieba 1.0.2、PostgreSQL 驱动、Reactor、Validation 和 Spring Boot Test；沿用现有 Spring Boot parent。T09 复用已有测试依赖，没有新增依赖或覆盖 BOM。实际依赖树、Java 17 编译和启动结果待后续验证。
+根目录 [pom.xml](pom.xml) 已声明 AgentScope core/OpenAI 扩展 2.0.4、MyBatis starter 3.0.5、jieba 1.0.2、PostgreSQL 驱动、Reactor、Validation 和 Spring Boot Test；沿用现有 Spring Boot parent。T09 复用已有测试依赖，没有新增依赖或覆盖 BOM。Java 17 目标编译和 JAR 打包已通过；成功启动仍受 T07 `QaService` 缺失阻止，依赖树尚未单独记录。
 
 PostgreSQL 驱动版本交由现有 Spring Boot 依赖管理。业务服务通过 MyBatis Mapper 完成持久化；Mapper XML 集中维护参数化 SQL，RRF 与重排序协调在 `HybridSearchService` 中完成。
 
@@ -137,8 +137,8 @@ PostgreSQL 驱动版本交由现有 Spring Boot 依赖管理。业务服务通�
 
 ## 运行与验证状态
 
-新增 T05 JUnit 前已有 48 个测试通过，新增 15 个测试尚未执行；`mvn -DskipTests package` 可生成可执行 JAR。T03 的[手动数据库初始化脚本及说明](src/main/resources/db/README.md)已在 PostgreSQL 17／pgvector 0.8.6 数据库中成功执行；T04 的资料导入及 T05 的两路召回、重排序回退、主题扩展、快照隔离和证据读取已有受控运行记录，详见[T04 运行验证](docs/t04-ingestion-verification.md)与[T05 运行验证](docs/t05-search-verification.md)。真实硅基流动调用、完整问答、HTTP 接口和 Mock 流程仍待后续任务与真实模型验证。
+当前完整测试共 63 个，已全部通过；`mvn -DskipTests package` 可生成可执行 JAR。T03 的[手动数据库初始化脚本及说明](src/main/resources/db/README.md)已在 PostgreSQL 17／pgvector 0.8.6 数据库中成功执行；T04 的资料导入及 T05 的两路召回、重排序回退、主题扩展、快照隔离和证据读取已有受控运行记录，详见[T04 运行验证](docs/t04-ingestion-verification.md)与[T05 运行验证](docs/t05-search-verification.md)。默认 Web 应用仍因缺少 T07 `QaService` Bean 而无法启动；真实硅基流动调用、完整问答、HTTP 接口和 Mock 流程仍待后续任务与真实模型验证。
 
 验收材料至少覆盖明确答案、文档冲突、资料外问题、相似改写、上下文追问和工具失败；另验证执行上限与文档替换。Mock 验证流程，真实模型 Trace 证明动作调整，二者分别标注，结果引用对应文件。
 
-当前 Git 根目录、`pom.xml`、`src/`、README 与 `docs/` 位于同一项目根目录。最终交付仍需补齐完整问答业务、R01–R10 验收证据、T05 JUnit 测试运行结果、真实模型与检索评估及实测结论，记录实际投入时间和未完成项，并提交题号、GitHub URL 与最终 commit SHA；当前不预填。T04／T05 已按独立 Worktree、子代理静态审查、合并后运行验证的流程完成；其他任务仍按相同流程推进。
+当前 Git 根目录、`pom.xml`、`src/`、README 与 `docs/` 位于同一项目根目录。最终交付仍需补齐完整问答业务、R01–R10 验收证据、真实模型与检索评估及实测结论，记录实际投入时间和未完成项，并提交题号、GitHub URL 与最终 commit SHA；当前不预填。T04／T05 已按独立 Worktree、子代理静态审查、合并后运行验证的流程完成；其他任务仍按相同流程推进。

@@ -1,6 +1,6 @@
 # 测试与评估
 
-本文记录 T09 的已确认验收决定、已编写的测试与执行结果。本轮任务基线为 T01 合并提交 `ccdda70497ae1a1f1cd1980d44bcc4d25f644b87`。现有 48 个契约与模型中断测试已通过；T04 和 T05 已分别完成本机临时 PostgreSQL／pgvector 与受控模型服务的导入、检索读取验证，详见 [T04 运行验证](t04-ingestion-verification.md)与 [T05 运行验证](t05-search-verification.md)。默认 Web 应用仍依赖尚未合并的 T07 `QaService`，当前没有实际问答、真实模型 Trace 或完整 HTTP 验收，项目尚未验收。
+本文记录 T09 的已确认验收决定、已编写的测试与执行结果。本轮任务基线为 T01 合并提交 `ccdda70497ae1a1f1cd1980d44bcc4d25f644b87`。2026 年 11 月 1 日已在 `dev` 的 `5ff4dd0` 运行完整测试，63 个用例全部通过，包含此前新增的 15 个 T05 JUnit。T04 和 T05 已分别完成本机 PostgreSQL／pgvector 与受控模型服务的导入、检索读取验证，详见 [T04 运行验证](t04-ingestion-verification.md)与 [T05 运行验证](t05-search-verification.md)。默认 Web 应用仍依赖尚未合并的 T07 `QaService`，当前没有实际问答、真实模型 Trace 或完整 HTTP 验收，项目尚未验收。
 
 ## 已确认的交付边界
 
@@ -18,18 +18,18 @@
 
 | 交付 | 范围 | 完成边界 |
 | --- | --- | --- |
-| 契约测试 | 向量维度与有限值、配置约束及隔离绑定、枚举与角色 JSON、读取结果互斥、UTF-8 资料排序、关键集合不可变性。 | 只引用 T01 已有实现，不创建未来业务实现的空测试或伪测试；当前离线运行共 48 个测试通过。 |
+| 契约测试 | 向量维度与有限值、配置约束及隔离绑定、枚举与角色 JSON、读取结果互斥、UTF-8 资料排序、关键集合不可变性。 | 只引用 T01 已有实现，不创建未来业务实现的空测试或伪测试；当前完整测试共 63 个并通过。 |
 | Maven 入口 | 沿用已有 Spring Boot Test 依赖；纯单元测试与隔离配置绑定测试不扫描真实应用、不创建数据源、不调用云服务。替换现有空的全应用 `contextLoads` 测试。 | 依赖准备后不需要业务密钥和数据库；Maven 首次下载依赖仍可能联网。命令已实际运行。 |
 | 验收材料 | `examples/` 中准备 E01 至 E10 的输入与预期检查，映射 R01 至 R10，并提供标注模板、记录说明与后续产物规范。 | 不生成实际回答、实际 Trace 或通过记录。 |
 | README | 修正「尚未声明依赖」等过时状态，提供本轮测试命令、条件和待验证事项，保留原有选型理由。 | 不把未来 HTTP、导入或完整离线 Mock 命令写成当前可用入口。 |
 | 三份交付文档 | 本文及 AI 使用记录、阶段复盘。 | 已知事实与待完成内容分开；不代填用户个人修改、实际用时或测试成绩。 |
 | 文档对齐 | 同步术语与 T01 对离线入口的旧设想。 | 仅作必要的跨文档说明，不改动生产代码、依赖或配置。 |
 
-后续模块的实现测试、真实 PostgreSQL 检索、至少三组实际输入/输出/Trace、至少两条真实模型决策路径、故障注入、资料替换与四方案检索对比均需后续补齐。当前不能据此宣布 R01 至 R10 已通过。
+后续模块的未覆盖实现测试、至少三组实际输入/输出/Trace、至少两条真实模型决策路径、故障注入、资料替换与四方案检索对比均需后续补齐。真实 PostgreSQL schema、Mapper、分词、召回、排序回退、快照隔离和读取已由本次集成测试覆盖。当前不能据此宣布 R01 至 R10 已通过。
 
 ## 当前可执行测试的范围
 
-测试源码位于 [`src/test/java/com/mango/backend/`](../src/test/java/com/mango/backend/)。以下清单描述断言覆盖；48 个既有测试已通过，新增 15 个 T05 测试尚未执行。
+测试源码位于 [`src/test/java/com/mango/backend/`](../src/test/java/com/mango/backend/)。以下清单描述断言覆盖；48 个既有测试和新增 15 个 T05 测试均已通过。
 
 | 测试类 | 检查内容 | 不能证明的能力 |
 | --- | --- | --- |
@@ -51,6 +51,17 @@ mvn test
 ```
 
 上述入口会执行既有契约／模型测试和 T05 JUnit。T05 的 `T05PostgresIntegrationTest` 需要 Docker；Testcontainers 自动启动 `pgvector/pgvector:pg17`，执行仓库 schema 并导入合成资料，不连接本机临时数据库，也不使用真实模型密钥。若只运行无 Docker 的既有契约测试，可执行 `mvn -Dtest='*ContractTest' test`，但该命令不包含 T05。插件、依赖和镜像首次准备可能需要网络；只有全部缓存后才可尝试断网执行。
+
+### 2026 年 11 月 1 日执行记录
+
+| 检查 | 实际结果 |
+| --- | --- |
+| `mvn test` | 通过，63 个测试，0 失败、0 错误、0 跳过 |
+| T05 PostgreSQL 集成 | 通过，`T05PostgresIntegrationTest` 的 2 个用例在 Docker `pgvector/pgvector:pg17` 中完成 |
+| `mvn -DskipTests package` | 通过，生成可执行 JAR |
+| 可执行 JAR 启动 | 未通过，按当前实现状态停在缺少 T07 `QaService` Bean；不是测试环境问题 |
+
+运行环境为 macOS、Java 21.0.12、Maven 3.9.9 和已启动的 Docker Desktop，项目按 Java 17 编译目标构建。首次执行还发现并修复了以下测试缺陷：AssertJ 断言链错误、Testcontainers 动态属性早于容器启动，以及 Maven/Surefire 测试 JVM 的 SOCKS 代理阻断本地 JDBC。修复均经子代理静态审查后合并，记录见 [Testcontainers 启动时序](pitfalls/T09-testcontainers-startup.md)和 [本地 JDBC SOCKS 代理](pitfalls/T09-local-jdbc-socks-proxy.md)。
 
 ## 需求与后续证据映射
 
@@ -101,12 +112,12 @@ E06 保留真实模型和数据库，只在测试配置中包装 `EmbeddingClien
 | T02 模型客户端 | 请求协议、批序、下标、有限分数及超时/错误映射。 |
 | T03 数据持久化 | 真实 PostgreSQL/pgvector schema、Mapper、事务与快照隔离；不以 H2 代替。 |
 | T04 资料导入 | 原文偏移、哈希、分词一致性和快照发布已完成运行验证；人工检索标注仍待补充。 |
-| T05 检索读取 | 已有单元 JUnit 和 Docker PostgreSQL 集成 JUnit；待用户指令执行。预算边界、错误恢复聚合、多并发和真实模型仍待补齐。 |
+| T05 检索读取 | 单元 JUnit 和 Docker PostgreSQL 集成 JUnit 已通过。预算边界、错误恢复聚合、多并发和真实模型仍待补齐。 |
 | T06 校验与 Trace | 引用和状态机械校验、事件序号、脱敏及不可变快照。 |
 | T07 问答服务 | 请求独立状态、预算/取消、实际循环、Mock 模型与工具替身。 |
 | T08 HTTP | 请求/历史边界校验、状态码、统一响应与实际接口调用。 |
 
-本轮 T09 契约测试已交叉验证 48 个用例通过；T04 与 T05 的实际运行结果分别见 [T04 运行验证](t04-ingestion-verification.md)与 [T05 运行验证](t05-search-verification.md)。T05 JUnit 已加入永久回归，但尚未执行。完整问答、真实模型和 HTTP 接口仍未运行。
+当前完整测试已交叉验证 63 个用例通过；T04 与 T05 的实际运行结果分别见 [T04 运行验证](t04-ingestion-verification.md)与 [T05 运行验证](t05-search-verification.md)。完整问答、真实模型和 HTTP 接口仍未运行。
 
 ### 静态审查记录
 
