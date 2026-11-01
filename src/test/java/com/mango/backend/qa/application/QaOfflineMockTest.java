@@ -35,11 +35,12 @@ import static org.mockito.Mockito.*;
 
 /** 实际 AgentQaService + AgentScope + 真实工具包装／读取／校验，只有模型和资料存储是替身。 */
 class QaOfflineMockTest {
-    enum Scenario { ANSWER, CONFLICT, OUTSIDE, RECOVERY, UNOBSERVED, TOOL_LIMIT, ITERATION_LIMIT, MODEL_FAILURE }
+    enum Scenario { ANSWER, CONFLICT, CONFLICT_ADVICE, OUTSIDE, RECOVERY, UNOBSERVED, TOOL_LIMIT, ITERATION_LIMIT, MODEL_FAILURE }
 
     @ParameterizedTest
     @EnumSource(Scenario.class)
     void runsActualServiceAndFrameworkWithoutKeysOrDatabase(Scenario scenario) throws Exception {
+        boolean conflict = scenario == Scenario.CONFLICT || scenario == Scenario.CONFLICT_ADVICE;
         var properties = properties(scenario);
         var store = mock(KnowledgeStore.class);
         when(store.latestReadySnapshot(any())).thenReturn(Optional.of(T05TestFixtures.readySnapshot("snapshot-1")));
@@ -58,7 +59,7 @@ class QaOfflineMockTest {
             var second = new Candidate(T05TestFixtures.preview("D02", "v1", "clause-1", "报销期限", "报销期限为 15 天。"),
                     2, 2, 0.02, 0.8, CandidateOrigin.PRIMARY);
             var candidates = scenario == Scenario.OUTSIDE ? List.<Candidate>of()
-                    : scenario == Scenario.CONFLICT ? List.of(first, second) : List.of(first);
+                    : conflict ? List.of(first, second) : List.of(first);
             boolean failed = scenario == Scenario.RECOVERY && count == 1;
             var errors = failed ? List.of(new RecallProblem(scope, RecallRoute.VECTOR,
                     new Failure(Failure.Code.TIMEOUT, "固定一次故障", true))) : List.<RecallProblem>of();
@@ -81,7 +82,7 @@ class QaOfflineMockTest {
         assertThat(answer).isNotNull();
         var events = traces.events(answer.runId());
         String caseId = switch (scenario) {
-            case CONFLICT -> "E02";
+            case CONFLICT, CONFLICT_ADVICE -> "E02";
             case OUTSIDE -> "E03";
             case RECOVERY -> "E06";
             case TOOL_LIMIT, ITERATION_LIMIT -> "E07";
@@ -105,11 +106,15 @@ class QaOfflineMockTest {
                         .contains("\"content\"", "\"supersedes\"")
                         .doesNotContain("contentHash", "startOffset", "endOffset"));
             }
-            case CONFLICT -> {
+            case CONFLICT, CONFLICT_ADVICE -> {
                 assertThat(answer.status()).isEqualTo(TaskStatus.CONFLICT);
+                assertThat(answer.reason()).isEqualTo(AnswerReason.APPLICABILITY_UNKNOWN);
                 assertThat(answer.citations()).extracting(AnswerEnvelope.Citation::documentId).containsExactly("D01", "D02");
                 assertThat(searches.get()).isEqualTo(2);
-                assertThat(answer.clarifyingQuestion()).isNotBlank();
+                assertThat(answer.answer()).contains("30 天", "15 天", "不能选取")
+                        .doesNotContain("建议按较严格", "未读制度", "暂按");
+                assertThat(String.join("", answer.evidenceGaps())).doesNotContain("先按 15 天");
+                assertThat(answer.clarifyingQuestion()).contains("制度归口部门").doesNotContain("先按 15 天");
             }
             case OUTSIDE -> assertThat(answer.status()).isEqualTo(TaskStatus.NO_EVIDENCE);
             case RECOVERY -> {
@@ -185,6 +190,7 @@ class QaOfflineMockTest {
 
         @Override
         public Flux<ChatResponse> stream(List<Msg> messages, List<ToolSchema> tools, GenerateOptions options) {
+            boolean conflict = scenario == Scenario.CONFLICT || scenario == Scenario.CONFLICT_ADVICE;
             inputs.add(List.copyOf(messages));
             if (scenario == Scenario.MODEL_FAILURE) return Flux.error(new IllegalStateException("upstream-secret"));
             long observed = messages.stream().flatMap(message -> message.getContent().stream())
@@ -204,19 +210,21 @@ class QaOfflineMockTest {
                         "version", "v1", "chunkId", "clause-1", "purpose", "核对期限原文"));
                 return scenario == Scenario.UNOBSERVED ? response(read, finish(answer())) : response(read);
             }
-            if (scenario == Scenario.CONFLICT && observed == 2) {
+            if (conflict && observed == 2) {
                 return response(new ToolUseBlock("read-2", "readKnowledge", Map.of("documentId", "D02",
                         "version", "v1", "chunkId", "clause-1", "purpose", "核对冲突另一方")));
             }
-            if (scenario == Scenario.CONFLICT && observed == 3) {
+            if (conflict && observed == 3) {
                 return response(new ToolUseBlock("supplement", "searchKnowledge", Map.of("query", "适用范围和替代关系",
                         "topK", 6, "purpose", "查证制度适用关系")));
             }
-            return response(finish(scenario == Scenario.CONFLICT
-                    ? new AnswerDraft(TaskStatus.CONFLICT, AnswerReason.APPLICABILITY_UNKNOWN, "30 天与 15 天冲突",
+            return response(finish(conflict
+                    ? new AnswerDraft(TaskStatus.CONFLICT, AnswerReason.APPLICABILITY_UNKNOWN,
+                    scenario == Scenario.CONFLICT_ADVICE ? "建议按较严格的 15 天执行。未读制度也没有期限。" : "30 天与 15 天冲突",
                     List.of(new AnswerDraft.CitationDraft("D01", "v1", "clause-1", "30 天"),
                             new AnswerDraft.CitationDraft("D02", "v1", "clause-1", "15 天")),
-                    List.of("适用范围未知"), "应适用哪份制度？") : answer()));
+                    scenario == Scenario.CONFLICT_ADVICE ? List.of("先按 15 天") : List.of("适用范围未知"),
+                    scenario == Scenario.CONFLICT_ADVICE ? "是否先按 15 天？" : "应适用哪份制度？") : answer()));
         }
 
         private static AnswerDraft answer() {
