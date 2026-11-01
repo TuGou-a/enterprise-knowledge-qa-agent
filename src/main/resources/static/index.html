@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="企业报销与差旅制度问答助手，检索制度原文，查看回答依据。">
+  <meta name="theme-color" content="#153f36">
+  <title>制度问答 · 企业知识助手</title>
+  <link rel="stylesheet" href="./app.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="icon-book" viewBox="0 0 24 24"><path d="M12 5.5C9 3.5 5.5 3.5 3 4.5v15c3-1 6-1 9 1 3-2 6-2 9-1v-15c-2.5-1-6-1-9 1Zm0 0v15"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="icon-chat" viewBox="0 0 24 24"><path d="M20 15a3 3 0 0 1-3 3H8l-5 3V6a3 3 0 0 1 3-3h11a3 3 0 0 1 3 3Z"/><path d="M7 8h9M7 12h6"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6"/></symbol>
+    <symbol id="icon-receipt" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3ZM9 7h6M9 11h6M9 15h3"/></symbol>
+    <symbol id="icon-case" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V3h8v4M3 12c6 3 12 3 18 0M12 12v4"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m8 12 3 3 5-6M12 3l8 3v6c0 5-8 9-8 9s-8-4-8-9V6Z"/></symbol>
+    <symbol id="icon-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v.5"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  </svg>
+
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="工作区">
+      <a class="brand" href="./" aria-label="企业知识助手首页">
+        <span class="brand-icon"><svg class="icon"><use href="#icon-book"/></svg></span>
+        <span>企业知识助手<small>KNOWLEDGE AGENT</small></span>
+      </a>
+      <button class="new-chat" id="new-chat" type="button"><svg class="icon"><use href="#icon-plus"/></svg>新建对话<span class="shortcut">＋</span></button>
+      <div class="nav-label">工作台</div>
+      <div class="nav-current" aria-current="page"><svg class="icon"><use href="#icon-chat"/></svg>制度问答<span class="active-dot"></span></div>
+      <div class="scope-card">
+        <span class="scope-label">当前知识范围</span>
+        <h2>报销与差旅制度</h2>
+        <p>从制度原文中查找依据，帮助理解适用条件与办理要求。</p>
+        <div class="scope-tags"><span>费用报销</span><span>出差管理</span></div>
+      </div>
+      <div class="sidebar-footer"><span class="avatar">企</span><div>企业知识问答<small>让每个回答都有据可查</small></div></div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div class="breadcrumb"><span>工作台</span><svg class="icon"><use href="#icon-chevron"/></svg><strong>制度问答</strong></div>
+        <span class="source-label"><svg class="icon"><use href="#icon-book"/></svg>基于知识库回答</span>
+      </header>
+
+      <div class="scroll-area" id="scroll-area">
+        <section class="welcome" id="welcome" aria-labelledby="welcome-title">
+          <div class="eyebrow"><span></span>你的制度查询助手</div>
+          <h1 id="welcome-title">制度有疑问，<br>从这里找到<span>依据。</span></h1>
+          <p class="intro">关于报销、差旅和办理要求，直接提问。<br>助手会查阅知识库，整理回答并附上原文引用。</p>
+          <div class="suggestions" aria-label="示例问题">
+            <button class="suggestion" type="button" data-question="出差回来后，报销需要在多久内提交？">
+              <span class="suggestion-icon"><svg class="icon"><use href="#icon-receipt"/></svg></span><span class="suggestion-topic">费用报销</span><span class="suggestion-question">出差后，多久内需要提交报销？</span><span class="suggestion-link">询问报销期限 <span aria-hidden="true">↗</span></span>
+            </button>
+            <button class="suggestion" type="button" data-question="出差期间的差旅补贴标准是什么？">
+              <span class="suggestion-icon"><svg class="icon"><use href="#icon-case"/></svg></span><span class="suggestion-topic">差旅管理</span><span class="suggestion-question">出差期间的补贴标准是什么？</span><span class="suggestion-link">了解差旅补贴 <span aria-hidden="true">↗</span></span>
+            </button>
+            <button class="suggestion" type="button" data-question="费用报销需要准备哪些票据和材料？">
+              <span class="suggestion-icon"><svg class="icon"><use href="#icon-check"/></svg></span><span class="suggestion-topic">办理材料</span><span class="suggestion-question">报销前，需要准备哪些材料？</span><span class="suggestion-link">查看材料要求 <span aria-hidden="true">↗</span></span>
+            </button>
+          </div>
+          <div class="welcome-note"><svg class="icon"><use href="#icon-info"/></svg>资料不足时会说明限制；需要更多背景时会继续追问。</div>
+        </section>
+
+        <section class="conversation" id="conversation" aria-label="当前对话" hidden>
+          <div class="conversation-heading"><h1>制度问答</h1><span id="turn-count">当前对话</span></div>
+          <div id="messages" role="log" aria-label="问答消息" aria-live="polite" aria-relevant="additions text"></div>
+        </section>
+      </div>
+
+      <div class="composer-area">
+        <div class="composer-wrap">
+          <p class="error-notice" id="error-notice" role="alert" hidden></p>
+          <form class="composer" id="question-form" aria-label="发送问题">
+            <label class="sr-only" for="question">请输入报销或差旅制度问题</label>
+            <textarea id="question" name="question" rows="2" maxlength="2000" placeholder="输入你的问题，例如：出差报销需要准备什么？" required aria-describedby="input-hint character-count"></textarea>
+            <div class="composer-toolbar"><span id="input-hint">Enter 发送<span class="desktop-hint"> · Shift + Enter 换行</span></span><div class="composer-actions"><span id="character-count">0 / 2000</span><button class="send-button" id="send-button" type="submit" disabled><span id="send-label">发送问题</span><svg class="icon"><use href="#icon-arrow"/></svg></button></div></div>
+          </form>
+          <p class="disclaimer">回答依据当前知识库资料，请结合原文与实际适用条件核对。对话仅保留在当前页面，刷新后清空。</p>
+        </div>
+      </div>
+      <noscript><p class="noscript-notice">请启用 JavaScript，以使用问答功能。</p></noscript>
+    </main>
+  </div>
+</body>
+</html>
