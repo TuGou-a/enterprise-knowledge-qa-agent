@@ -13,16 +13,36 @@ import xml.etree.ElementTree as ET
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("unit", "postgres"))
+    parser.add_argument("mode", choices=("unit", "postgres", "mock", "qa", "retrieval"))
+    parser.add_argument("--case", choices=("E01", "E02", "E03", "E04", "E05", "E06", "E08", "E09"))
+    parser.add_argument("--snapshot", help="问答用例要求的当前最新 READY 快照")
+    parser.add_argument("--corpus", choices=("normal", "mutation"), help="E08 本次资料")
+    parser.add_argument("--snapshots", help="检索评估 normal=<id>,conflict=<id>,mutation=<id>")
     args = parser.parse_args()
+    if args.mode == "qa" and (args.case is None or not args.snapshot):
+        parser.error("qa 需要 --case 和 --snapshot")
+    if args.mode == "retrieval" and not args.snapshots:
+        parser.error("retrieval 需要 --snapshots")
     root = Path(__file__).resolve().parents[1]
     started = datetime.now(timezone.utc)
     run_id = started.strftime("%Y%m%dT%H%M%SZ") + "-" + uuid.uuid4().hex
     output = root / "examples" / "tests" / args.mode / run_id
     reports = output / "reports"
-    command = ["mvn", "-Dstyle.color=never", "-Dtest.reports-directory=" + str(reports)]
+    metadata_path = (output / "run.json").relative_to(root).as_posix()
+    command = ["mvn", "-Dstyle.color=never", "-Dtest.reports-directory=" + str(reports),
+               "-Devaluation.executionMetadata=" + metadata_path]
     if args.mode == "postgres":
         command.append("-Ppostgres-it")
+    elif args.mode == "mock":
+        command.append("-Dtest=QaOfflineMockTest")
+    elif args.mode == "qa":
+        command.extend(["-Preal-evaluation", "-Dtest=RealQaEvaluationTest",
+                        "-Devaluation.case=" + args.case, "-Devaluation.snapshot=" + args.snapshot])
+        if args.corpus:
+            command.append("-Devaluation.corpus=" + args.corpus)
+    elif args.mode == "retrieval":
+        command.extend(["-Preal-evaluation", "-Dtest=RealRetrievalEvaluationTest",
+                        "-Devaluation.snapshots=" + args.snapshots])
     command.append("test")
     commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, check=True,
                             capture_output=True, text=True).stdout.strip()
@@ -31,7 +51,8 @@ def main():
     reports.mkdir(parents=True)
     metadata = {
         "materialType": "ACTUAL_AUTOMATED_TEST_RUN",
-        "mode": "ISOLATED_UNIT" if args.mode == "unit" else "POSTGRES_WITH_MODEL_STUBS",
+        "mode": {"unit": "ISOLATED_UNIT", "postgres": "POSTGRES_WITH_MODEL_STUBS",
+                 "mock": "OFFLINE_QA_MOCK", "qa": "REAL_QA", "retrieval": "REAL_RETRIEVAL"}[args.mode],
         "commit": commit,
         "workingTreeDirtyAtStart": dirty,
         "startedAt": started.isoformat(),

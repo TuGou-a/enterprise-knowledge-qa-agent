@@ -32,9 +32,12 @@ curl --fail-with-body -sS http://localhost:8080/api/qa \
 ```bash
 python3 scripts/run-tests.py unit
 python3 scripts/run-tests.py postgres
+python3 scripts/run-tests.py mock
+python3 scripts/run-tests.py qa --case E01 --snapshot '<当前最新normal快照ID>'
+python3 scripts/run-tests.py retrieval --snapshots 'normal=<id>,conflict=<id>,mutation=<id>'
 ```
 
-需要 Python 3、Java 和 Maven；`postgres` 另需 Docker 与 pgvector 镜像。输出位于从项目根目录计算的 `examples/tests/<mode>/<runId>/`，包含 `run.json`、`console.log` 和本次独立的 `reports/`。unit 是隔离单元测试，postgres 是真实数据库加模型替身；均不冒充完整问答 Mock 或真实模型验收。
+需要 Python 3、Java 和 Maven；`postgres` 另需 Docker 与 pgvector 镜像，`qa`／`retrieval` 需要实际资料与模型环境。输出位于从项目根目录计算的 `examples/tests/<mode>/<runId>/`，包含 `run.json`、`console.log` 和本次独立的 `reports/`。unit 为隔离回归，postgres 为真实数据库加模型替身，mock 为实际问答服务加确定性替身，qa／retrieval 才会调用各自所需的真实模型。
 
 每次记录实际命令、commit、运行开始前的未提交状态、时间、Maven 退出码和报告计数。没有报告时数量为 `null`，启动失败、中断或报告解析失败需保留；不复制历史报告制造本次成绩。这些目录只由实际运行生成，当前没有预填。
 
@@ -52,6 +55,6 @@ python3 scripts/run-tests.py postgres
 
 真实入口支持 E01/E02/E03/E04/E05/E06/E08/E09，E02 使用最新 conflict，其他普通用例使用 normal。E08 分别在 normal、mutation 发布后运行，设置 `evaluation.corpus` 和实际快照。E06/E09 的测试配置只在对应客户端首次调用注入一次 TIMEOUT，并记录实际注入次数，后续调用委托真实客户端。此入口直接调用实际服务，不代替 HTTP 端到端验证。
 
-`run.md` 记录时间、实际 commit、命令、Java／框架／模型版本、资料快照与索引配置、前置条件、结束状态、失败或限制、人工核对者及意见。输入、输出与 Trace 必须属于同次运行。真实模型与 PostgreSQL 加故障注入的用例仍放在 `real/`，注明 `REAL_WITH_INJECTED_FAULT`、注入点和次数。
+`run.json` 显式记录实际索引配置、模型版本、commit、工作树状态和执行前提；`run.md` 记录时间、Java／框架、快照及终态，并链接元数据和同次外层脚本的实际命令、起止时间与退出码。人工核对者、时间与意见明确标为待填写，不预判通过。输入、输出与 Trace 必须属于同次运行。直接 Maven 调用缺少外层记录时会标明证据不完整。真实模型与 PostgreSQL 加故障注入的用例仍放在 `real/`，注明 `REAL_WITH_INJECTED_FAULT`、注入点和次数。
 
 Trace 记录实际步骤、工具参数、返回摘要、后续动作、公开简要依据与终止状态；不保存密钥、鉴权头、上游原始错误体或模型内部思维。至少三组真实材料覆盖正常、资料不足、工具失败，并以至少两条真实路径证明模型观察工具结果后改变动作。检索结果、HTTP 替身和机械引用校验不能替代这些证据。

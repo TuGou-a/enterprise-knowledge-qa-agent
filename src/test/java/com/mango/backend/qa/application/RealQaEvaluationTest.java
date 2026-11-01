@@ -16,6 +16,7 @@ import com.mango.backend.evaluation.RetrievalEvaluation;
 import com.mango.backend.infra.model.SiliconFlowEmbeddingClient;
 import com.mango.backend.infra.model.SiliconFlowRerankClient;
 import com.mango.backend.infra.pg.KnowledgeMapper;
+import com.mango.backend.knowledge.ingest.CorpusEvaluationBinding;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.annotation.MapperScan;
@@ -61,9 +62,10 @@ class RealQaEvaluationTest {
         var labels = RetrievalEvaluation.load(Path.of("examples/retrieval-labels.json"));
         var corpus = labels.corpora().stream().filter(value -> value.corpusId().equals(corpusId)).findFirst().orElseThrow();
         var snapshot = store.latestReadySnapshot(Duration.ofMillis(properties.timeouts().databaseMs())).orElseThrow();
-        if (!snapshot.snapshotId().equals(expectedSnapshot) || !snapshot.contentHash().equals(corpus.contentHash())) {
+        if (!snapshot.snapshotId().equals(expectedSnapshot)) {
             throw new IllegalArgumentException("最新 READY 快照与指定用例资料不符，请先按资料说明发布所需资料");
         }
+        CorpusEvaluationBinding.verify(corpus, snapshot, store, properties);
         var mapper = new ObjectMapper();
         QaRequest request = null;
         for (var planned : mapper.readTree(Path.of("examples/cases.json").toFile()).path("cases")) {

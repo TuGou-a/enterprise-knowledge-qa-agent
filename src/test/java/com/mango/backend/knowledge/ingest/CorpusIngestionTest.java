@@ -23,6 +23,7 @@ import java.security.MessageDigest;
 import java.time.Duration;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Optional;
 
 import static com.mango.backend.contract.knowledge.KnowledgeTypes.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,6 +55,52 @@ class CorpusIngestionTest {
             }
         }
         // 仅核对标注身份与条款存在性，不能据此宣称参考答案已通过人工语义复核。
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"scope", "topic", "offset", "profile", "hash"})
+    void evaluationBindingRejectsMetadataAndChunkDriftEvenWhenBodyHashMatches(String defect) throws Exception {
+        var properties = T05TestFixtures.properties();
+        var labels = RetrievalEvaluation.load(Path.of("examples/retrieval-labels.json"));
+        var corpus = labels.corpora().stream().filter(value -> value.corpusId().equals("normal")).findFirst().orElseThrow();
+        try (var validation = Validation.buildDefaultValidatorFactory()) {
+            var reader = new CorpusSourceReader(mapper, validation.getValidator(), new ClauseSplitter(), properties);
+            var prepared = reader.read(Path.of(corpus.path()), "bound");
+            var profile = T05TestFixtures.readySnapshot("bound").indexProfile();
+            var snapshot = new CorpusSnapshot("bound", SnapshotState.READY, profile, prepared.contentHash(),
+                    java.time.Instant.now(), java.time.Instant.now());
+            var store = mock(KnowledgeStore.class);
+            when(store.read(any(), any())).thenAnswer(call -> {
+                ChunkKey key = call.getArgument(0);
+                var chunk = prepared.chunks().stream().filter(value -> value.key().equals(key)).findFirst().orElseThrow();
+                var document = prepared.documents().stream().filter(value -> value.metadata().key().equals(key.document()))
+                        .findFirst().orElseThrow().metadata();
+                return Optional.of(new ReadEvidence(document, chunk));
+            });
+            CorpusEvaluationBinding.verify(corpus, snapshot, store, properties);
+            if (defect.equals("scope") || defect.equals("topic") || defect.equals("offset")) {
+                doAnswer(call -> {
+                    ChunkKey key = call.getArgument(0);
+                    var chunk = prepared.chunks().stream().filter(value -> value.key().equals(key)).findFirst().orElseThrow();
+                    var document = prepared.documents().stream().filter(value -> value.metadata().key().equals(key.document()))
+                            .findFirst().orElseThrow().metadata();
+                    if (defect.equals("scope")) {
+                        document = new DocumentMetadata(document.key(), document.title(), document.versionDate(),
+                                "被修改的适用范围", document.supersedes(), document.contentHash());
+                    } else {
+                        chunk = new KnowledgeChunk(chunk.key(), defect.equals("topic") ? "错误主题" : chunk.topicKey(),
+                                chunk.content(), chunk.startOffset() + (defect.equals("offset") ? 1 : 0),
+                                chunk.endOffset() + (defect.equals("offset") ? 1 : 0), chunk.contentHash());
+                    }
+                    return Optional.of(new ReadEvidence(document, chunk));
+                }).when(store).read(any(), any());
+            }
+            var actual = new CorpusSnapshot(snapshot.snapshotId(), snapshot.state(), defect.equals("profile")
+                    ? new IndexProfile("wrong", 1024, profile.preprocessingVersion(), profile.tokenizerVersion(),
+                    profile.dictionaryVersion(), profile.stopWordsVersion()) : profile,
+                    defect.equals("hash") ? "0".repeat(64) : snapshot.contentHash(), snapshot.createdAt(), snapshot.publishedAt());
+            assertThrows(IllegalArgumentException.class, () -> CorpusEvaluationBinding.verify(corpus, actual, store, properties));
+        }
     }
 
     @Test

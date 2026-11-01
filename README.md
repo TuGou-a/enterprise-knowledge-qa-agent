@@ -36,6 +36,7 @@ mvn -Ppostgres-it test
 ```bash
 python3 scripts/run-tests.py unit
 python3 scripts/run-tests.py postgres
+python3 scripts/run-tests.py mock
 ```
 
 真实检索评估需要已初始化的 PostgreSQL、三组已发布快照及模型环境变量。先按 [资料导入说明](data/README.md)导入，再将导入输出的真实快照 ID 填入下列命令；该入口调用硅基流动，不调用 DeepSeek，但共享配置仍要求全部必填变量。它不导入、发布或覆盖资料：
@@ -55,6 +56,8 @@ mvn -Preal-evaluation -Dtest=RealQaEvaluationTest \
 ```
 
 支持 E01/E02/E03/E04/E05/E06/E08/E09，实际输入、输出、Trace 和元数据写入 `examples/real/<caseId>/<runId>/`。E02 要求 conflict，其他用例按[证据说明](examples/README.md)选择；E06/E09 固定注入一次 Embedding／Rerank 超时，仅在测试配置生效。该入口调用真实 DeepSeek 和硅基流动；状态和语义仍需人工核对，不自动声明验收通过。
+
+需要完整交付证据时，真实问答使用 `python3 scripts/run-tests.py qa --case E01 --snapshot '<实际快照ID>'`，检索对比使用 `python3 scripts/run-tests.py retrieval --snapshots 'normal=<id>,conflict=<id>,mutation=<id>'`。脚本将实际命令、起止时间、退出码与同次输出关联；直接 Maven 调用仍可用于开发，但缺少外层记录时会标为证据不完整。
 
 评审可先阅读 [需求映射和测试边界](docs/03-evaluation.md)，再检查 `src/test/` 和 `examples/`。T04／T05 的历史受控运行记录分别见 [T04 验证](docs/t04-ingestion-verification.md)与 [T05 验证](docs/t05-search-verification.md)，不能替代本次改动的运行结果。T07 已合并，获得运行指令后可使用 `examples/requests/E01.json` 等请求调用 `POST /api/qa`；当前不将完整应用启动列为已验证入口。
 

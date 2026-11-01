@@ -42,7 +42,6 @@ import static com.mango.backend.evaluation.RetrievalEvaluation.*;
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class RealRetrievalEvaluationTest {
     @Autowired private AgentProperties properties;
-    @Autowired private CorpusSourceReader reader;
     @Autowired private KnowledgeStore store;
     @Autowired private KnowledgeTokenizer tokenizer;
     @Autowired private EmbeddingClient embedding;
@@ -68,27 +67,9 @@ class RealRetrievalEvaluationTest {
         }
         var snapshots = new LinkedHashMap<String, CorpusSnapshot>();
         var timeout = Duration.ofMillis(properties.timeouts().databaseMs());
-        var configuredProfile = new IndexProfile(properties.siliconflow().embeddingModel(), 1024,
-                properties.index().preprocessingVersion(), properties.index().tokenizerVersion(),
-                properties.index().dictionaryVersion(), properties.index().stopWordsVersion());
         for (var corpus : labels.corpora()) {
             var snapshot = store.findSnapshot(ids.get(corpus.corpusId()), timeout).orElseThrow();
-            if (snapshot.state() != SnapshotState.READY || !snapshot.contentHash().equals(corpus.contentHash())
-                    || !snapshot.indexProfile().equals(configuredProfile)) {
-                throw new IllegalArgumentException("快照状态、资料摘要或索引配置与评估不一致：" + corpus.corpusId());
-            }
-            var prepared = reader.read(Path.of(corpus.path()), snapshot.snapshotId());
-            if (!prepared.contentHash().equals(corpus.contentHash())) {
-                throw new IllegalArgumentException("参考资料集合哈希与实际切分结果不一致");
-            }
-            for (var chunk : prepared.chunks()) {
-                var actual = store.read(chunk.key(), timeout).orElseThrow();
-                var document = prepared.documents().stream()
-                        .filter(value -> value.metadata().key().equals(chunk.key().document())).findFirst().orElseThrow();
-                if (!actual.chunk().equals(chunk) || !actual.document().equals(document.metadata())) {
-                    throw new IllegalArgumentException("快照的条款或元数据与参考资料不一致");
-                }
-            }
+            CorpusEvaluationBinding.verify(corpus, snapshot, store, properties);
             snapshots.put(corpus.corpusId(), snapshot);
         }
         String runId = DateTimeFormatter.ofPattern("uuuuMMdd'T'HHmmss'Z'").withZone(ZoneOffset.UTC)
@@ -108,12 +89,20 @@ class RealRetrievalEvaluationTest {
         report.put("embeddingModel", properties.siliconflow().embeddingModel());
         report.put("rerankModel", properties.siliconflow().rerankModel());
         report.put("javaVersion", System.getProperty("java.version"));
-        var git = new ProcessBuilder("git", "rev-parse", "HEAD").start();
-        String commit = new String(git.getInputStream().readAllBytes(), StandardCharsets.UTF_8).strip();
+        String executionMetadata = System.getProperty("evaluation.executionMetadata");
+        report.put("executionMetadataFile", executionMetadata);
+        var git = new ProcessBuilder("git", "rev-parse", "HEAD").redirectErrorStream(true).start();
+        String commit;
+        try (var stream = git.getInputStream()) {
+            commit = new String(stream.readAllBytes(), StandardCharsets.UTF_8).strip();
+        }
         if (git.waitFor() != 0) throw new IllegalStateException("无法记录实际 Git commit");
         report.put("commit", commit);
-        var gitStatus = new ProcessBuilder("git", "status", "--porcelain").start();
-        boolean dirty = !new String(gitStatus.getInputStream().readAllBytes(), StandardCharsets.UTF_8).isBlank();
+        var gitStatus = new ProcessBuilder("git", "status", "--porcelain").redirectErrorStream(true).start();
+        boolean dirty;
+        try (var stream = gitStatus.getInputStream()) {
+            dirty = !new String(stream.readAllBytes(), StandardCharsets.UTF_8).isBlank();
+        }
         if (gitStatus.waitFor() != 0) throw new IllegalStateException("无法记录工作树状态");
         report.put("workingTreeDirtyAtStart", dirty);
         report.set("queries", mapper.valueToTree(rows));
@@ -185,6 +174,10 @@ class RealRetrievalEvaluationTest {
                 + "`。输入、快照、原始召回、排名、计量、失败和汇总见 [results.json](results.json)。\n\n"
                 + "入口：`mvn -Preal-evaluation -Dtest=RealRetrievalEvaluationTest -Devaluation.snapshots='" + supplied
                 + "' test`；其他自定义 JVM／Maven 参数如有需另记。\n\n"
+                + (executionMetadata == null ? "直接 Maven 调用未捕获完整命令与退出码，完整交付应使用 scripts/run-tests.py retrieval。\n\n"
+                : "本次实际命令、起止时间和退出码见 [外层运行记录]("
+                + output.toAbsolutePath().relativize(Path.of(executionMetadata).toAbsolutePath())
+                .toString().replace('\\', '/') + ")。\n\n")
                 + "标注状态：`" + labels.annotationStatus() + "`。本次仅比较检索，不运行 DeepSeek 或问答 Agent；"
                 + "不证明动态动作调整或答案支持性。16 个问题来自 7／8 条款的小型合成资料，不能据此推断普遍收益。\n");
         if (failed) throw new AssertionError("存在必要检索失败，已保存结果；失败问题不进入成功排名均值，须结合失败计数阅读");

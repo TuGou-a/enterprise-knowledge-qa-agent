@@ -61,11 +61,14 @@ mvn -Ppostgres-it test
 ```bash
 python3 scripts/run-tests.py unit
 python3 scripts/run-tests.py postgres
+python3 scripts/run-tests.py mock
 ```
 
 脚本记录实际 commit、开始前是否存在未提交改动、命令、开始／结束时间、Maven 退出码与报告计数，日志和报告放在 `examples/tests/<mode>/<runId>/`。每次为 Surefire 指定全新报告目录，避免把旧报告混入本次结果。没有生成报告时计数为 `null`；中断和启动失败如实记录。脚本未运行，目录当前尚无实际产物。
 
 完整离线流程也可单独执行 `mvn -Dtest=QaOfflineMockTest test`。实际服务生成的每次响应与 Trace 会保存到 `examples/mock/<caseId>/<runId>/`，标记 `MOCK`。模型输出预设动作仅用于验证框架接线和异常路径，不能用这些动作声称真实模型具备动态决策能力。
+
+交付采集统一使用脚本：`mock` 仅运行离线问答；`qa --case E01 --snapshot '<实际ID>'` 运行选定真实问答；`retrieval --snapshots 'normal=<id>,conflict=<id>,mutation=<id>'` 运行四方案对比。E08 可附加 `--corpus normal|mutation`。脚本将外层 `run.json` 的路径传给测试 JVM，问答和检索产物反向链接同次 Maven 的实际命令、起止时间与退出码。直接 Maven 调用没有该记录时会注明证据不完整，不能视为最终交付证据。
 
 ## 参考标注与快照绑定
 
@@ -98,7 +101,7 @@ mvn -Preal-evaluation -Dtest=RealRetrievalEvaluationTest \
   -Devaluation.snapshots='normal=<正常快照ID>,conflict=<冲突快照ID>,mutation=<替换快照ID>' test
 ```
 
-共享配置仍要求数据库与两家模型的必填变量；该评估只调用硅基流动 Embedding／Rerank，不调用 DeepSeek。入口不导入或修改资料，启动时校验 READY、集合哈希、IndexProfile 和实际条款／元数据。实际运行后才会生成 `examples/retrieval/real/<runId>/results.json` 和 `run.md`，包含输入、快照、原始召回、排名、指标、计量、失败、commit 与参考标注状态。源码中的默认测试不运行此入口。
+共享配置仍要求数据库与两家模型的必填变量；该评估只调用硅基流动 Embedding／Rerank，不调用 DeepSeek。入口不导入或修改资料，检索与真实问答共用 `CorpusEvaluationBinding`，校验 READY、集合哈希、IndexProfile 和实际每条原文／元数据；适用范围、替代关系、主题及偏移不能只靠正文哈希判断。实际运行后才会生成 `examples/retrieval/real/<runId>/results.json` 和 `run.md`，包含输入、快照、原始召回、排名、指标、计量、失败、commit 与参考标注状态。源码中的默认测试不运行此入口。
 
 ## R01–R10 与剩余验收
 
