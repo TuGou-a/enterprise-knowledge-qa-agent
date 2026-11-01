@@ -130,16 +130,16 @@ public final class AgentQaService implements QaService {
                 draft = null;
             }
         }
-        var checked = validator.validate(draft, context);
-        boolean unobserved = checked.citations().stream().anyMatch(citation -> !state.wasObserved(
-                new ChunkKey(new DocumentKey(context.snapshot().snapshotId(), citation.documentId(),
-                        citation.version()), citation.chunkId())));
-        if (unobserved) {
+        if (state.hasUnobservedCitation(draft)) {
             draft = null;
-            checked = validator.validate(null, context);
             if (forced == null) { forced = AnswerReason.OUTPUT_INVALID; }
         }
-        if (forced == null && state.fatalSearch()) { forced = AnswerReason.ROUTE_FAILED; }
+        var checked = validator.validate(draft, context);
+        if (forced == null && state.fatalSearch()
+                && checked.reason() != AnswerReason.OUTPUT_INVALID
+                && checked.reason() != AnswerReason.CITATION_INVALID) {
+            forced = AnswerReason.ROUTE_FAILED;
+        }
         var budget = state.budget().snapshot();
         if (forced != null) {
             var reason = budget.deadlineExceeded() ? AnswerReason.DEADLINE_EXCEEDED

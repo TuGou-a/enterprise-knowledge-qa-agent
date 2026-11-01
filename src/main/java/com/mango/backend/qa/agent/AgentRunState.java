@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.mango.backend.contract.config.AgentProperties;
 import com.mango.backend.contract.error.Failure;
 import com.mango.backend.contract.qa.AnswerReason;
+import com.mango.backend.contract.qa.AnswerDraft;
 import com.mango.backend.contract.runtime.RunContext;
 import com.mango.backend.qa.application.RequestExecutionBudget;
 import io.agentscope.core.message.Msg;
@@ -99,7 +100,8 @@ public final class AgentRunState {
             if (kind == BusinessTool.SEARCH_KNOWLEDGE) {
                 String query = text(input, "query");
                 var top = input.path("topK");
-                Integer requestedTop = top.isIntegralNumber() && top.canConvertToInt()
+                Integer requestedTop = top.isNumber() && top.canConvertToInt()
+                        && top.decimalValue().stripTrailingZeros().scale() <= 0
                         ? top.intValue() : null;
                 int limit = properties.retrieval().primaryLimit();
                 requested = new SearchInput(query, requestedTop);
@@ -151,7 +153,22 @@ public final class AgentRunState {
                 tool.outcome, tool.deliveryError));
     }
 
-    public synchronized boolean wasObserved(ChunkKey key) { return observed.contains(key); }
+    /** 在 T06 可能整体丢弃引用前，保留独立的观察顺序违规事实。 */
+    public synchronized boolean hasUnobservedCitation(AnswerDraft draft) {
+        if (draft == null || draft.citations() == null) { return false; }
+        for (var citation : draft.citations()) {
+            if (citation == null || citation.quote() == null || citation.quote().isBlank()) { continue; }
+            var key = new ChunkKey(new DocumentKey(context.snapshot().snapshotId(),
+                    citation.documentId(), citation.version()), citation.chunkId());
+            var evidence = context.evidence().find(key);
+            // 不存在或原文不匹配仍由 T06 判 CITATION_INVALID；此处只识别观察时间违规。
+            if (evidence.isPresent() && evidence.get().chunk().content().contains(citation.quote())
+                    && !observed.contains(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
     public synchronized void failSearch() { fatalSearch = true; }
     public synchronized boolean fatalSearch() { return fatalSearch; }
     public synchronized boolean modelFailed() { return modelFailed; }
