@@ -29,7 +29,7 @@
 
 ## 当前可执行测试的范围
 
-测试源码位于 [`src/test/java/com/mango/backend/`](../src/test/java/com/mango/backend/)。以下清单描述断言覆盖；当前 48 个测试均已通过。
+测试源码位于 [`src/test/java/com/mango/backend/`](../src/test/java/com/mango/backend/)。以下清单描述断言覆盖；48 个既有测试已通过，新增 15 个 T05 测试尚未执行。
 
 | 测试类 | 检查内容 | 不能证明的能力 |
 | --- | --- | --- |
@@ -38,16 +38,19 @@
 | `ReadResultContractTest` | 成功结果仅有证据，错误结果仅有明确失败，拒绝混合或缺失状态。 | 实际原文读取、哈希、引用及语义支持。 |
 | `KnowledgeOrderingContractTest` | UTF-8 字节序、补充字符排序及完整片段键的优先级。 | 真实 PostgreSQL 的排序规则或 Mapper 行为。 |
 | `WireContractTest` | 角色与状态 JSON、数字枚举拒绝、历史/主题成员不可变性、Trace 工具输入判别字段及序列化往返。 | HTTP 边界、实际事件顺序及真实 Agent 决策。 |
+| `HybridSearchServiceTest` | RRF、全池重排序、单／双路失败、失败回退、主题截断与致命错误传播。 | 真实 Mapper、模型质量、并发吞吐。 |
+| `KnowledgeEvidenceReaderTest` | 文本预算先于证据登记、预算拒绝、缺失片段及依赖错误。 | 真实数据库读取、引用语义支持。 |
+| `T05PostgresIntegrationTest` | Docker pgvector 中的 schema、资料导入、两路召回、失败回退、快照隔离与证据读取。 | 真实云模型、Agent 决策、HTTP 验收。 |
 
 空的全应用 `BackendApplicationTests.contextLoads` 已由明确的契约测试替换。隔离配置绑定测试只注册 `DatabaseProperties`，不加载 `BackendApplication`、模型配置或数据源自动配置；Bean Validation 中的合成凭据仅作为待校验值，不会用于真实调用。没有用占位密钥启动真实模式。
 
 用户授权后，在 Java 17 和已安装的 Maven 环境下于项目根目录执行以下入口；仓库未提供 Maven Wrapper。实际使用 Java 21 运行时按 `release 17` 编译：
 
 ```bash
-mvn -Dtest='*ContractTest' test
+mvn test
 ```
 
-当前默认测试集也可通过 `mvn test` 执行。插件和依赖首次准备可能需要网络；只有相关依赖都已缓存后，才可尝试 `mvn -o -Dtest='*ContractTest' test`。这里的离线是「无业务密钥、无数据库、无模型调用」，不保证首次安装可断网完成。
+上述入口会执行既有契约／模型测试和 T05 JUnit。T05 的 `T05PostgresIntegrationTest` 需要 Docker；Testcontainers 自动启动 `pgvector/pgvector:pg17`，执行仓库 schema 并导入合成资料，不连接本机临时数据库，也不使用真实模型密钥。若只运行无 Docker 的既有契约测试，可执行 `mvn -Dtest='*ContractTest' test`，但该命令不包含 T05。插件、依赖和镜像首次准备可能需要网络；只有全部缓存后才可尝试断网执行。
 
 ## 需求与后续证据映射
 
@@ -98,12 +101,12 @@ E06 保留真实模型和数据库，只在测试配置中包装 `EmbeddingClien
 | T02 模型客户端 | 请求协议、批序、下标、有限分数及超时/错误映射。 |
 | T03 数据持久化 | 真实 PostgreSQL/pgvector schema、Mapper、事务与快照隔离；不以 H2 代替。 |
 | T04 资料导入 | 原文偏移、哈希、分词一致性和快照发布已完成运行验证；人工检索标注仍待补充。 |
-| T05 检索读取 | 真实数据库下的 RRF、确定性重排序与 HTTP 失败回退、关联版本、固定快照与证据登记已通过临时验证；永久 Maven 回归、预算边界及错误恢复聚合仍待补齐。 |
+| T05 检索读取 | 已有单元 JUnit 和 Docker PostgreSQL 集成 JUnit；待用户指令执行。预算边界、错误恢复聚合、多并发和真实模型仍待补齐。 |
 | T06 校验与 Trace | 引用和状态机械校验、事件序号、脱敏及不可变快照。 |
 | T07 问答服务 | 请求独立状态、预算/取消、实际循环、Mock 模型与工具替身。 |
 | T08 HTTP | 请求/历史边界校验、状态码、统一响应与实际接口调用。 |
 
-本轮 T09 契约测试已交叉验证 48 个用例通过；T04 与 T05 的实际运行结果分别见 [T04 运行验证](t04-ingestion-verification.md)与 [T05 运行验证](t05-search-verification.md)。T05 临时验证覆盖逻辑失败注入和真实 PostgreSQL，但尚未纳入 Maven 永久测试。完整问答、真实模型和 HTTP 接口仍未运行。
+本轮 T09 契约测试已交叉验证 48 个用例通过；T04 与 T05 的实际运行结果分别见 [T04 运行验证](t04-ingestion-verification.md)与 [T05 运行验证](t05-search-verification.md)。T05 JUnit 已加入永久回归，但尚未执行。完整问答、真实模型和 HTTP 接口仍未运行。
 
 ### 静态审查记录
 
