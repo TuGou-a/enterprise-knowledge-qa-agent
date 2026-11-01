@@ -15,6 +15,24 @@ T09 测试与交付材料已合入 `dev`。2026-11-01 又在当前源码基线 `
 - [示例与证据说明](examples/README.md)：验收请求、16 个参考标注问题、完整真实问答 Trace、HTTP 证据和检索结果。
 - [业务术语表](GLOSSARY.md)与[数据库选型决策](docs/adr/0001-postgres-hybrid-retrieval.md)。
 
+## 前端页面
+
+新增原生 HTML、CSS、JavaScript 问答页面，入口为 [index.html](src/main/resources/static/index.html)。页面由 Spring Boot 提供，无需安装前端依赖或单独构建。
+
+先按下文「配置与启动边界」注入模型服务与数据库环境变量，并按 [资料导入说明](data/README.md)初始化、发布知识资料，再启动应用：
+
+```bash
+mvn spring-boot:run
+```
+
+启动后访问 `http://localhost:8080/`。如通过 `--server.port` 或 `SERVER_PORT` 修改端口，使用对应的服务地址；例如端口为 `18080` 时访问 `http://localhost:18080/`。页面使用同源 `POST /api/qa`，应通过后端服务访问；直接双击 HTML 文件只能查看界面，不能进行问答。
+
+页面支持示例问题填入、连续追问、新建对话、回答状态、资料缺口、检索降级提示及原文引用展开。Enter 发送，Shift + Enter 换行。回答按纯文本展示，引用可查看文档 ID、版本、片段和原文位置。
+
+对话只保存在当前页面内存中，刷新后清空。向接口传递历史时，按后端默认上限保留最近的完整问答轮次：最多 20 条消息、累计 12000 字符，单条助手历史最多 4000 字符；页面中的完整回答不截断。问题最多 2000 字符。如调整 `QA_*` 输入限制，应同步调整前端限制，后端校验仍为最终依据。
+
+本次前端改动按开发流程仅完成代码审查，尚未运行测试；下文测试记录对应此前的后端基线。
+
 ## 当前测试入口
 
 需要 Java 17 和 Maven，仓库没有 Maven Wrapper。默认入口不创建真实数据源、不调用云模型、不启动 Docker；模型协议测试只访问受控的本机 HTTP 服务。首次下载 Maven 依赖仍可能需要网络，依赖缓存完整后才能尝试 `-o`。在项目根目录执行：
@@ -70,7 +88,7 @@ mvn -Preal-evaluation -Dtest=RealQaEvaluationTest \
 - 中文分词采用 jieba，使用 Java 实现接入当前工程。
 - DeepSeek 官方 API 负责问答与工具决策；硅基流动的 `BAAI/bge-m3` 负责 Embedding，`BAAI/bge-reranker-v2-m3` 负责重排序。
 - 请求携带问题及可选对话历史，后端第一版不保存跨请求会话。
-- 本期交付 HTTP API、调用示例、测试和运行记录；暂不开发聊天界面。
+- 交付 HTTP API、调用示例、测试和运行记录；另补充原生 HTML 聊天页面，通过现有接口完成问答。
 
 ## 技术选型与取舍
 
