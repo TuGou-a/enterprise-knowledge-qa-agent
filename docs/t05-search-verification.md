@@ -8,6 +8,12 @@
 
 后续已把关键行为沉淀为永久 JUnit：`HybridSearchServiceTest`、`KnowledgeEvidenceReaderTest` 和 `T05PostgresIntegrationTest`。集成测试使用 Testcontainers 启动 Docker 中的 `pgvector/pgvector:pg17`，执行正式 schema 并导入 `normal.json`、`conflict.json`；测试尚未运行。
 
+## 永久 JUnit 审查
+
+审查基线为 `89fbce0`，初版测试提交为 `742d7b9`。两名子代理分别检查规范与契约，未发现生产代码问题或阻断项。审查补充了 RRF 输入顺序、重复候选双路排名与分数、稳定并列、keyword 单路失败、全文加载失败回退、Docker 集成候选数量、证据预算参数及失败路径不解除读取限制等断言。
+
+新增测试共 15 个：`HybridSearchServiceTest` 9 个、`KnowledgeEvidenceReaderTest` 4 个、`T05PostgresIntegrationTest` 2 个。规范与契约复核均已闭环；由于项目流程要求合并后等待测试指令，这些 JUnit 尚未编译或执行，不能记录为通过。
+
 ## 环境
 
 - macOS，Asia/Shanghai

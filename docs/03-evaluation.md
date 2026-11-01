@@ -29,7 +29,7 @@
 
 ## 当前可执行测试的范围
 
-测试源码位于 [`src/test/java/com/mango/backend/`](../src/test/java/com/mango/backend/)。以下清单描述断言覆盖；当前 48 个测试均已通过。
+测试源码位于 [`src/test/java/com/mango/backend/`](../src/test/java/com/mango/backend/)。以下清单描述断言覆盖；48 个既有测试已通过，新增 15 个 T05 测试尚未执行。
 
 | 测试类 | 检查内容 | 不能证明的能力 |
 | --- | --- | --- |
@@ -47,10 +47,10 @@
 用户授权后，在 Java 17 和已安装的 Maven 环境下于项目根目录执行以下入口；仓库未提供 Maven Wrapper。实际使用 Java 21 运行时按 `release 17` 编译：
 
 ```bash
-mvn -Dtest='*ContractTest' test
+mvn test
 ```
 
-当前默认测试集也可通过 `mvn test` 执行。T05 的 `T05PostgresIntegrationTest` 需要 Docker；Testcontainers 自动启动 `pgvector/pgvector:pg17`，执行仓库 schema 并导入合成资料，不连接本机临时数据库，也不使用真实模型密钥。插件、依赖和镜像首次准备可能需要网络；只有全部缓存后才可尝试断网执行。
+上述入口会执行既有契约／模型测试和 T05 JUnit。T05 的 `T05PostgresIntegrationTest` 需要 Docker；Testcontainers 自动启动 `pgvector/pgvector:pg17`，执行仓库 schema 并导入合成资料，不连接本机临时数据库，也不使用真实模型密钥。若只运行无 Docker 的既有契约测试，可执行 `mvn -Dtest='*ContractTest' test`，但该命令不包含 T05。插件、依赖和镜像首次准备可能需要网络；只有全部缓存后才可尝试断网执行。
 
 ## 需求与后续证据映射
 

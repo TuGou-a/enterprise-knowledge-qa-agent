@@ -47,6 +47,10 @@ class KnowledgeEvidenceReaderTest {
         assertThat(result.evidence()).isEqualTo(evidence);
         assertThat(result.error()).isNull();
         assertThat(events).containsExactly("budget", "evidence", "resolve");
+        assertThat(budget.readCharacters).isEqualTo(evidence.chunk().content().length());
+        assertThat(budget.toolTextCharacters).isEqualTo(evidence.chunk().content().length());
+        assertThat(ledger.problems).isEmpty();
+        assertThat(ledger.resolveCalls).hasValue(1);
     }
 
     @Test
@@ -67,6 +71,7 @@ class KnowledgeEvidenceReaderTest {
         assertThat(evidenceRegistry.entries()).isEmpty();
         assertThat(ledger.problems).hasSize(1);
         assertThat(ledger.problems.get(0).key()).isEqualTo(key);
+        assertThat(ledger.resolveCalls).hasValue(0);
     }
 
     @Test
@@ -85,6 +90,7 @@ class KnowledgeEvidenceReaderTest {
         assertThat(ledger.problems)
                 .extracting(ReadProblem::key)
                 .containsExactly(key("missing"));
+        assertThat(ledger.resolveCalls).hasValue(0);
     }
 
     @Test
@@ -104,6 +110,7 @@ class KnowledgeEvidenceReaderTest {
         assertThat(result.error()).isEqualTo(failure.failure());
         assertThat(evidenceRegistry.entries()).isEmpty();
         assertThat(ledger.problems).hasSize(1);
+        assertThat(ledger.resolveCalls).hasValue(0);
     }
 
     private static ChunkKey key(String chunkId) {
@@ -175,6 +182,8 @@ class KnowledgeEvidenceReaderTest {
     private static final class TestBudget implements ExecutionBudget {
         private final List<String> events;
         private final boolean allowText;
+        int readCharacters;
+        int toolTextCharacters;
 
         private TestBudget(List<String> events, boolean allowText) {
             this.events = events;
@@ -195,6 +204,8 @@ class KnowledgeEvidenceReaderTest {
 
         public boolean tryAcquireText(int readCharacters, int toolTextCharacters) {
             events.add("budget");
+            this.readCharacters = readCharacters;
+            this.toolTextCharacters = toolTextCharacters;
             return allowText;
         }
 

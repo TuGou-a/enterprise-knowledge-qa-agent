@@ -20,10 +20,10 @@
 需要 Java 17、已安装的 Maven（可使用 Maven 3.9 系列）和正在运行的 Docker。T05 PostgreSQL 集成测试使用 Testcontainers 自动启动 `pgvector/pgvector:pg17`，执行现有 `V001__knowledge.sql` 并导入合成资料，不使用本机临时 PostgreSQL 集群，也不需要真实模型密钥。首次准备依赖和容器镜像可能需要网络。收到测试指令后，在项目根目录执行：
 
 ```bash
-mvn -Dtest='*ContractTest' test
+mvn test
 ```
 
-测试覆盖向量合法性、配置约束、读取结果互斥、资料排序、JSON 契约、模型调用中断，以及 T05 的融合、回退、主题扩展和证据读取。`T05PostgresIntegrationTest` 通过 Docker 中的 pgvector 容器验证真实 Mapper、分词、快照隔离和读取。新增测试尚未运行，不能引用为通过结果。依赖和镜像全部缓存后才可尝试 `-o` 断网执行。当前入口不能证明完整 Mock 问答、真实模型决策或线上检索质量。
+测试覆盖向量合法性、配置约束、读取结果互斥、资料排序、JSON 契约、模型调用中断，以及 T05 的融合、回退、主题扩展和证据读取。`T05PostgresIntegrationTest` 通过 Docker 中的 pgvector 容器验证真实 Mapper、分词、快照隔离和读取。新增 15 个测试尚未运行，不能引用为通过结果。依赖和镜像全部缓存后才可尝试 `-o` 断网执行。当前入口不能证明完整 Mock 问答、真实模型决策或线上检索质量。
 
 评审可先阅读 [需求映射和测试边界](docs/03-evaluation.md)，再检查 `src/test/` 和 `examples/`。T03 数据库初始化、T04 资料导入和 T05 检索读取已有受控运行记录，详见 [T04 运行验证](docs/t04-ingestion-verification.md)与 [T05 运行验证](docs/t05-search-verification.md)。完整问答运行步骤仍待 T07 完成。
 
@@ -137,7 +137,7 @@ PostgreSQL 驱动版本交由现有 Spring Boot 依赖管理。业务服务通�
 
 ## 运行与验证状态
 
-48 个现有测试已通过，`mvn -DskipTests package` 可生成可执行 JAR。T03 的[手动数据库初始化脚本及说明](src/main/resources/db/README.md)已在 PostgreSQL 17／pgvector 0.8.6 临时数据库中成功执行；T04 的资料导入及 T05 的两路召回、重排序回退、主题扩展、快照隔离和证据读取已用受控模型服务完成验证，详见[T04 运行验证](docs/t04-ingestion-verification.md)与[T05 运行验证](docs/t05-search-verification.md)。真实硅基流动调用、完整问答、HTTP 接口和 Mock 流程仍待后续任务与真实模型验证。
+新增 T05 JUnit 前已有 48 个测试通过，新增 15 个测试尚未执行；`mvn -DskipTests package` 可生成可执行 JAR。T03 的[手动数据库初始化脚本及说明](src/main/resources/db/README.md)已在 PostgreSQL 17／pgvector 0.8.6 数据库中成功执行；T04 的资料导入及 T05 的两路召回、重排序回退、主题扩展、快照隔离和证据读取已有受控运行记录，详见[T04 运行验证](docs/t04-ingestion-verification.md)与[T05 运行验证](docs/t05-search-verification.md)。真实硅基流动调用、完整问答、HTTP 接口和 Mock 流程仍待后续任务与真实模型验证。
 
 验收材料至少覆盖明确答案、文档冲突、资料外问题、相似改写、上下文追问和工具失败；另验证执行上限与文档替换。Mock 验证流程，真实模型 Trace 证明动作调整，二者分别标注，结果引用对应文件。
 

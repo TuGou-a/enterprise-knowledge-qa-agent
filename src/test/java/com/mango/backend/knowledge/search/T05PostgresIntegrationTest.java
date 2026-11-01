@@ -131,9 +131,17 @@ class T05PostgresIntegrationTest {
         assertThat(conflict.routes()).isEqualTo(
                 new Routes(RouteStatus.OK, RouteStatus.OK, RouteStatus.OK));
         assertThat(conflict.rankingMode()).isEqualTo(RankingMode.RERANK);
-        assertThat(conflict.metrics().rerankInputCount()).isGreaterThan(1);
+        assertThat(conflict.metrics().vectorCount()).isEqualTo(8);
+        assertThat(conflict.metrics().keywordCount()).isPositive();
+        assertThat(conflict.metrics().uniqueCount()).isEqualTo(8);
+        assertThat(conflict.metrics().rerankInputCount()).isEqualTo(8);
         assertThat(rerank.topN).isEqualTo(rerank.documentCount);
         assertThat(rerank.documentCount).isEqualTo(conflict.metrics().rerankInputCount());
+        assertThat(conflict.metrics().rerankInputKeys())
+                .hasSize(8)
+                .doesNotHaveDuplicates()
+                .allSatisfy(key -> assertThat(key.document().snapshotId())
+                        .isEqualTo(conflictSnapshotId));
         assertThat(conflict.primaryCandidates())
                 .extracting(candidate -> candidate.source().key().document().documentId())
                 .containsExactly("D01");

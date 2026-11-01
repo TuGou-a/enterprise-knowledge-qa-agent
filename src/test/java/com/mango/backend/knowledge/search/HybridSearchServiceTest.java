@@ -58,12 +58,23 @@ class HybridSearchServiceTest {
                 new RerankScore(2, 0.9), new RerankScore(0, 0.2), new RerankScore(1, 0.7)));
         service = service(store, rerank);
 
-        var result = service.search(new SearchRequest("报销期限", 2),
+        var result = service.search(new SearchRequest("报销期限", 3),
                 context(store.ledger, new TestBudget(Duration.ofSeconds(120))));
 
         assertThat(result.primaryCandidates())
                 .extracting(candidate -> candidate.source().key().chunkId())
-                .containsExactly("C", "A");
+                .containsExactly("C", "A", "B");
+        assertThat(result.metrics().rerankInputKeys())
+                .extracting(key -> key.chunkId())
+                .containsExactly("B", "A", "C");
+        var bCandidate = result.primaryCandidates().stream()
+                .filter(candidate -> candidate.source().key().chunkId().equals("B"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(bCandidate.vectorRank()).isEqualTo(2);
+        assertThat(bCandidate.keywordRank()).isEqualTo(1);
+        assertThat(bCandidate.rrfScore()).isCloseTo(1.0 / 62 + 1.0 / 61,
+                org.assertj.core.data.Offset.offset(1e-12));
         assertThat(result.routes()).isEqualTo(
                 new Routes(RouteStatus.OK, RouteStatus.OK, RouteStatus.OK));
         assertThat(result.rankingMode()).isEqualTo(RankingMode.RERANK);
@@ -99,6 +110,29 @@ class HybridSearchServiceTest {
                 .extracting(RecallProblem::route)
                 .containsExactly(RecallRoute.VECTOR);
         assertThat(result.degraded()).isTrue();
+    }
+
+    @Test
+    void keepsVectorCandidatesWhenTheKeywordRouteFails() {
+        var a = T05TestFixtures.preview("D1", "v1", "A", "报销期限", "A 预览");
+        var store = new TestStore();
+        store.vectorHits = () -> List.of(hit(a, 1, 0.1));
+        store.keywordHits = () -> {
+            throw dependency(Failure.Code.DATABASE_UNAVAILABLE, "keyword unavailable");
+        };
+        store.chunks = keys -> List.of(T05TestFixtures.chunk(keys.get(0), "topic", "完整条款"));
+        service = service(store,
+                new RecordingRerankClient(List.of(new RerankScore(0, 0.8))));
+
+        var result = service.search(new SearchRequest("报销期限", 1),
+                context(store.ledger, new TestBudget(Duration.ofSeconds(120))));
+
+        assertThat(result.routes()).isEqualTo(
+                new Routes(RouteStatus.OK, RouteStatus.ERROR, RouteStatus.OK));
+        assertThat(result.unresolvedErrors())
+                .extracting(RecallProblem::route)
+                .containsExactly(RecallRoute.KEYWORD);
+        assertThat(result.primaryCandidates()).hasSize(1);
     }
 
     @Test
@@ -151,6 +185,58 @@ class HybridSearchServiceTest {
                 .extracting(Failure::code)
                 .containsExactly(Failure.Code.UPSTREAM_UNAVAILABLE);
         assertThat(store.expandCalls).hasValue(1);
+    }
+
+    @Test
+    void fallsBackToRrfWhenRerankInputLoadingFails() {
+        var a = T05TestFixtures.preview("D1", "v1", "A", "报销期限", "A 预览");
+        var store = new TestStore();
+        store.vectorHits = () -> List.of(hit(a, 1, 0.1));
+        store.chunks = keys -> {
+            throw dependency(Failure.Code.NOT_FOUND, "chunk missing");
+        };
+        store.expansion = new TopicExpansion(List.of(), false);
+        var rerank = new RecordingRerankClient(List.of());
+        service = service(store, rerank);
+
+        var result = service.search(new SearchRequest("报销期限", 1),
+                context(store.ledger, new TestBudget(Duration.ofSeconds(120))));
+
+        assertThat(result.primaryCandidates())
+                .extracting(candidate -> candidate.source().key().chunkId())
+                .containsExactly("A");
+        assertThat(result.rankingMode()).isEqualTo(RankingMode.RRF_FALLBACK);
+        assertThat(result.metrics().rerankInputCount()).isZero();
+        assertThat(result.rankingWarnings())
+                .extracting(Failure::code)
+                .containsExactly(Failure.Code.NOT_FOUND);
+        assertThat(rerank.calls).hasValue(0);
+        assertThat(store.expandCalls).hasValue(1);
+    }
+
+    @Test
+    void breaksEqualRrfAndRerankScoresByPoolAndStableKeyOrder() {
+        var a = T05TestFixtures.preview("D2", "v1", "A", "报销期限", "A 预览");
+        var b = T05TestFixtures.preview("D1", "v1", "B", "报销期限", "B 预览");
+        var store = new TestStore();
+        store.vectorHits = () -> List.of(hit(a, 1, 0.1));
+        store.keywordHits = () -> List.of(hit(b, 1, 0.9));
+        store.chunks = keys -> keys.stream()
+                .map(key -> T05TestFixtures.chunk(key, "topic", "完整条款"))
+                .toList();
+        var rerank = new RecordingRerankClient(List.of(
+                new RerankScore(1, 0.5), new RerankScore(0, 0.5)));
+        service = service(store, rerank);
+
+        var result = service.search(new SearchRequest("报销期限", 2),
+                context(store.ledger, new TestBudget(Duration.ofSeconds(120))));
+
+        assertThat(result.metrics().rerankInputKeys())
+                .extracting(key -> key.chunkId())
+                .containsExactly("B", "A");
+        assertThat(result.primaryCandidates())
+                .extracting(candidate -> candidate.source().key().chunkId())
+                .containsExactly("B", "A");
     }
 
     @Test
