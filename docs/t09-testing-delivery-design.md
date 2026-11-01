@@ -138,7 +138,7 @@ T09 合并到 `dev` 后，用户再次明确授权真实模型调用。主代理
 `9aaeaea71615664e512fecfbf1f4e169e8264ae0` 为源码基线完成当前提交复验，历史成功记录
 保持不变。
 
-- 默认测试 `184/184`、PostgreSQL 集成 `189/189`、离线 Mock `8/8` 均零失败、零错误、零跳过。
+- 默认测试 `184/184`、PostgreSQL profile `189/189`（含默认回归）、离线 Mock `8/8` 均零失败、零错误、零跳过。
 - 新建临时 PostgreSQL 17／pgvector 容器并应用正式 schema，导入 normal、conflict、mutation
   资料后全部发布为 `READY`；运行结束后已停止并删除容器。
 - E01、E02、E03、E04、E05、E06、E08 normal、E08 mutation、E09 共 9 次真实服务运行成功。

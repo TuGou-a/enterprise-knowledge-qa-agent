@@ -127,7 +127,7 @@ Socrates 对照目标标签确认 API、注解及上下文注入可行，`onAgen
 | 最终检查（源码基线 `3cddda8` + 最终证据工作树） | 结果 |
 | --- | --- |
 | 默认测试 | 184 个通过，0 失败／错误／跳过 |
-| PostgreSQL 集成 | 189 个通过，真实 pgvector |
+| PostgreSQL profile | 189 个通过（含默认回归），真实 pgvector |
 | 真实问答 | E01/E02/E03/E04/E05/E06/E08/E09 均按预期完成 |
 | 真实 HTTP E01 | HTTP 200，`ANSWERED`，2 条引用 |
 | 16 题检索评估 | 16 题无失败，混合重排序 MRR@6 `1.0` |

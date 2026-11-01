@@ -21,9 +21,10 @@ DeepSeek `deepseek-chat` 和硅基流动 Embedding／Rerank。conflict 快照为
 进入后续模型调用后结束。一次补查通过 `READ_KNOWLEDGE` 与双方读取同轮发起，修复后的断言按
 callId 和完成顺序正确识别。修复前的错误回答及旧断言误判证据继续保留，不覆盖历史证据。
 
-上述测试与真实 E02 记录均在 `workingTreeDirtyAtStart=true` 时开始。脚本会在执行前创建证据目录，
-因此该标记至少包含未提交运行产物，但现有记录没有保存完整脏文件列表。最终提交前需在干净工作树
-重跑必要入口，不能把本轮记录当作未来最终 SHA 的等价证明。
+上述测试与真实 E02 记录在开始时已存在未提交差异；外层测试记录为
+`workingTreeDirtyAtStart=true`，真实问答内层元数据为 `workingTreeDirty=true`。现有记录没有保存
+完整脏文件清单。最终提交前需在干净工作树重跑必要入口，不能把本轮记录当作未来最终 SHA 的等价
+证明。
 
 受限沙箱中的首次单元测试记录
 `tests/unit/20261101T080247Z-4aee64b9dff6486ea007136b920becae/` 保留为环境失败：190 项中
@@ -41,7 +42,7 @@ DeepSeek `deepseek-chat` 和硅基流动两个模型，临时数据库与测试�
 | 检查或用例 | 本次证据 |
 | --- | --- |
 | 默认单元测试 `184/184` | `tests/unit/20261101T064650Z-e3c4042a938f4acfa382b324fb02321a/` |
-| PostgreSQL 集成测试 `189/189` | `tests/postgres/20261101T064704Z-215b890de4c649acbb41f6e89c842965/` |
+| PostgreSQL profile `189/189`（含默认回归） | `tests/postgres/20261101T064704Z-215b890de4c649acbb41f6e89c842965/` |
 | 离线问答 Mock `8/8` | `tests/mock/20261101T064716Z-405d95494d7849d9925e7addef4d1f24/` |
 | E01 | `real/E01/1736e41f-c8e1-4699-84b5-c5f2ee06b5af/` |
 | E02 | `real/E02/ea61d620-9563-4a43-b3e7-e481eca8f6f1/` |
@@ -84,7 +85,7 @@ E02 复核更正：上述 `ea61d620-9563-4a43-b3e7-e481eca8f6f1` 虽返回 `CONF
 | 离线 Mock | 正常、冲突、资料外、恢复、未观察引用、工具/轮次上限、模型失败 | `mock/E02/`、`mock/E03/`、`mock/E06/`、`mock/E07/`、`mock/E10/` |
 
 自动化测试证据位于 `tests/unit/`、`tests/postgres/`、`tests/qa/` 和 `tests/retrieval/`。该历史轮
-默认测试为 `184/184`，PostgreSQL 集成测试为 `189/189`；E02 修复后的最新结果为 `190/190` 和
+默认测试为 `184/184`，PostgreSQL profile 为 `189/189`（含默认回归）；E02 修复后的最新结果为 `190/190` 和
 `195/195`，见本文上方。测试目录中的 `run.json` 记录 commit、
 命令、起止时间、退出码和报告计数。
 

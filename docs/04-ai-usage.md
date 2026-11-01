@@ -20,7 +20,7 @@ T09 第二阶段按 2026-11-01 的新确认补充测试、参考标注、评估�
 
 用户指出 E02 历史回答虽然返回 `CONFLICT`，正文仍建议按较严格的 15 天办理，属于变相选边。AI 随后协助定位原因、修改冲突展示边界、补充恶意草稿回归和真实问答验收断言；用户提供真实模型环境并授权运行。修复后的三次真实 E02 均只并列已读的 D01、D02 原文，明确在适用关系确认前不能选取任一方。
 
-本次已有运行记录为：默认测试 `190/190`、PostgreSQL profile `195/195`、离线 Mock `9/9`，另有真实 E02 `3/3`。这些记录的 `workingTreeDirtyAtStart` 均为 `true`，至少包含生成中的证据目录，但没有保存完整脏文件列表；最终仍需在干净工作树重跑。原始错误回答和错误断言记录继续保留，不覆盖历史证据。详细根因和验证范围见 [E02 冲突回答踩坑](pitfalls/T07-conflict-answer-advice.md)与[并行补查验收踩坑](pitfalls/T09-supplement-verification-order.md)。
+本次已有运行记录为：默认测试 `190/190`、PostgreSQL profile `195/195`、离线 Mock `9/9`，另有真实 E02 `3/3`。这些运行开始时已有未提交差异；外层测试记录为 `workingTreeDirtyAtStart=true`，真实问答内层元数据为 `workingTreeDirty=true`，但没有保存完整脏文件列表；最终仍需在干净工作树重跑。原始错误回答和错误断言记录继续保留，不覆盖历史证据。详细根因和验证范围见 [E02 冲突回答踩坑](pitfalls/T07-conflict-answer-advice.md)与[并行补查验收踩坑](pitfalls/T09-supplement-verification-order.md)。
 
 ## 个人贡献与验证边界
 
@@ -58,7 +58,7 @@ T09 第二阶段按 2026-11-01 的新确认补充测试、参考标注、评估�
 
 修复提交 `1505e86` 经两名子代理规范／需求双轴审查和定向复核后合并为 `3cddda8`。最终主代理执行：
 
-- 默认测试 184 项、PostgreSQL 集成 189 项，全部通过。
+- 默认测试 184 项、PostgreSQL profile 189 项（含默认回归），全部通过。
 - E01/E02/E03/E04/E05/E06/E08/E09 真实问答，保存请求、响应、Trace 和运行元数据。
 - 真实 HTTP `POST /api/qa`，返回 HTTP 200 与 `ANSWERED`。
 - 16 题四方案检索评估，0 个失败问题。
