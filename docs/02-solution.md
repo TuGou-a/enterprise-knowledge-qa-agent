@@ -90,7 +90,7 @@ AgentScope `2.0.4` 的 `ToolExecutor` 已将同步工具调度到 `boundedElasti
 3. 文本和查询经同一 jieba 处理配置得到分词；PostgreSQL 采用 `simple` 配置保存词项，关键词路由按 `ts_rank_cd` 排序。
 4. 向量路由在相同快照中按余弦距离 `<=>` 升序排序；关键词路由在同一快照中执行全文检索。
 5. 两路分别取最多 20 条，按稳定片段键去重并用 RRF 融合；建议 `k=60`，保留最多 20 条作为重排序候选池。不要在重排序之前先缩小到最终 6 条。
-6. 使用同一查询与候选条款原文调用硅基流动 `BAAI/bge-reranker-v2-m3`，按返回的相关性排名选取最多 6 条主候选。空候选池跳过云请求，记录 `SKIPPED_EMPTY`。
+6. 使用同一查询与候选条款原文调用硅基流动 `BAAI/bge-reranker-v2-m3`，取得整个融合池的分数后，本地按相关性分数、RRF 名次与稳定片段键排序，再选取最多 6 条主候选。空候选池跳过云请求，记录 `SKIPPED_EMPTY`。
 7. 以重排序前候选池的 `topic_key` 扩展同主题的其他资料版本，按稳定片段键去重，最多额外返回 12 条；该集合独立于主候选，不受重排序 Top-K 或分数过滤。达到扩展数量或文本预算时标记 `truncated=true`，不宣称已穷尽所有规定。
 
 上述数量均是可配置建议初值，尚未验证。最终工具结果最多包含 6 条主候选与 12 条主题扩展；`topK` 只控制主候选数量。Trace 分别记录每路召回数、去重数、送入重排序数、主候选数与主题扩展数。
@@ -99,7 +99,7 @@ RRF 的单个片段得分为各路 `1 / (k + rank)` 的和，未进入某一路�
 
 ### 重排序接口与回退
 
-复用 `SILICONFLOW_API_KEY` 和 `SILICONFLOW_BASE_URL`，增加 `RERANK_MODEL=BAAI/bge-reranker-v2-m3`。调用 `POST /rerank`，发送 `model`、`query`、候选条款文本数组 `documents`、`top_n=min(topK, 候选数)` 与 `return_documents=false`。不向该模型发送只适用于 Qwen 系列的 `instruction`。来源：[官方 Rerank API](https://docs.siliconflow.cn/docs/api/rerank-post)、[BAAI 模型卡](https://huggingface.co/BAAI/bge-reranker-v2-m3)。
+复用 `SILICONFLOW_API_KEY` 和 `SILICONFLOW_BASE_URL`，增加 `RERANK_MODEL=BAAI/bge-reranker-v2-m3`。调用 `POST /rerank`，发送 `model`、`query`、候选条款文本数组 `documents`、`top_n=候选池大小` 与 `return_documents=false`。用户在 T05 访谈中确认：取得整个池的分数后本地选取 topK，使入选边界的并列分数也遵循项目排序规则。不向该模型发送只适用于 Qwen 系列的 `instruction`。接口资料：[官方 Rerank API](https://docs.siliconflow.cn/docs/api/rerank-post)、[BAAI 模型卡](https://huggingface.co/BAAI/bge-reranker-v2-m3)。
 
 客户端保留本次输入下标到稳定片段键的映射，校验 `results[].index` 范围、唯一性、结果数量以及 `relevance_score` 为有限数值。以原始输入对应的本地原文及版本为准，不把服务返回文本写回知识库。并列分数按 RRF 排名、片段键确定次序；分数仅表达相关性，不解释为制度优先级、答案置信度或可通用的拒答阈值。
 

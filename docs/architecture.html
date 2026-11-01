@@ -173,7 +173,7 @@
   "documents": ["&lt;候选条款原文 1&gt;", "&lt;候选条款原文 2&gt;"],
   "top_n": 2,
   "return_documents": false
-}</code></pre><p class="source-note">两条候选仅用于展示请求结构，实际 top_n 取 topK 与候选数的较小值。BGE 不发送 Qwen 专用的 instruction。</p></div>
+}</code></pre><p class="source-note">两条候选仅用于展示请求结构，实际 top_n 等于融合候选池大小。取得完整分数后，本地按分数、RRF 名次与稳定片段键排序，再选取 topK。BGE 不发送 Qwen 专用的 instruction。</p></div>
         <div class="card"><ol class="steps"><li><strong>保留输入映射</strong>输入下标对应快照、文档版本与片段键。</li><li><strong>验证返回值</strong>检查 index 范围、唯一性、数量和有限分数；并列按 RRF 排名与片段键排序。</li><li><strong>按本地原文查证</strong>结果只调整阅读顺序，不修改知识库，不代替 readKnowledge。</li></ol></div>
       </div>
       <div class="table-wrap"><table><thead><tr><th>执行结果</th><th>应用返回的排序模式</th><th>后续行为</th></tr></thead><tbody>
