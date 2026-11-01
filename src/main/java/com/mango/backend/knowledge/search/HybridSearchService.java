@@ -11,8 +11,10 @@ import com.mango.backend.contract.model.ModelTypes.Usage;
 import com.mango.backend.contract.model.RerankClient;
 import com.mango.backend.contract.runtime.RunContext;
 import com.mango.backend.contract.search.KnowledgeSearch;
+import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
@@ -33,6 +35,10 @@ public final class HybridSearchService implements KnowledgeSearch {
     private final EmbeddingClient embedding;
     private final RerankClient rerank;
     private final AgentProperties properties;
+    // 外层同步工具也运行于共享 boundedElastic，召回分支需避免排在等待它们的父调用之后。
+    private final Scheduler recallScheduler = Schedulers.newBoundedElastic(
+            Schedulers.DEFAULT_BOUNDED_ELASTIC_SIZE, Schedulers.DEFAULT_BOUNDED_ELASTIC_QUEUESIZE,
+            "knowledge-recall");
 
     public HybridSearchService(KnowledgeStore store, KnowledgeTokenizer tokenizer,
                                EmbeddingClient embedding, RerankClient rerank,
@@ -116,11 +122,6 @@ public final class HybridSearchService implements KnowledgeSearch {
                 var chunks = store.loadChunks(snapshotId, inputKeys,
                         budget.timeout(timeouts.databaseMs(), true));
                 var documents = chunks.stream().map(KnowledgeChunk::content).toList();
-                long characters = documents.stream().mapToLong(String::length).sum();
-                if (characters > properties.limits().rerankCharacters()) {
-                    throw new DependencyException(new Failure(Failure.Code.INPUT_LIMIT_EXCEEDED,
-                            "重排序完整条款累计长度超限，已回退 RRF", false));
-                }
                 var timeout = budget.timeout(timeouts.rerankMs(), true);
                 sentKeys = inputKeys;
                 long started = System.nanoTime();
@@ -197,11 +198,16 @@ public final class HybridSearchService implements KnowledgeSearch {
 
     private Mono<RecallResult> recall(Supplier<List<RecallHit>> operation, SearchBudget budget) {
         return Mono.fromCallable(() -> new RecallResult(operation.get(), null))
-                .subscribeOn(Schedulers.boundedElastic())
+                .subscribeOn(recallScheduler)
                 .onErrorResume(DependencyException.class,
                         exception -> Mono.just(new RecallResult(List.of(), exception.failure())))
                 .timeout(budget.remaining(), Mono.fromSupplier(() -> new RecallResult(List.of(),
                         new Failure(Failure.Code.TIMEOUT, "检索路由未在工具剩余时限内完成", true))));
+    }
+
+    @PreDestroy
+    public void dispose() {
+        recallScheduler.dispose();
     }
 
     private record RecallResult(List<RecallHit> hits, Failure error) {}
