@@ -4,14 +4,15 @@
 
 ## E02 冲突回答修复复验
 
-2026-11-01 以 `dev` 的 `87c48bb` 重新执行测试，使用 Java 17.0.19、真实 PostgreSQL/pgvector、
+2026-11-01 的自动化测试在 `dev` 的 `8d83e6b` 上运行；验收断言修正并合入 `87c48bb` 后，
+真实 E02 在同一 conflict 快照上完成复验。测试使用 Java 17.0.19、真实 PostgreSQL/pgvector、
 DeepSeek `deepseek-chat` 和硅基流动 Embedding／Rerank。conflict 快照为
 `9fe4377e-b373-4187-b364-1165fc3e4766`，包含 3 份文档、8 个条款。
 
 | 检查或用例 | 本次证据与结果 |
 | --- | --- |
 | 默认单元测试 `190/190` | `tests/unit/20261101T080735Z-ef5578c4110b45628de982191be4afc8/` |
-| PostgreSQL 集成测试 `195/195` | `tests/postgres/20261101T080756Z-15a104f0c0db48228dffd79d085c57c1/` |
+| PostgreSQL profile `195/195`（含默认回归） | `tests/postgres/20261101T080756Z-15a104f0c0db48228dffd79d085c57c1/` |
 | 离线问答 Mock `9/9` | `tests/mock/20261101T080745Z-9315f51c9c944161a2a944d70bfce8bc/` |
 | 真实 E02 `3/3` | `real/E02/1a896ff6-2e5d-402e-9235-9a5b54d3efb6/`、`real/E02/9f492d8a-f32e-47ad-939b-6c0361285951/`、`real/E02/ecf4ff6c-a7e8-44ff-ad22-ebf4ae8f839f/` |
 
@@ -19,6 +20,10 @@ DeepSeek `deepseek-chat` 和硅基流动 Embedding／Rerank。conflict 快照为
 缺口和追问均未推荐任一方；同次 Trace 均在读取双方后完成适用关系或替代关系补查，并在补查结果
 进入后续模型调用后结束。一次补查通过 `READ_KNOWLEDGE` 与双方读取同轮发起，修复后的断言按
 callId 和完成顺序正确识别。修复前的错误回答及旧断言误判证据继续保留，不覆盖历史证据。
+
+上述测试与真实 E02 记录均在 `workingTreeDirtyAtStart=true` 时开始。脚本会在执行前创建证据目录，
+因此该标记至少包含未提交运行产物，但现有记录没有保存完整脏文件列表。最终提交前需在干净工作树
+重跑必要入口，不能把本轮记录当作未来最终 SHA 的等价证明。
 
 受限沙箱中的首次单元测试记录
 `tests/unit/20261101T080247Z-4aee64b9dff6486ea007136b920becae/` 保留为环境失败：190 项中
@@ -78,8 +83,9 @@ E02 复核更正：上述 `ea61d620-9563-4a43-b3e7-e481eca8f6f1` 虽返回 `CONF
 | 16 题检索评估 | `COMPLETED`，0 个失败问题 | `retrieval/real/20261101T062009Z-5222daac-179c-4a87-95e4-7b5249fa2a52/` |
 | 离线 Mock | 正常、冲突、资料外、恢复、未观察引用、工具/轮次上限、模型失败 | `mock/E02/`、`mock/E03/`、`mock/E06/`、`mock/E07/`、`mock/E10/` |
 
-自动化测试证据位于 `tests/unit/`、`tests/postgres/`、`tests/qa/` 和 `tests/retrieval/`。最终
-默认测试为 `184/184`，PostgreSQL 集成测试为 `189/189`。测试目录中的 `run.json` 记录 commit、
+自动化测试证据位于 `tests/unit/`、`tests/postgres/`、`tests/qa/` 和 `tests/retrieval/`。该历史轮
+默认测试为 `184/184`，PostgreSQL 集成测试为 `189/189`；E02 修复后的最新结果为 `190/190` 和
+`195/195`，见本文上方。测试目录中的 `run.json` 记录 commit、
 命令、起止时间、退出码和报告计数。
 
 ## 输入与标注
@@ -89,7 +95,7 @@ E02 复核更正：上述 `ea61d620-9563-4a43-b3e7-e481eca8f6f1` 虽返回 `CONF
 - [retrieval-labels.json](retrieval-labels.json)：16 个固定检索问题、相关条款、冲突对和参考答案，绑定三组源文件摘要与集合哈希。
 - [retrieval-labels.template.json](retrieval-labels.template.json)：新增标注用的未填写模板，不能直接计分。
 
-参考标注来源为 `AI_ASSISTED_SOURCE_REVIEW`，状态为 `REFERENCE_REVIEW_PENDING`。它们经过原文逐条核对，但尚未由用户人工复核；条款存在性测试不能证明语义标注正确。修改资料、主题或元数据后，需要重新标注并更新源文件摘要，不能只改哈希绕过复核。
+参考标注来源为 `AI_ASSISTED_SOURCE_REVIEW`，状态为 `REFERENCE_REVIEW_PENDING`。16 条问题、相关条款和参考答案的逐项对照见[参考标注复核](retrieval-labels-review.md)；该记录仍不等同于用户独立确认，条款存在性测试也不能证明语义标注一定正确。修改资料、主题或元数据后，需要重新标注并更新源文件摘要，不能只改哈希绕过复核。
 
 相关条款以 `corpusId + documentId + version + chunkId` 标识，在执行时绑定实际 `snapshotId`。同一资料每次导入生成新的 UUID，因此不预填随机快照。`null` 是未标注，空数组只表示已确认无相关条款；资料外问题不进入正例 Recall／MRR 分母。
 

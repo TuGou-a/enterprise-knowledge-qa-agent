@@ -4,8 +4,10 @@ T09 按用户于 2026-11-01 确认的范围分阶段交付。本阶段补齐已�
 
 ## E02 冲突回答修复复验（2026-11-01）
 
-用户授权使用项目 `.env` 中的真实模型后，以 `dev` 的
-`87c48bba281c2eff043236b180dc36cbf84ed795` 完成复验。测试环境为 Java 17.0.19、Maven 3.9.9、
+用户授权使用项目 `.env` 中的真实模型后，自动化测试以修复提交
+`8d83e6be7802a5e35e0487ff48b8e79270796edb` 运行；验收断言修正并以
+`87c48bba281c2eff043236b180dc36cbf84ed795` 合入后，真实 E02 在该提交上完成复验。
+测试环境为 Java 17.0.19、Maven 3.9.9、
 真实 PostgreSQL/pgvector、DeepSeek `deepseek-chat`、`BAAI/bge-m3` Embedding 和
 `BAAI/bge-reranker-v2-m3` Rerank。新建 conflict 快照
 `9fe4377e-b373-4187-b364-1165fc3e4766`，集合哈希
@@ -15,7 +17,7 @@ T09 按用户于 2026-11-01 确认的范围分阶段交付。本阶段补齐已�
 | 检查 | 实际结果 | 本次证据 |
 | --- | --- | --- |
 | `scripts/run-tests.py unit` | 190 个测试通过，0 失败／错误／跳过 | `examples/tests/unit/20261101T080735Z-ef5578c4110b45628de982191be4afc8/` |
-| `scripts/run-tests.py postgres` | 195 个测试通过，0 失败／错误／跳过 | `examples/tests/postgres/20261101T080756Z-15a104f0c0db48228dffd79d085c57c1/` |
+| `scripts/run-tests.py postgres` | PostgreSQL profile 共 195 个测试通过（含默认回归），0 失败／错误／跳过 | `examples/tests/postgres/20261101T080756Z-15a104f0c0db48228dffd79d085c57c1/` |
 | `scripts/run-tests.py mock` | 9 个完整离线问答场景通过 | `examples/tests/mock/20261101T080745Z-9315f51c9c944161a2a944d70bfce8bc/` |
 | 真实 E02 | 连续 `3/3` 通过新增硬断言 | `examples/real/E02/1a896ff6-2e5d-402e-9235-9a5b54d3efb6/`、`9f492d8a-f32e-47ad-939b-6c0361285951/`、`ecf4ff6c-a7e8-44ff-ad22-ebf4ae8f839f/` |
 
@@ -25,6 +27,11 @@ D02 的 15 个自然日原文，明确指出确认适用关系前不能选取任
 补查，并在补查结果进入后续模型调用后结束；补查形式包含 `SEARCH_KNOWLEDGE` 和
 `READ_KNOWLEDGE`。因此，本次修复覆盖了历史运行中
 “风险提示变相选边”和未读制度否定结论两项验收风险。
+
+上述 unit、postgres、Mock 和真实 E02 记录的 `workingTreeDirtyAtStart` 均为 `true`。测试脚本会在
+开始 Maven 前创建本次证据目录，因此该标记至少包含尚未提交的运行产物；现有记录没有保存开始时
+具体脏文件列表，不能证明其余差异仅为证据目录。最终提交前必须在干净工作树上重跑必要入口，不能
+把本节结果当作未来最终 SHA 的等价证明。
 
 Java 17 首次真实 E02 `examples/real/E02/d9e73d43-1121-462a-99ad-f0f5560cb2cf/` 的回答本身
 正确，但旧断言只接受双方读取完成后才“开始”的 `SEARCH_KNOWLEDGE`，误拒绝了与双方读取同轮
@@ -88,8 +95,9 @@ Recall 与冲突成对召回均为 1.0000。正常组仅 7 条款、冲突组仅
 E02 后续复核发现，上述运行的正确状态和双方引用没有阻止正文建议按 15 天办理，且正文对未读差旅条款作出无依据的否定结论。此次记录只证明请求完成，不能证明 R02 通过；原始输出继续保留。修复后的 `3/3` 真实复验、conflict 快照和断言结果见本节上方的 E02 修复复验，实现与根因见[冲突回答踩坑记录](pitfalls/T07-conflict-answer-advice.md)。
 
 本次主代理的既有核对未识别上述 E02 风险，核对结论据此更正；这不等同于用户人工复核。R08 的真实
-流式总时限／取消后迟到结果、R09 的真实并发实验仍只由确定性测试覆盖。运行记录中的
-`workingTreeDirtyAtStart=true` 来自保留的自动化证据和 Mock 产物，产品源码未修改。
+流式总时限／取消后迟到结果、R09 的真实并发实验仍只由确定性测试覆盖。该历史轮记录的
+`workingTreeDirtyAtStart=true` 至少包含生成中的证据和 Mock 产物，但未保存完整脏文件列表；不能
+仅凭该记录证明产品源码未修改。
 
 ## 最终运行结果（2026-11-01）
 
@@ -204,7 +212,7 @@ python3 scripts/run-tests.py mock
 
 ## 参考标注与快照绑定
 
-[retrieval-labels.json](../examples/retrieval-labels.json) 含 16 个固定问题，覆盖明确术语、语义改写、必要条件、交通票据遗失、冲突、资料替换和资料外问题。`annotationSource=AI_ASSISTED_SOURCE_REVIEW`，`annotationStatus=REFERENCE_REVIEW_PENDING`；这是依照原文形成的参考标注，未经用户人工复核，不作为已确认的质量结论。
+[retrieval-labels.json](../examples/retrieval-labels.json) 含 16 个固定问题，覆盖明确术语、语义改写、必要条件、交通票据遗失、冲突、资料替换和资料外问题。`annotationSource=AI_ASSISTED_SOURCE_REVIEW`，`annotationStatus=REFERENCE_REVIEW_PENDING`；逐题原文对照记录见[参考标注复核](../examples/retrieval-labels-review.md)。这是 AI 依照原文完成的复核，未经用户独立确认，不作为已确认的人类质量结论。
 
 每份资料固定源文件 SHA-256 与 T04 `contentHash`。源文件摘要覆盖元数据和主题标注；T04 集合哈希只覆盖排序后的文档 ID、版本、原文哈希，不能单独证明元数据未改变。相关条款使用 `corpusId + documentId + version + chunkId`，运行时绑定实际 `snapshotId`；不能把一次导入的随机 UUID 当成长期标注身份。
 
@@ -240,7 +248,7 @@ mvn -Preal-evaluation -Dtest=RealRetrievalEvaluationTest \
 | 需求 | 用例 | 当前交付与剩余证据 |
 | --- | --- | --- |
 | R01 明确答案 | E01 | 真实运行 `ANSWERED`，3 轮模型决策、2 次检索、1 次读取；人工语义复核仍待填写。 |
-| R02 文档冲突 | E02 | 真实运行 `CONFLICT`，读取双方并补查适用关系，引用 3 条已读原文。 |
+| R02 文档冲突 | E02 | 修复后真实运行 `3/3` 均为 `CONFLICT`；每次引用 D01、D02 两条已读原文，并在读取双方后完成适用范围、优先级或替代关系补查。 |
 | R03 资料外问题 | E03 | 真实运行 `NO_EVIDENCE`，多次检索后说明资料范围与缺口。 |
 | R04 相似改写 | E04 | 真实运行 `ANSWERED`，与 E01 使用同一条期限依据。 |
 | R05 上下文追问 | E05 | 真实运行 `ANSWERED`，利用历史指向差旅凭证并重新读取当前快照。 |
@@ -250,7 +258,7 @@ mvn -Preal-evaluation -Dtest=RealRetrievalEvaluationTest \
 | R09 资料替换 | E08 | normal 为 30 天，mutation 为 20 天；新请求重新读取并引用 D01 v2。同一进行中请求的并发实时验证仍由单元状态回归覆盖，未做真实并发压测。 |
 | R10 离线入口 | E10 | 默认测试和 PostgreSQL profile 均执行实际服务、AgentScope、工具与校验；证据标记为 `MOCK`。 |
 
-最终至少提交三组真实输入、实际输出及运行记录，覆盖正常、资料不足与工具失败，并覆盖全部验收点。答案支持性、冲突解释、缺口与限制逐项人工核对，记录核对者和时间。引用有效不等于答案受到支持，检索高分也不是回答置信度。
+最终至少提交三组真实输入、实际输出及运行记录，覆盖正常、资料不足与工具失败，并覆盖全部验收点。答案支持性、冲突解释、缺口与限制逐项人工核对，记录核对者和时间；提交前状态见[提交前检查](10-submission-readiness.md)。引用有效不等于答案受到支持，检索高分也不是回答置信度。
 
 真实问答采集入口使用 T07 实际服务，保留真实模型与 PostgreSQL。E06 只在测试配置包装 `EmbeddingClient` 首次调用注入一次 TIMEOUT；相同查询必要路由恢复并补足查证后才解除限制，未恢复时不能返回 `NO_EVIDENCE`。E09 只在首次 Rerank 注入一次 TIMEOUT，后续委托真实客户端；必要查证完整且依据充分时允许披露降级后回答。包装器不能通过生产 HTTP 参数启用，单次注入与后续委托另有单元测试。
 

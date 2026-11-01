@@ -126,7 +126,7 @@ T01 不应仅以未实现的方法桩宣布集成完成。每个任务完成后�
 
 ## 用户授权后的验证计划
 
-最终验证已完成：默认测试 184 项、PostgreSQL 集成 189 项、8 个真实问答、真实 HTTP 和 16 题检索评估均通过。T04 的本机数据库与受控 Embedding 导入验证继续保留，详见 [T04 运行验证](t04-ingestion-verification.md)与 [T05 运行验证](t05-search-verification.md)。最终结果见 [测试与评估](03-evaluation.md#最终运行结果2026-11-01)。
+后端核心验证已完成：E02 修复后默认测试 190 项、PostgreSQL profile 195 项、离线 Mock 9 项均通过，真实 E02 连续 `3/3` 通过；此前 8 个真实问答、真实 HTTP 和 16 题检索评估继续保留。相关运行开始时工作树有未提交差异，最终仍需在干净工作树复跑。T04 的本机数据库与受控 Embedding 导入验证详见 [T04 运行验证](t04-ingestion-verification.md)与 [T05 运行验证](t05-search-verification.md)。最新结果见 [测试与评估](03-evaluation.md#e02-冲突回答修复复验2026-11-01)，提交状态见[提交前检查](10-submission-readiness.md)。
 
 下表保留原计划框架，并已按最终运行结果更新。剩余未做项包括真实流式总时限、取消后迟到结果、R09 并发实验和人工语义复核。
 
