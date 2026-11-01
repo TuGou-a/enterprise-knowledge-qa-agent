@@ -6,13 +6,13 @@
 
 模型服务使用本地确定性 HTTP 桩，不能证明真实硅基流动模型的相关性排序质量、网络延迟、限流或账号可用性。T07 尚未合并，本次没有完整 Agent 工具循环、HTTP 问答或真实 DeepSeek 调用。
 
-后续已把关键行为沉淀为永久 JUnit：`HybridSearchServiceTest`、`KnowledgeEvidenceReaderTest` 和 `T05PostgresIntegrationTest`。集成测试使用 Testcontainers 启动 Docker 中的 `pgvector/pgvector:pg17`，执行正式 schema 并导入 `normal.json`、`conflict.json`；测试尚未运行。
+后续已把关键行为写入永久 JUnit：`HybridSearchServiceTest`、`KnowledgeEvidenceReaderTest` 和 `T05PostgresIntegrationTest`。集成测试使用 Testcontainers 启动 Docker 中的 `pgvector/pgvector:pg17`，执行正式 schema 并导入 `normal.json`、`conflict.json`；2026 年 11 月 1 日已执行，全部通过。
 
 ## 永久 JUnit 审查
 
 审查基线为 `89fbce0`，初版测试提交为 `742d7b9`。两名子代理分别检查规范与契约，未发现生产代码问题或阻断项。审查补充了 RRF 输入顺序、重复候选双路排名与分数、稳定并列、keyword 单路失败、全文加载失败回退、Docker 集成候选数量、证据预算参数及失败路径不解除读取限制等断言。
 
-新增测试共 15 个：`HybridSearchServiceTest` 9 个、`KnowledgeEvidenceReaderTest` 4 个、`T05PostgresIntegrationTest` 2 个。规范与契约复核均已闭环；由于项目流程要求合并后等待测试指令，这些 JUnit 尚未编译或执行，不能记录为通过。
+新增测试共 15 个：`HybridSearchServiceTest` 9 个、`KnowledgeEvidenceReaderTest` 4 个、`T05PostgresIntegrationTest` 2 个。规范与契约复核均已闭环；合并后已在用户授权下完成编译与执行，15 个用例全部通过。
 
 ## 环境
 
@@ -27,12 +27,18 @@
 
 | 检查 | 结果 |
 | --- | --- |
-| `mvn test` | 通过，48 个既有测试，0 失败、0 错误、0 跳过 |
+| `mvn test` | 通过，当前共 63 个测试，0 失败、0 错误、0 跳过 |
 | T05 逻辑级临时验证程序 | 通过，45 项断言 |
 | T05 PostgreSQL 集成临时验证程序 | 通过，26 项断言 |
 | `mvn -DskipTests package` | 通过，生成 `target/backend-0.0.1-SNAPSHOT.jar` |
 
 首次在受限沙箱内运行 `mvn test` 时，4 个既有内嵌 HTTP 测试因禁止绑定本机端口而报 `SocketException: Operation not permitted`；在沙箱外重跑同一命令后全部通过。该差异属于执行环境限制。
+
+## 永久 JUnit 执行结果
+
+2026 年 11 月 1 日在 `dev` 的 `5ff4dd0` 执行 `mvn test`：63 个测试全部通过，其中 T05 新增的 15 个 JUnit 全部通过。`T05PostgresIntegrationTest` 的 2 个用例在 Docker Desktop 启动的 `pgvector/pgvector:pg17` 容器中实际完成 schema 初始化、资料导入、两路召回、排序失败回退、快照隔离和原文读取。
+
+首次执行发现三个测试基础设施缺陷并已修复：AssertJ 对 `Stream` 的断言链位置错误、Testcontainers 动态属性早于容器启动，以及 Maven/Surefire 测试 JVM 的 SOCKS 代理阻断本地 JDBC。相关原因和修复见 [Testcontainers 启动时序](pitfalls/T09-testcontainers-startup.md)与[本地 JDBC SOCKS 代理](pitfalls/T09-local-jdbc-socks-proxy.md)。
 
 ## 逻辑级验证
 
@@ -66,7 +72,7 @@
 ## 未覆盖与限制
 
 - 没有调用真实硅基流动 Embedding／Rerank 或 DeepSeek，未验证真实语义相关性、限流、网络延迟与账号。
-- 新增 `HybridSearchServiceTest`、`KnowledgeEvidenceReaderTest`、`T05PostgresIntegrationTest` 已写入 `src/test/`；由于项目开发流程要求合并后等待测试指令，本次编码阶段尚未执行这些 JUnit。
+- `HybridSearchServiceTest`、`KnowledgeEvidenceReaderTest`、`T05PostgresIntegrationTest` 的 15 个 JUnit 已执行并通过。
 - 未验证多并发请求下的独立召回调度器容量、阻塞 HTTP／JDBC 取消是否立即生效或吞吐上限。
 - 未运行 T07 Agent 工具循环、T08 HTTP 接口、实际回答、引用支持性和 R01–R10 验收。
 - 未完成二元相关条款的人工标注、四种检索方案指标比较或真实模型收益评估。
