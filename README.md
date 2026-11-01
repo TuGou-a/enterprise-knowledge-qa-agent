@@ -2,9 +2,11 @@
 
 面向报销与差旅制度的知识问答项目。通过检索和原文读取工具，帮助员工获得有文档依据的回答；资料冲突或不足时，明确说明限制并请求补充信息。
 
+GitHub 仓库：[TuGou-a/enterprise-knowledge-qa-agent](https://github.com/TuGou-a/enterprise-knowledge-qa-agent)。
+
 T09 测试与交付材料已合入 `dev`。2026-11-01 的 E02 修复在 `8d83e6b` 合入，该提交上的运行记录为默认测试 `190/190`、PostgreSQL profile `195/195`（含默认回归）、离线 Mock `9/9`；验收断言修正后又在 `87c48bb` 上取得真实 E02 `3/3`。此前在 `9aaeaea` 上完成的 E01／E03／E04／E05／E06／E08／E09、真实 HTTP 调用和 16 题四方案检索评估继续保留。结果与证据见[测试与评估](docs/03-evaluation.md)。运行使用 DeepSeek `deepseek-chat`、硅基流动 `BAAI/bge-m3`／`BAAI/bge-reranker-v2-m3` 和真实 PostgreSQL/pgvector。
 
-上述运行记录在开始时已存在未提交差异；其中外层测试记录为 `workingTreeDirtyAtStart=true`，真实问答内层元数据为 `workingTreeDirty=true`，且没有保存具体文件清单，不能据此推断产品源码未被修改。最终仍需在干净工作树上重跑必要入口。核心功能与已有验证材料基本齐备，尚待前端端到端验证、参考标注人工确认、个人事实补充、GitHub 远程配置和最终 SHA 登记。提交前按[提交前检查](docs/10-submission-readiness.md)逐项收口，不以本文的历史测试结果替代最终提交核对。
+上述运行记录在开始时已存在未提交差异；其中外层测试记录为 `workingTreeDirtyAtStart=true`，真实问答内层元数据为 `workingTreeDirty=true`，且没有保存具体文件清单，不能据此推断产品源码未被修改。最终仍需在干净工作树上重跑必要入口。核心功能与已有验证材料基本齐备，尚待前端端到端验证、参考标注人工确认、个人事实补充、评审账号访问和最终 SHA 登记。提交前按[提交前检查](docs/10-submission-readiness.md)逐项收口，不以本文的历史测试结果替代最终提交核对。
 
 ## 文档入口
 
@@ -196,4 +198,4 @@ PostgreSQL 驱动版本交由现有 Spring Boot 依赖管理。业务服务通�
 
 验收材料至少覆盖明确答案、文档冲突、资料外问题、相似改写、上下文追问和工具失败；另验证执行上限与文档替换。Mock 验证流程，真实模型 Trace 证明动作调整，二者分别标注，结果引用对应文件。
 
-当前 Git 根目录、`pom.xml`、`src/`、README 与 `docs/` 位于同一项目根目录。T07 问答业务及 T09 执行入口已运行并保存证据；E02 冲突回答修复已完成真实复验。前端端到端验证、参考标注人工确认、实际投入时间、个人修改、题号、GitHub URL 和最终 commit SHA 仍需收口，不预填不存在的事实。
+当前 Git 根目录、`pom.xml`、`src/`、README 与 `docs/` 位于同一项目根目录。T07 问答业务及 T09 执行入口已运行并保存证据；E02 冲突回答修复已完成真实复验。前端端到端验证、参考标注人工确认、实际投入时间、个人修改、题号、评审账号访问和最终 commit SHA 仍需收口，不预填不存在的事实。

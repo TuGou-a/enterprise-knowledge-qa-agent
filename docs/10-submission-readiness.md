@@ -14,13 +14,14 @@
 | 参考标注 | AI 已逐题对照原文，仍待用户独立确认 | [参考标注复核](../examples/retrieval-labels-review.md) |
 | 前端页面 | 仅完成静态代码审查，尚未完成浏览器端到端验证 | `src/main/resources/static/` |
 | 密钥安全 | 真实 `.env` 已忽略；现有提交未发现真实密钥 | `.gitignore`、`.env.example` |
+| GitHub 仓库 | 私有仓库已创建，远端默认分支为 `main` | <https://github.com/TuGou-a/enterprise-knowledge-qa-agent> |
 
 ## 尚未完成
 
 - **前端端到端验证：**需要在合并后的最终代码上启动应用，打开首页，验证问题提交、连续追问、新建对话、引用展开、错误提示和移动端基本布局。
 - **参考标注人工确认：**AI 已对照原文，但不能把 `REFERENCE_REVIEW_PENDING` 改成 `HUMAN_REVIEWED`；需用户确认 16 条标注和真实回答的语义支持性。
 - **用户个人事实：**题号、实际投入时间、本人亲自修改或判断、最终 commit SHA 目前没有完整记录。
-- **仓库发布：**交付仓库尚未配置 GitHub remote；隔离克隆中的 `origin` 只指向本地工作副本，不能作为 GitHub URL，也无法确认指定评审账号是否有权限。
+- **评审访问：**仓库当前为私有，必须邀请指定评审账号或按提交要求改为公开，否则评审无法访问。
 - **最终运行绑定：**以下测试记录对应修复和证据提交，不是未来全部文档与提交信息收尾后的最终 SHA。最终提交前应确认工作树干净，并在最终 SHA 上重新核对必要入口。
 
 ## 最终提交步骤
@@ -28,7 +29,7 @@
 1. 用户确认前端验证指令后，在合并后的 `dev` 上执行默认测试、离线 Mock、数据库集成测试和一次真实 HTTP／浏览器冒烟；保存失败记录，不覆盖历史证据。
 2. 用户确认 16 条参考标注和真实回答的语义支持性；如仍有修改，先重新评估并更新证据。
 3. 填写题号、实际投入、个人贡献和独立验证结果；不填写推测值。
-4. 配置 GitHub remote、推送 `dev` 和提交对象，并检查仓库可见性或评审账号权限。
+4. 确认 `main` 已推送，并邀请指定评审账号或按提交要求调整仓库可见性。
 5. 确认 `.env`、`target/`、`.idea/`、`reference-code/` 和临时 worktree 不在提交内容中；运行 `git status --short` 应为空。
 6. 从最终提交读取完整 SHA，将其与题号、GitHub URL 一起提交；不再修改仓库后复用旧 SHA。
 
@@ -38,7 +39,7 @@
 
 ```text
 题号：
-GitHub URL：
+GitHub URL：https://github.com/TuGou-a/enterprise-knowledge-qa-agent
 最终 commit SHA：
 实际投入：
 个人贡献：
