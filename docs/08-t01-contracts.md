@@ -105,7 +105,7 @@ T04 在导入边界一次性校验资料字段、唯一键、偏移/substring/�
 
 Embedding 输入非空、数量及单文本长度在 T02 接收边界检查；`EmbeddingBatch.vectors[i]` 严格对应输入 `texts[i]`，外部返回顺序由 T02 按 index 还原。按架构请求 `encoding_format=float`，不发送 `dimensions`。服务响应 ID 和 usage 可为空，不能把缺失计量伪造为 0。
 
-Rerank 输入保持本地条款全文，不信任服务返回的文本。`topN` 必须位于 1 至候选数量，返回数量必须等于 topN，`RerankScore.inputIndex` 不重复且处于输入范围，相关性分数必须有限。T02 只验证协议，不做 RRF 回退。T05 将 inputIndex 映射到本次 `SearchMetrics.rerankInputKeys`，按分数降序、RRF 名次和稳定片段键打破并列。
+Rerank 输入保持本地条款全文，不信任服务返回的文本。`topN` 必须位于 1 至候选数量，返回数量必须等于 topN，`RerankScore.inputIndex` 不重复且处于输入范围，相关性分数必须有限。T02 只验证协议，不做 RRF 回退。用户在 T05 访谈中确认：T05 请求完整融合池的分数，即 `topN=候选池大小`，将 inputIndex 映射到本次 `SearchMetrics.rerankInputKeys`，按分数降序、RRF 名次和稳定片段键打破并列后再取 effective topK。
 
 `KnowledgeStore.loadChunks(snapshotId, keys, timeout)` 批量读取重排序前候选池对应的完整本地条款，返回顺序严格对应 keys；只接受同一固定快照的去重键。缺任一条款、快照不符或数据库失败时整批抛 DependencyException，不返回部分列表。这是检索内部素材读取，不调用 EvidenceRegistry，不能代替模型主动调用 readKnowledge。T05 在该批量读取失败时跳过云端重排序、整批回退 RRF，把错误记入 rankingWarnings；主题扩展仍执行，若主题扩展本身也失败，必须作为工具失败传播，不能伪装成完整扩展。
 
@@ -115,7 +115,7 @@ Rerank 输入保持本地条款全文，不信任服务返回的文本。`topN` 
 
 T07 工具边界检查查询非空白及长度，去除首尾空白后创建 `SearchRequest`；原始 topK 缺省取配置主候选上限，其余夹取到 1 至配置上限，再将非空 int 传给 SearchRequest。当前默认上限为 6。T07 Trace 同时记录 requested 和 effective 参数，T05 使用 effective 值生成 `SearchScope(snapshotId, query, topK)`。
 
-`Candidate` 包含预览、两路排名、RRF 分数、可空重排序分数和来源。未进入某一路的 rank 为 null；主题扩展在融合池外时 RRF 为 0、两路 rank 与 rerankScore 可为空。排名从 1 开始，分数不是置信度或制度优先级。`TopicGroup.members` 按 topicKey 关联本次返回的主候选与相关候选；truncated 仅表示该主题尚未完整呈现。
+`Candidate` 包含预览、两路排名、RRF 分数、可空重排序分数和来源。未进入某一路的 rank 为 null；主题扩展在融合池外时 RRF 为 0、两路 rank 与 rerankScore 可为空。排名从 1 开始，分数不是置信度或制度优先级。`TopicGroup.members` 按 topicKey 关联本次返回的主候选与相关候选。用户在 T05 访谈中确认沿用单次全局主题扩展：全局未截断时各组 truncated=false；全局截断时全部种子主题组均保守标记 truncated=true，表示主题完整性未能确认，不能据此声称已精确定位遗漏主题。
 
 `Routes` 分别表示 vector、keyword、rerank。必要召回正常且为空仍为 OK；无词元时关键词正常返回空，不伪造失败。无候选时 Rerank 为 `SKIPPED_EMPTY`，rankingMode 为 `NONE`；成功排序为 `RERANK`。重排序超时、无效下标、输入受限等整批使用 RRF，标记 `ERROR/RRF_FALLBACK`、rankingWarnings 和 degraded；不加入必要召回 unresolvedErrors，且仍执行独立主题扩展。
 
